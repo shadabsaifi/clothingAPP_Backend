@@ -1,0 +1,80 @@
+<section class="content-header">
+        <h1>
+            Add Boost Package
+            <small></small>
+        </h1>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#">
+                    <i class="fa fa-dashboard"></i> Home</a>
+            </li>
+            <li class="active">Product Management</li>
+            <li class="active">Add Premium Package</li>
+        </ol>
+    </section>
+    <section class="content">
+        <div class="inner-content static-content">
+            <div class="panel panel-default custom-panel">
+                <div class="panel-body">
+                    <div class="common-form-center">
+                        <form class="form-horizontal" name="addNewPackage">
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Name:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control custum-formcontrol" name="boostName" ng-model="obj.boostName" placeholder="Enter Name" ng-maxlength="52" ng-minlength="2" pattern="[a-zA-Z0-9 ]+"
+                                        required>
+                                    <span style="color:red;" ng-show="addNewPackage.boostName.$dirty && addNewPackage.boostName.$invalid">
+                                        <span ng-show="addNewPackage.boostName.$error.required">Name is required.</span>
+                                        <span ng-show="addNewPackage.boostName.$error.pattern">Name is invalid</span>
+                                        <span ng-show="addNewPackage.boostName.$error.maxlength && !addNewPackage.boostName.$error.pattern">Name is too large.</span>
+                                        <span ng-show="addNewPackage.boostName.$error.minlength && !addNewPackage.boostName.$error.pattern">Name is too short.</span>
+                                        
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                    <label class="control-label col-sm-4">Coins:</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control custum-formcontrol" name="boostValueInCoins" ng-model="obj.boostValueInCoins" placeholder="Enter Coins"  ng-pattern= "/^[0-9]*$/" ng-maxlength="10" required>
+                                        <span style="color:red;" ng-show="addNewPackage.boostValueInCoins.$dirty && addNewPackage.boostValueInCoins.$invalid">
+                                            <span ng-show="addNewPackage.boostValueInCoins.$error.required">Coin is required.</span>
+                                            <span ng-show="addNewPackage.boostValueInCoins.$error.pattern">Coins type is invalid.</span>
+                                            <span ng-show="addNewPackage.boostValueInCoins.$error.maxlength && !addNewPackage.boostValueInCoins.$error.pattern">Coins value is too large</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                        <label class="control-label col-sm-4">Boost Qty:</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control custum-formcontrol" name="boostQty" ng-model="obj.boostQty" placeholder="Enter boost" ng-maxlength="10" ng-pattern="/^\d+$/" required>
+                                            <span style="color:red;" ng-show="addNewPackage.boostQty.$dirty && addNewPackage.boostQty.$invalid">
+                                                <span ng-show="addNewPackage.boostQty.$error.required">Boost is required.</span>
+                                                <span ng-show="addNewPackage.boostQty.$error.pattern">Boost type is invalid.</span>
+                                                <span ng-show="addNewPackage.boostQty.$error.maxlength && !addNewPackage.boostQty.$error.pattern">Boost value is too large.</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4">Description:</label>
+                                <div class="col-sm-8">
+                                
+                                    <textarea class="form-control" rows="5" name="boostDesc" ng-model="obj.boostDesc" id="comment"  ng-maxlength="200" ng-minlength="2" required placeholder="Enter Description" ng-pattern="/^[ A-Za-z0-9_@./#%&]*$/"></textarea> 
+                                    <span style="color:red;" ng-show="addNewPackage.boostDesc.$dirty && addNewPackage.boostDesc.$invalid">
+                                        <span ng-show="addNewPackage.boostDesc.$error.required">Package description is required.</span>
+                                        <span ng-show="addNewPackage.boostDesc.$error.pattern">Package description is invalid.</span>
+                                        <span ng-show="addNewPackage.boostDesc.$error.maxlength && !addNewPackage.boostDesc.$error.pattern">Package description is too large.</span>
+                                        <span ng-show="addNewPackage.boostDesc.$error.minlength && !addNewPackage.boostDesc.$error.pattern">Package description is too short.</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group button-center">
+                                <div class="col-sm-12">
+                                    <button type="submit" class="btn btn-primary" ng-click="savePackage()" ng-disabled="addNewPackage.$invalid">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>

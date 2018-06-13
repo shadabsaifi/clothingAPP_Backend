@@ -1,0 +1,112 @@
+<section class="content-header">
+    <h1>
+        Add Premium Package
+        <small></small>
+    </h1>
+    <ol class="breadcrumb">
+        <li>
+            <a href="#">
+                <i class="fa fa-dashboard"></i> Home</a>
+        </li>
+        <li class="active">Subscription Package Management</li>
+        <li class="active">Add Premium Package</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="inner-content static-content">
+        <div class="panel panel-default custom-panel">
+            <div class="panel-body">
+                <div class="common-form-center">
+                    <form class="form-horizontal" name="addNewPackage">
+                        <!-- <div class="form-group">
+                        <label class="control-label col-sm-4">Package Image</label>
+                        <div class="col-sm-8">
+                            <div class="uplaoad-image">
+                                 <div class="image-box">
+                                      <img ng-src={{obj.packageImage}} alt="Image Placeholder">
+                                 </div>
+                               <button ng-click="click()" class="uplode-img-button"> Submit</button>
+                            </div>
+                            <span ng-show="imageValue" style="color:red;">Image is required</span>
+                            <input type="file" name="pic" value="PackagePic">
+                        </div>
+                         <div class="col-sm-5">
+                            <img ng-src={{obj.packageImage}} alt="Image Placeholder" style="height: 40px;width: 40px">
+                        </div> -->
+                        <!-- </div> -->
+                        
+                           <!-- <div class="form-group">
+                            <label class="control-label col-sm-4">Amount:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control custum-formcontrol" name="packageType" ng-model="obj.packageType" placeholder="Enter Package Type"
+                                    ng-pattern="/^[a-z ,.'-]+$/i" required>
+                                <span style="color:red;" ng-show="addNewPackage.packageType.$dirty && addNewPackage.packageType.$invalid">
+                                    <span ng-show="addNewPackage.packageType.$error.required">Package Type is required.</span>
+                                    <span ng-show="addNewPackage.packageType.$error.pattern">Package type is Invalid</span>
+                                </span>
+                            </div>
+                        </div> -->
+                        <!-- <div class="form-group">
+                            <label class="control-label col-sm-4">Package Name:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control custum-formcontrol " name="packageName" ng-model="obj.packageName" placeholder="Enter Package Name"
+                                    required>
+                                <span style="color:red;" ng-show="addNewPackage.packageName.$dirty && addNewPackage.packageName.$invalid">
+                                    <span ng-show="addNewPackage.packageName.$error.required">Package Name is required.</span>
+                                    <span ng-show="addNewPackage.packageName.$error.pattern">Package Name is Invalid</span>
+                                </span>
+                            </div>
+                        </div> -->
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Amount:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control custum-formcontrol" name="amount" ng-model="obj.amount" placeholder="Enter Amount" maxlength="10" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/"
+                                    required>
+                                <span style="color:red;" ng-show="addNewPackage.amount.$dirty && addNewPackage.amount.$invalid">
+                                    <span ng-show="addNewPackage.amount.$error.required">Package price is required.</span>
+                                    <span ng-show="addNewPackage.amount.$error.pattern">Package price is Invalid</span>
+                                </span>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group">
+                            <label class="control-label col-sm-4">timePeriod:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control custum-formcontrol" name="timePeriod" ng-model="obj.timePeriod" placeholder="Enter timePeriod" required>
+                                <span style="color:red;" ng-show="addNewPackage.timePeriod.$dirty && addNewPackage.timePeriod.$invalid">
+                                    <span ng-show="addNewPackage.timePeriod.$error.required">timePeriod is required.</span>
+                                    <span ng-show="addNewPackage.timePeriod.$error.pattern">timePeriod is Invalid</span>
+                                </span>
+                            </div>
+                        </div> -->
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Time Period:</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control custum-formcontrol" name="timePeriod" ng-model="obj.timePeriod" placeholder="Enter Number Of Days" ng-pattern="/^\d+$/" maxlength="5" required>
+                                <span style="color:red;" ng-show="addNewPackage.timePeriod.$dirty && addNewPackage.timePeriod.$invalid">
+                                    <span ng-show="addNewPackage.timePeriod.$error.required">Time period is required.</span>
+                                    <span ng-show="addNewPackage.timePeriod.$error.pattern">Time period is Invalid</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-sm-4">Description:</label>
+                            <div class="col-sm-8">
+                                <!-- <input type="text" class="form-control"  placeholder="Enter Features" name="features"> -->
+                                <textarea class="form-control" rows="5" name="description" ng-model="obj.description" id="comment" required></textarea>
+                                <span style="color:red;" ng-show="addNewPackage.description.$dirty && addNewPackage.description.$invalid">
+                                    <span ng-show="addNewPackage.description.$error.required">Package description is required.</span>
+                                    <span ng-show="addNewPackage.description.$error.pattern">Package description is Invalid</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group button-center">
+                            <div class="col-sm-12">
+                                <button type="submit" class="btn btn-primary" ng-click="savePackage()" ng-disabled="addNewPackage.$invalid">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

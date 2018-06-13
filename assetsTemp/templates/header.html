@@ -1,0 +1,117 @@
+<div class="wrapper">
+
+    <header class="main-header  custom-header">
+       <!-- Logo -->
+       <a href="" class="logo">
+          <!-- mini logo for sidebar mini 50x50 pixels -->
+          <span class="logo-mini"><b>TC</b></span>
+          <!-- logo for regular state and mobile devices -->
+          <span class="logo-lg"><b>Clothing</b></span>
+       </a>
+       <!-- Header Navbar: style can be found in header.less -->
+       <nav class="navbar navbar-static-top">
+          <!-- Sidebar toggle button-->
+          <a href="" class="sidebar-toggle" data-toggle="push-menu" role="button">
+          <span class="sr-only">Toggle navigation</span>
+          </a>
+          <!-- Navbar Right Menu -->
+          <div class="navbar-custom-menu">
+             <ul class="nav navbar-nav">
+              
+                <!-- User Account: style can be found in dropdown.less -->
+                <li class="dropdown user user-menu">
+                   <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                   <img ng-src={{profilePic}} class="user-image" alt="User Image">
+                   <span class="hidden-xs">{{name}}</span>
+                   </a>
+                   <ul class="dropdown-menu">
+                      <!-- User image -->
+                      <li class="user-header">
+                         <img src={{profilePic}} class="img-circle" alt="User Image">
+                         <h4>{{name}}&nbsp;<small>{{createdAt}}</small>
+                         </h4>
+                      </li>
+                      <!-- Menu Body -->
+ 
+                      <!-- Menu Footer-->
+                      <li class="user-footer">
+                         <div class="pull-left">
+                            <a href="#/header/viewAdminProfile"  class="btn btn-default btn-flat">Profile</a>
+                         </div>
+                         <div class="pull-right">
+                            <a href="" class="btn btn-default btn-flat"  data-toggle="modal" data-target="#logout">Logout</a>
+                         </div>
+                      </li>
+                   </ul>
+                </li>
+                <!-- Control Sidebar Toggle Button -->
+            </ul>
+          </div>
+       </nav>
+    </header>
+    <!-- Left side column. contains the logo and sidebar -->
+    <aside class="main-sidebar custom-sidebar">
+       <!-- sidebar: style can be found in sidebar.less -->
+       <section class="sidebar">
+          <!-- Sidebar user panel -->
+          <div class="user-panel">
+             <div class="user-image image">
+                <img src={{profilePic}} class="img-circle" alt="User Image">
+             </div>
+             <div class="user-name">
+                <p>{{name}}</p>
+             </div>
+          </div>
+     
+ 
+   
+         
+ 
+ 
+         <ul class="sidebar-menu custmside-menu" data-widget="tree">
+             <li ng-class="{ active: isActive('/header/dashBoard')||isActive('/header/viewAdminProfile')||isActive('/header/updateAdmin') }"><a href="#/header/dashBoard"><i class="fa fa-dashboard"></i><span>Dashboard</span></a></li>
+             <li ng-class="{ active: isActive('/header/userMgmt')||isActive('/header/viewUser')}"><a href="#/header/userMgmt"><i class="fa fa-files-o"></i><span>User Management</span></a></li>
+             <li ng-class="{ active: isActive('/header/subPackageMgmt') || isActive('/header/viewPackage') || isActive('/header/addNewPackage')}"><a href="#/header/subPackageMgmt"><i class="fa fa-th"></i><span>Subscription Package Mgmt</span></a></li>
+             <li ng-class="{ active: isActive('/header/boostList')||isActive('/header/addBoostPackage')||isActive('/header/viewBoost') }"><a href="#/header/boostList" ><i class="glyphicon glyphicon-usd"></i><span>Boost Account Mgmt</span></a></li>
+             <li ng-class="{ active: isActive('/header/static') }"><a href="#/header/static"><i class="fa fa-pie-chart"></i><span>Static Content Management</span></a></li>
+             <li><a href="" data-toggle="modal" data-target="#logout"><i class="fa fa-laptop"></i><span>Logout</span></a></li>
+         </ul>
+       </section>
+ 
+       
+ 
+       <!-- /.sidebar -->
+    </aside>
+    <div class="content-wrapper">
+       <div ui-view style="padding-top: 70px;"></div>
+    </div>
+    <!-- /.content-wrapper -->
+    <footer class="main-footer custom-footer">
+       
+       <strong>Copyright &copy; 2014-2016.</strong> All rights reserved.
+       <div class="pull-right hidden-xs">
+          <b>Version</b> 2.4.0
+       </div>
+    </footer>
+   
+ 
+                 <div class="modal fade modal-block" id="logout" role="dialog">
+                     <div class="modal-dialog">
+                         <!-- Modal content-->
+                         <div class="modal-content">
+                             <div class="modal-header custum-modal-header">
+                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                 <h4 class="modal-title"></h4>
+                             </div>
+                             <div class="modal-body">
+                                 <p class="text-center">Are you sure you want to logout?</p>
+                             </div>
+                             <div class="modal-footer custum-modal-footer">
+                                 <button type="button" class="btn btn-default btn-blue" data-dismiss="modal" ng-click="logout();">Yes</button>
+                                 <button type="button" class="btn btn-default btn-red" data-dismiss="modal">No</button>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+ 
+ </div>

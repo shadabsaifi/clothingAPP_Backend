@@ -1,0 +1,152 @@
+<section class="content-header">
+    <h1>
+        Premium Account Management
+        <small></small>
+      </h1>
+    <ol class="breadcrumb">
+        <li><a href=""><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">    Premium Account Management</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="inner-content static-content">
+        <div class="panel panel-default custom-panel">
+            <div class="panel-body">
+                <div ng-show="packagesTable">
+                    <div class="search-bar">
+                        <input type="text" ng-model="packageSearch" ng-keyup="packageSearchFn()" placeholder="Search" ng-change="validation1()">
+                        <button class="fa fa-search text-center custum-search" ng-click="packageSearchFn()" ng-disabled="packageSearchDisabler"></button>
+                    </div>
+                </div>
+                <div ng-show="subsAndTransTable">
+                    <div class="search-bar">
+                        <input type="text" ng-model="subsAndTransSearch" ng-keyup="subsAndTransSearchFn()" placeholder="Search" ng-change="validation2()">
+                        <button class="fa fa-search text-center custum-search" ng-click="subsAndTransSearchFn()" ng-disabled="subsSearchDisabler"></button>
+                    </div>
+                </div>
+                <br>
+                <div class="custum-tab-pckg">
+                    <button class="btn-primary modify first" ng-click="package()">Packages</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button class="btn-primary modify second" ng-click="subsAndTrans()">Subscriptions And Transactions</button>
+                </div>
+                <br>
+                <div ng-show="packagesTable">
+                    <div class="button-right">
+                        <button class="btn btn-primary" ng-click="addPremiumPack();">Add premium Plan</button>
+                    </div>
+                    <br>
+                    <div class="custom-table table-responsive">
+                        <table border="1" class="table table-bordered">
+                            <tr>
+                                <th>ID</th>
+                            
+                                <th>Amount</th>
+                   
+                                <th>Time Period</th>
+                                <th>Description</th>
+                                <th>Created on</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr ng-repeat="data in packageData">
+                                <td>{{$index+1+a}}</td>
+                              
+                                <td>{{data.amount}}</td>
+                         
+                                <td>{{data.timePeriod}}</td>
+                                <td>{{data.description}}</td>
+                                <td>{{data.createdAt.substring(0,10)}}</td>
+                                <td class="action-buttons">
+                                    <a class="btn btn-primary btn-sm" ng-click="viewPackage(data);"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp; View</a>&nbsp;&nbsp;&nbsp;
+                                    <a class="btn btn-danger btn-sm" ng-click="deletePackage(data);" data-toggle="modal" data-target="#delPackage"><i class="fa fa-trash-o" aria-hidden="true" ></i>&nbsp; Delete</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <pagination class="custom-pagination" boundary-links="true" total-items="totalItems" items-per-page="itemsPerPage" ng-model="currentPage" ng-change="newPage()" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;">
+                    </pagination>
+                </div>
+                <div ng-show="subsAndTransTable">
+                    <div class="custom-table table-responsive">
+                        <table border="1" class="table table-bordered">
+                            <tr>
+                                <th>ID</th>
+                                <th>Transction Number</th>
+                                <th>Package Name</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr ng-repeat="data in subsData">
+                                <td>{{$index+1+b}}</td>
+                                <td>{{data.transactionNumber}}</td>
+                                <td>{{data.packageName}}</td>
+                                <td>{{data.amount}}</td>
+                                <td>{{data.createdAt}}</td>
+                                <td>
+                                    <a class="btn btn-primary btn-sm" ng-click="viewTransaction(data);" data-toggle="modal" data-target="#view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp; View</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <pagination class="custom-pagination" boundary-links="true" total-items="totalItemsSubs" items-per-page="itemsPerPageSubs" ng-model="currentPageSubs" ng-change="newPageSubs()" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;">
+                    </pagination>
+                </div>
+                <div id="view" class="modal fade custom-modal" role="dialog">
+                    <div class="modal-dialog">
+                  
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Transaction Details</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="forgotpassword-block">
+                                    <form>
+                                        <div class="row">
+                                            <label class="col-sm-4">Transction Number</label>
+                                            <div class="col-sm-6">{{viewThisTrans.transactionNumber}}</div>
+                                        </div>
+                               
+                                        <div class="row">
+                                            <label class="col-sm-4">Amount</label>
+                                            <div class="col-sm-6">{{viewThisTrans.amount}}</div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-sm-4">Date And Time</label>
+                                            <div class="col-sm-6">{{viewThisTrans.createdAt}}</div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="col-sm-4">Made By</label>
+                                            <div class="col-sm-6">{{viewThisTrans.madeBy.name}}</div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade modal-block" id="delPackage" role="dialog">
+                    <div class="modal-dialog">
+                       
+                        <div class="modal-content">
+                            <div class="modal-header custum-modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title"></h4>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-center">Are you sure you want to DELETE this Premium.</p>
+                            </div>
+                            <div class="modal-footer custum-modal-footer">
+                                <button type="button" class="btn btn-default btn-blue" data-dismiss="modal" ng-click="finalDelete();">Yes</button>
+                                <button type="button" class="btn btn-default btn-red" data-dismiss="modal">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
