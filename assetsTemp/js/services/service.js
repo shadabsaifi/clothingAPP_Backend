@@ -1,8 +1,8 @@
 app.service('tapNCultureService',['$http','$q',function($http,$q){
 
 	let self=this;
-	let baseUrl="http://localhost:8000/admin/";
-	//  let baseUrl="http://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:4646/admin/"
+	let baseUrl="http://localhost:1468/admin/";
+	//  let baseUrl="http://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:1468/admin/"
 	
 	self.profile=()=>{
 		return httpMethod("get", "profile")
