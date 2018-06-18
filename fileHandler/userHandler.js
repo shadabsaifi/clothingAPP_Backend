@@ -224,12 +224,24 @@ var randomstring = require("randomstring")
                         if (err)
                             return commonFile.responseHandler(res, 400, "Internal Server Error.")
                         else if (secondResult)
-                            return commonFile.responseHandler(res, 409, "Enail id already Regisetered.")
+                            return commonFile.responseHandler(res, 409, "Email id already Registered.")
                         else {
                             commonFile.createHash(req.body.password, (err, password)=>{
                                 if(err)
                                     console.log(err)
                                 else{
+                                    var name = (req.body.name).toLowerCase();
+                                    var fullName = ""
+                                    let array = name.split(" ")
+                                    
+                                    var i = 0
+                                    
+                                    do{
+                                        fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1)+" ";
+                                        i++;
+                                    }while(i<array.length)
+                                    
+                                    req.body.name = fullName
                                     console.log("password====>>>",password)
                                     req.body.password = password
                                     new user(req.body).save((err, result) => {
@@ -669,20 +681,20 @@ var randomstring = require("randomstring")
         // let pattern = new RegExp('^'+req.body.search,'i')
         re = new RegExp(pattern, 'gi');
 
-        user.findOne({_id:req.body.userId}, (err, userResult)=>{
+        user.findOne({_id:req.body.userId}).populate('myFavourite.product').exec((err, userResult)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else{
                 
                 let query = { bodyType:userResult.bodyType }
 
-                if(req.body.search && req.body.productName){
+                if(req.body.search && req.body.productName.length){
             
                     query.$and = [{productName:{ $in:req.body.productName }},{productName:re}]
                     console.log("and========>>>",query) 
                 }
                 else{
-                    if(req.body.productName){
+                    if(req.body.productName.length){
                         query.productName = { $in:req.body.productName }
                         console.log("or========>>>",query)
                     }
@@ -694,6 +706,7 @@ var randomstring = require("randomstring")
                 }
         
                 let options = {
+                    lean:true,
                     page:req.body.page || 1,
                     limit:req.body.limit || 10
                 }
@@ -704,11 +717,80 @@ var randomstring = require("randomstring")
                 product.paginate(query, options, (err, result)=>{
                     if (err)
                         return commonFile.responseHandler(res, 400, "Internal Server Error.")
-                    else
+                    else{
+
+                        result.docs.map((x)=>{
+                            let index = userResult.myFavourite.findIndex((y)=> y.product._id.toString() === x._id.toString())
+                            if(index != -1){
+                                x.isLike = true
+                            }
+                            else{
+                                x.isLike = false
+                            }
+                        })
+                        
                         return commonFile.responseHandler(res, 200, "Success.", result)
+                    }
+                        
                 })
             }
         })
+    },
+
+
+
+
+      // @@@@@@@@@@@@@@@@@@@@@@@  productDetail Api to show the product Detail   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    productDetail:(req, res)=>{
+        console.log("req.body========>>>>",req.body)
+        product.findById({ _id:req.body.productId, status:"ACTIVE" }, (err, result)=>{
+            if (err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else
+                return commonFile.responseHandler(res, 200, "Success", result)
+        })
+
+    },
+
+
+
+ // @@@@@@@@@@@@@@@@@@@@@@@  productName Api to show the Product Name List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    productNameList:(req, res)=>{
+
+        // let n = req.body.page || 1
+        // let m = req.body.limit || 10
+        
+        let masterQuery = [
+            {
+                $group: { _id: "$productName", productQuantity: { $sum: 1 } }
+            },
+            { 
+                $sort: {  _id:1 } 
+            }
+        ]
+
+        product.aggregate(masterQuery, (err, result)=>{
+            if (err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else{
+                
+                // pagination start 
+
+                // let showData = result.slice((n-1)*m, n*m)
+                // let finalObj = { 
+                //     BrandList:showData,
+                //     page:n,
+                //     limit:m,
+                //     total:result.length,
+                //     pages:Math.ceil(result.length/m)
+                // }
+                // return commonFile.responseHandler(res, 200, "Success", finalObj)
+                return commonFile.responseHandler(res, 200, "Success", result)
+            }
+        })
+
     },
 
 

@@ -37,8 +37,8 @@ module.exports = {
         user: "nj7870@gmail.com"
     },
     server_port: process.env.PORT || 1468,
-    mongo_url:"mongodb://localhost:27017/clothing",
-    // mongo_url:"mongodb://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:27017/clothing",
+    // mongo_url:"mongodb://localhost:27017/clothing",
+    mongo_url:"mongodb://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:27017/clothing",
     jwt1SecretKey:"anujdubeyNode",
     jwtSecretKey:"clothing",
     cloud:{

@@ -46,18 +46,7 @@ module.exports = {
         if (!req.body.email || !req.body.password) {
             return commonFile.responseHandler(res, 401, "Error: Credentials missing")
         }
-        admin.findOne({
-            email: req.body.email
-        }, {
-            name: 1,
-            email: 1,
-            profilePic: 1,
-            password: 1,
-            accountID: 1,
-            location: 1,
-            phoneNumber:1,
-            createdAt:1
-        }).lean().exec((err, result) => {
+        admin.findOne({ email: req.body.email }).lean().exec((err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Error: In login function")
             else if (result) {
@@ -137,6 +126,149 @@ module.exports = {
 
 
 
+    // @@@@@@@@@@@@@@@@@@@@@@@  addNewUser Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    addNewUser: (req, res)=>{
+        console.log("req.body========>>>>",req.body)
+
+            if (!req.body.name || !req.body.email || !req.body.age || !req.body.bodyType || !req.body.height || !req.body.weight) {
+                return commonFile.responseHandler(res, 400, "Parameter missing.")
+            }
+            user.findOne({ email: req.body.email }, (err, firstResult) => {
+                if (err)
+                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                else if (firstResult)
+                    return commonFile.responseHandler(res, 409, "Email id already Registered.")
+                else{
+                    var name = (req.body.name).toLowerCase();
+                    var fullName = ""
+                    let array = name.split(" ")
+                    
+                    var i = 0
+                    
+                    do{
+                        fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1)+" ";
+                        i++;
+                    }while(i<array.length)
+                    
+                    req.body.name = fullName
+                    req.body.status = "ACTIVE"
+                    new user(req.body).save((err, result)=>{
+                        if (err)
+                            return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                        else
+                            return commonFile.responseHandler(res, 200, "You have Successfully Add New User.")
+                   })
+                }
+            })
+
+    },
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@  userDetail Api to to Show the Details  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    userDetail:(req,res)=>{
+        console.log("req.body========>>>>",req.body)
+        console.log("req.params========>>>>",req.params)
+        let query = { status:"ACTIVE" }
+        if(req.body.userId){
+            query._id = req.body.userId
+        }
+        if(req.params.userId){
+            query._id = req.params.userId
+        }
+        user.find(query, (err,result)=>{
+         if(err){
+            return commonFile.responseHandler(res, 400, "Internal server error")
+         }
+         else if(!result){
+            return commonFile.responseHandler(res, 400, "Error: No such user exists")
+         }
+         else{
+            return commonFile.responseHandler(res, 200, "Success: admin details.",result)
+         }
+        })
+    },
+
+
+     // @@@@@@@@@@@@@@@@@@@@@@@  editUser Api to to Show the Details  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    editUser: (req, res)=>{
+        if (!req.body.userId) {
+            return commonFile.responseHandler(res, 400, "Parameter missing.")
+        }
+
+        let updateObj = {  }
+
+        if(req.body.name){
+            updateObj.name = req.body.name
+        }
+        if(req.body.email){
+            updateObj.email = req.body.email
+        }
+        if(req.body.age){
+            updateObj.age = req.body.age
+        }
+        if(req.body.bodyType){
+            updateObj.bodyType = req.body.bodyType
+        }
+        if(req.body.height){
+            updateObj.height = req.body.height
+        }
+        if(req.body.weight){
+            updateObj.weight = req.body.weight
+        }
+
+        async.waterfall([(callback)=>{
+
+            if(req.body.email){
+
+                user.find({ _id:{$ne:req.body.userId }}, (err, emailResult) => {
+                    if (err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                    else if (emailResult) {
+                            var index = -1
+                            index = emailResult.findIndex((x)=> x.email === req.body.email)
+                            if(index != -1){
+                                return commonFile.responseHandler(res, 200, "Email ID already exits.")
+                            }
+                            else{
+                                callback(null, "done")
+                            }
+                        
+                    } 
+                    else {
+                        callback(null, "done")
+                    }
+                })
+            }
+            else{
+                callback(null, "done")
+            }
+        }, (next, callback)=>{
+            user.findOneAndUpdate({_id:req.body.userId}, updateObj, { new:true }, (err, final) => {
+                if (err)
+                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                else if (final) {
+                    callback(null, final)
+                } 
+                else {
+                    return commonFile.responseHandler(res, 400, "User not found.")
+                }
+            })
+
+        }], (err, finalResult)=>{
+            if (err)
+                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else
+                return commonFile.responseHandler(res, 200, "Profile Successfully Updated.")
+        })
+
+    },
+
+
+
+
 
 
     // @@@@@@@@@@@@@@@@@@@@@@@  blockUnblockUser Api to to change The Status Block/Unblock  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
@@ -161,12 +293,10 @@ module.exports = {
 
     deleteUser: (req, res) => {
         console.log("deleteUser req.body====>>>", req.body)
-        if (!req.body._id) {
+        if (!req.body.userId) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing in delete")
         }
-        user.findOneAndRemove({
-            _id: req.body._id
-        }, (err, result) => {
+        user.findOneAndRemove({ _id: req.body.userId }, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error")
             else if (result)
@@ -395,7 +525,7 @@ module.exports = {
 
     deleteProduct:(req, res)=>{
         console.log("req.body========>>>>",req.body)
-        product.findByIdAndUpdate({ _id:req.body.productId, status:"ACTIVE" }, { status:"DELETE" }, { new:true }, (err, result)=>{
+        product.findByIdAndUpdate({ _id:req.body.productId, status:"ACTIVE" }, { status:"DELETED" }, { new:true }, (err, result)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else
@@ -435,7 +565,6 @@ module.exports = {
         re = new RegExp(pattern, 'gi');
 
         let query = {}
-
         
         if(req.body.search && req.body.productName){
             
@@ -536,28 +665,32 @@ module.exports = {
 
     getAllUsers: (req, res) => {
 
-        if (req.body.filterWord) {
-            pattern = "\\b[a-z0-9']*" + req.body.filterWord + "[a-z0-9'?]*\\b";
-            re = new RegExp(pattern, 'gi');
-            query = {
-                $or: [{
-                    userName: re
-                }, {
-                    accountID: re
-                }, {
-                    status: re
-                }],
-            };
-        } else {
-            query = {
-            };
+        let  pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
+        let  re = new RegExp(pattern, 'gi');
+
+        let query = { status:"ACTIVE" }
+
+        if(req.body.search){
+            query.name = re
         }
 
-        user.paginate(query, {
+        if(req.body.bodyType){
+            query.bodyType = req.body.bodyType
+        }
+
+        if(req.body.gender){
+            query.gender = req.body.gender
+        }
+        
+
+        let options = {
+            
             page: req.body.page,
             limit: 10,
             lean: true
-        }, (err, result) => {
+        }
+
+        user.paginate(query, options, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Error")
             else {

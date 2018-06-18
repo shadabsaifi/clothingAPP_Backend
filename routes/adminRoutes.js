@@ -3,7 +3,7 @@ let adminHandler=require('../fileHandler/adminHandler.js')
 
 adminRoutes.post('/login',adminHandler.login);
 adminRoutes.post('/forgotPassword',adminHandler.forgotPassword)
-adminRoutes.post('/resetPassword',adminHandler.verifyToken,adminHandler.resetPassword)
+adminRoutes.post('/resetPassword',adminHandler.resetPassword)
 adminRoutes.get('/adminDetail',adminHandler.verifyToken,adminHandler.adminDetail)
 adminRoutes.get('/activeUsers',adminHandler.verifyToken,adminHandler.activeUsers)
 adminRoutes.get('/getStaticContent',adminHandler.getStaticContent)
@@ -23,6 +23,9 @@ adminRoutes.post('/productDetail',adminHandler.productDetail)
 adminRoutes.post('/productList',adminHandler.productList)
 adminRoutes.get('/productNameList',adminHandler.productNameList)
 adminRoutes.post('/updateProduct',adminHandler.updateProduct)
+adminRoutes.post('/addNewUser',adminHandler.addNewUser)
+adminRoutes.post('/userDetail',adminHandler.userDetail)
+adminRoutes.post('/editUser',adminHandler.editUser)
 
 // admin api end for clothing app
 

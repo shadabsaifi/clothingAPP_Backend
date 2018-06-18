@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate');
 var mongooseAggregatePaginate = require('mongoose-aggregate-paginate');
@@ -7,7 +6,8 @@ const db = mongoose.connection;
 let User = mongoose.Schema({
 
     name:{
-        type:String
+        type:String,
+        trim:true
     },
     age: {
         type:Number
@@ -17,7 +17,8 @@ let User = mongoose.Schema({
         trim: true
     },
     email:{
-        type:String
+        type:String,
+        trim: true
     },
     password:{
         type:String
@@ -48,7 +49,7 @@ let User = mongoose.Schema({
     }],
     status: {
         type: String,
-        enum: ["ACTIVE", "INACTIVE", "BLOCK", "UNBLOCK"],
+        enum: ["ACTIVE", "INACTIVE", "BLOCK", "UNBLOCK", "DELETED"],
         default: "INACTIVE"
     },
     deviceType: {

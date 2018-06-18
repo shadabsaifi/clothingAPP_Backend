@@ -39,7 +39,7 @@ let productSchema = new Schema({
 	},
 	status: {
 		type: String,
-		enum: ["ACTIVE", "DELETE"],
+		enum: ["ACTIVE", "DELETED"],
 		default: "ACTIVE"
 	},
 	stock: {
