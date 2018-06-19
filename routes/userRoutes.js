@@ -17,6 +17,7 @@ userRoutes.post('/updateUserDetail',userHandler.verifyToken,userHandler.updateUs
 userRoutes.post('/likeUnlikeProduct',userHandler.likeUnlikeProduct)
 userRoutes.post('/myFavourite',userHandler.myFavourite)
 userRoutes.get('/logout',userHandler.verifyToken,userHandler.logout)
+userRoutes.post('/searchsuggestion',userHandler.searchsuggestion)
 userRoutes.post('/productList',userHandler.productList)
 userRoutes.get('/productNameList',userHandler.verifyToken,userHandler.productNameList)
 userRoutes.post('/productDetail',userHandler.verifyToken,userHandler.productDetail)

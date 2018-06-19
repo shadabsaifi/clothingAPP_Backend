@@ -7,7 +7,7 @@ adminRoutes.post('/resetPassword',adminHandler.resetPassword)
 adminRoutes.get('/adminDetail',adminHandler.verifyToken,adminHandler.adminDetail)
 adminRoutes.get('/activeUsers',adminHandler.verifyToken,adminHandler.activeUsers)
 adminRoutes.get('/getStaticContent',adminHandler.getStaticContent)
-adminRoutes.get('/totalCollection',adminHandler.verifyToken,adminHandler.totalCollection)
+
 adminRoutes.post('/tempCld',adminHandler.verifyToken,adminHandler.uploadMultipleImagesCld)
 adminRoutes.post('/addNewPackage',adminHandler.addNewPackage)
 adminRoutes.post('/blockUnblockUser',adminHandler.verifyToken,adminHandler.blockUnblockUser)
@@ -17,6 +17,8 @@ adminRoutes.post('/deleteStaticContent',adminHandler.verifyToken,adminHandler.de
 adminRoutes.post('/searchFromUserMgmt',adminHandler.verifyToken,adminHandler.searchFromUserMgmt)
 
 // admin api start for clothing app
+adminRoutes.post('/addNewBrand',adminHandler.addNewBrand)
+adminRoutes.get('/brandNameList',adminHandler.brandNameList)
 adminRoutes.post('/addNewProduct',adminHandler.addNewProduct)
 adminRoutes.post('/deleteProduct',adminHandler.deleteProduct)
 adminRoutes.post('/productDetail',adminHandler.productDetail)
@@ -26,6 +28,7 @@ adminRoutes.post('/updateProduct',adminHandler.updateProduct)
 adminRoutes.post('/addNewUser',adminHandler.addNewUser)
 adminRoutes.post('/userDetail',adminHandler.userDetail)
 adminRoutes.post('/editUser',adminHandler.editUser)
+adminRoutes.get('/totalCollection',adminHandler.totalCollection)
 
 // admin api end for clothing app
 

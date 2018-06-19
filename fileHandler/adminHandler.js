@@ -1,6 +1,7 @@
 let jwt = require('jsonwebtoken')
 let config = require('../config/config-dev.js')
 let packages = require('../models/package.js')
+let brand = require('../models/brand.js')
 const boosts = require('../models/boost')
 const async = require('async')
 const multer = require('multer')
@@ -66,6 +67,65 @@ module.exports = {
                 })
             } else
                 return commonFile.responseHandler(res, 400, "Invalid Email")
+        })
+    },
+
+
+
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@  adminDetail Api to to Show the Details  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    adminDetail:(req,res)=>{
+
+        admin.find({}, (err,result)=>{
+         if(err){
+            return commonFile.responseHandler(res, 400, "Internal server error")
+         }
+         else if(!result){
+            return commonFile.responseHandler(res, 400, "Error: No such user exists")
+         }
+         else{
+            return commonFile.responseHandler(res, 200, "Success: admin details.",result)
+         }
+        })
+    },
+
+
+
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@ Admin editProfile Api to to change the Details  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    editProfile: (req, res) => {
+        if (!req.body.userName || !req.body.email || !req.body.accountID || !req.body.location || !req.body._id ||!req.body.phoneNumber)
+            return commonFile.responseHandler(res, 400, "Error: missing parameters")
+
+        let updateObj = {};
+        if (req.body.phoneNumber)
+        updateObj.phoneNumber = req.body.phoneNumber;
+        if (req.body.userName)
+            updateObj.userName = req.body.userName;
+        if (req.body.email)
+            updateObj.email = req.body.email;
+        if (req.body.accountID)
+            updateObj.accountID = req.body.accountID;
+        if (req.body.location)
+            updateObj.location = req.body.location;
+
+        admin.findOneAndUpdate({"_id": "req.body._id" }, {
+            $set: {
+                updateObj
+            }
+        }, {
+            new: true
+        }, (err, result) => {
+            if (err)
+                return commonFile.responseHandler(res, 400, "Error: findOneAndUpdate error editProfile")
+            else if (result) {
+                return commonFile.responseHandler(res, 200, "Success: admin updated")
+            } else
+                return commonFile.responseHandler(res, 400, "Error: No such user exists")
         })
     },
 
@@ -274,10 +334,10 @@ module.exports = {
     // @@@@@@@@@@@@@@@@@@@@@@@  blockUnblockUser Api to to change The Status Block/Unblock  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     blockUnblockUser: (req, res) => {
-        if (!req.body._id || !req.body.status) {
+        if (!req.body.userId || !req.body.status) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing in blockUnblock")
         }
-        user.findOneAndUpdate({ _id: mongoose.Types.ObjectId(req.body._id) }, { "status": req.body.status }, { new:true }, (err, result) => {
+        user.findOneAndUpdate({ _id: mongoose.Types.ObjectId(req.body.userId) }, { "status": req.body.status }, { new:true }, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Error: blockUnblock API")
             else if (result) {
@@ -308,70 +368,41 @@ module.exports = {
 
 
 
+     // @@@@@@@@@@@@@@@@@@@@@@@  getAllUsers Api to show the User List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-    // @@@@@@@@@@@@@@@@@@@@@@@  adminDetail Api to to Show the Details  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+     getAllUsers: (req, res) => {
 
-    adminDetail:(req,res)=>{
+        let  pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
+        let  re = new RegExp(pattern, 'gi');
 
-        admin.find({},{phoneNumber:1,location:1,name:1},(err,result)=>{
-         if(err){
-            return commonFile.responseHandler(res, 400, "Internal server error")
-         }
-         else if(!result){
-            return commonFile.responseHandler(res, 400, "Error: No such user exists")
-         }
-         else{
-            return commonFile.responseHandler(res, 200, "Success: admin details.",result)
-         }
-        })
-    },
+        let query = { status:"ACTIVE" }
 
+        if(req.body.search){
+            query.name = re
+        }
 
+        if(req.body.bodyType){
+            query.bodyType = req.body.bodyType
+        }
 
+        if(req.body.gender.toLowerCase() === 'male'){
+            query.gender = 'male'
+        }
+        else if(req.body.gender.toLowerCase() === 'female'){
+            query.gender = 'female'
+        }
+        
 
+        let options = {
+            
+            page: req.body.page,
+            limit: 10,
+            lean: true
+        }
 
-    // @@@@@@@@@@@@@@@@@@@@@@@  editProfile Api to to change the Details  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-
-    editProfile: (req, res) => {
-        if (!req.body.userName || !req.body.email || !req.body.accountID || !req.body.location || !req.body._id ||!req.body.phoneNumber)
-            return commonFile.responseHandler(res, 400, "Error: missing parameters")
-
-        let updateObj = {};
-        if (req.body.phoneNumber)
-        updateObj.phoneNumber = req.body.phoneNumber;
-        if (req.body.userName)
-            updateObj.userName = req.body.userName;
-        if (req.body.email)
-            updateObj.email = req.body.email;
-        if (req.body.accountID)
-            updateObj.accountID = req.body.accountID;
-        if (req.body.location)
-            updateObj.location = req.body.location;
-
-        admin.findOneAndUpdate({"_id": "req.body._id" }, {
-            $set: {
-                updateObj
-            }
-        }, {
-            new: true
-        }, (err, result) => {
+        user.paginate(query, options, (err, result) => {
             if (err)
-                return commonFile.responseHandler(res, 400, "Error: findOneAndUpdate error editProfile")
-            else if (result) {
-                return commonFile.responseHandler(res, 200, "Success: admin updated")
-            } else
-                return commonFile.responseHandler(res, 400, "Error: No such user exists")
-        })
-    },
-
-
-
-     // @@@@@@@@@@@@@@@@@@@@@@@  getStaticContent Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-
-    getStaticContent: (req, res) => {
-        staticContent.find({}, (err, result) => {
-            if (err)
-                return commonFile.responseHandler(res, 400, "Internal server error")
+                return commonFile.responseHandler(res, 400, "Internal Error")
             else {
                 return commonFile.responseHandler(res, 200, "Success", result)
             }
@@ -380,78 +411,73 @@ module.exports = {
 
 
 
-    // @@@@@@@@@@@@@@@@@@@@@@@  updateStaticContent Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-
-    updateStaticContent: (req, res) => {
-        console.log(req.body);
-        if (!req.body.field || !req.body.data)
-            return commonFile.responseHandler(res, 400, "Error: Parameters missing")
-        let key, obj = {};
-        if (req.body.field === "termsAndServices")
-            key = "termsAndServices";
-        else if (req.body.field === "aboutUs")
-            key = "aboutUs"
-        else
-            key = "contactUs"
-        let time = key + "CreatedAt"
-        obj = {
-            $set: {}
-        };
-        obj.$set[key] = req.body.data;
-        obj.$set[time] = Date.now()
-        staticContent.findOneAndUpdate({
-            _id: req.body._id
-        }, obj, {
-            new: true
-        }, (err, result) => {
-            if (err)
-                return commonFile.responseHandler(res, 400, "Error: In updateStaticContent")
-            else if (result) {
-                return commonFile.responseHandler(res, 200, "Success: Content Updated")
-            } else
-                return commonFile.responseHandler(res, 400, "Error: No collection exists")
-        })
-    },
 
 
+    // @@@@@@@@@@@@@@@@@@@@@@@  addNewBrand Api to add product by admin panel   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
+    addNewBrand:(req, res)=>{
 
-
-    // @@@@@@@@@@@@@@@@@@@@@@@  deleteStaticContent Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-
-    deleteStaticContent: (req, res) => {
-        if (!req.body.type){
+        if (!req.body.brandName || !req.body.brandGender){
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
-        let type = req.body.type,
-            query, updateObj = {
-                $set: {}
-            };
-        console.log(req.body)
-        query = {};
-        query[req.body.type] = {
-            $exists: true
-        };
-        updateObj.$set[req.body.type] = "";
-        console.log(query);
-        console.log(updateObj)
-        staticContent.findOneAndUpdate(query, updateObj, {
-            new: true
-        }, (err, result) => {
-            if (err) {
-                console.log("1111111")
-                return commonFile.responseHandler(res, 400, "Error: In deleteStaticContent")
-            } else if (result) {
-                console.log("2222line", result)
-                return commonFile.responseHandler(res, 200, "Success: Content deleted")
-            } else {
-                console.log("3333333333333")
-                return commonFile.responseHandler(res, 400, "Error: No collection exists")
-            }
-        })
+
+        if(req.body.brandGender.toLowerCase() === 'male'){
+            req.body.brandGender = 'Male'
+        }
+        if(req.body.brandGender.toLowerCase() === 'female'){
+            req.body.brandGender = 'Female'
+        }
+        if(req.body.brandGender.toLowerCase() === 'both'){
+            req.body.brandGender = 'Both'
+        }
+
+        var brandName = (req.body.brandName).toLowerCase();
+            var fullName = ""
+            let array = brandName.split(" ")
+            
+            var i = 0
+            
+            do{
+                fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1)+" ";
+                i++;
+            }while(i<array.length)
+            
+            req.body.brandName = fullName
+
+            new brand(req.body).save((err, result)=>{
+                if (err)
+                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                else
+                    return commonFile.responseHandler(res, 200, "Brand Successfully Added.")
+            })
+
     },
 
 
+
+
+     // @@@@@@@@@@@@@@@@@@@@@@@  brandNameList Api to show the Brand Name List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+     brandNameList:(req, res)=>{
+
+        
+        let masterQuery = [
+            {
+                $group: { _id: "$brandName", brandQuantity: { $sum: 1 } }
+            },
+            { 
+                $sort: {  _id:1 } 
+            }
+        ]
+
+        brand.aggregate(masterQuery, (err, result)=>{
+            if (err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else
+                return commonFile.responseHandler(res, 200, "Success", result)
+        })
+
+    },
 
 
 
@@ -459,10 +485,22 @@ module.exports = {
     // @@@@@@@@@@@@@@@@@@@@@@@  addNewProduct Api to add product by admin panel   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     addNewProduct:(req, res)=>{
-        // console.log("req.body========>>>>",req.body)
-        if (!req.body.createdBy || !req.body.productName || !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink){
+        console.log("req.body========>>>>",req.body)
+        if (!req.body.createdBy || !req.body.productName || !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender){
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
+
+
+        if(req.body.productGender.toLowerCase() === 'male'){
+            req.body.productGender = 'Male'
+        }
+        if(req.body.productGender.toLowerCase() === 'female'){
+            req.body.productGender = 'Female'
+        }
+        if(req.body.productGender.toLowerCase() === 'both'){
+            req.body.productGender = 'Both'
+        }
+
 
         async.waterfall([(callback)=>{
 
@@ -561,7 +599,6 @@ module.exports = {
     productList:(req, res)=>{
 
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
-        // let pattern = new RegExp('^'+req.body.search,'i')
         re = new RegExp(pattern, 'gi');
 
         let query = {}
@@ -599,6 +636,13 @@ module.exports = {
         })
     },
 
+
+
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@  updateProduct Api to update the Product  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+
     updateProduct:(req, res)=>{
         let query = { _id:req.body.productId }
 
@@ -622,8 +666,6 @@ module.exports = {
 
     productNameList:(req, res)=>{
 
-        // let n = req.body.page || 1
-        // let m = req.body.limit || 10
         
         let masterQuery = [
             {
@@ -637,21 +679,8 @@ module.exports = {
         product.aggregate(masterQuery, (err, result)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else{
-                
-                // pagination start 
-
-                // let showData = result.slice((n-1)*m, n*m)
-                // let finalObj = { 
-                //     BrandList:showData,
-                //     page:n,
-                //     limit:m,
-                //     total:result.length,
-                //     pages:Math.ceil(result.length/m)
-                // }
-                // return commonFile.responseHandler(res, 200, "Success", finalObj)
+            else
                 return commonFile.responseHandler(res, 200, "Success", result)
-            }
         })
 
     },
@@ -661,43 +690,171 @@ module.exports = {
 
 
 
-     // @@@@@@@@@@@@@@@@@@@@@@@  getAllUsers Api to show the User List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+     // @@@@@@@@@@@@@@@@@@@@@@@  DashBoard Collections  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-    getAllUsers: (req, res) => {
 
-        let  pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
-        let  re = new RegExp(pattern, 'gi');
+    totalCollection:(req,res)=>{
 
-        let query = { status:"ACTIVE" }
-
-        if(req.body.search){
-            query.name = re
+        async.waterfall([(callback)=>{
+            user.find({}, (err, user)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, user.length)
+            })
+        },(user, callback)=>{
+            brand.find({}, (err, brand)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, {totalUser:user, totalBrand:brand.length})
+            })  
+        },(both, callback)=>{
+            product.find({}, (err, product)=>{
+                if(err)
+                    callback(err)
+                else{
+                    both.totalProduct = product.length
+                    callback(null, both)
+                }
+            })
         }
+    ], (err, finalResult)=>{
+        if(err)
+            return commonFile.responseHandler(res, 400, "Internal Server Error.")
+        if(finalResult)
+            return commonFile.responseHandler(res, 200, "Success", finalResult)
 
-        if(req.body.bodyType){
-            query.bodyType = req.body.bodyType
-        }
+        })
+    },
 
-        if(req.body.gender){
-            query.gender = req.body.gender
-        }
-        
 
-        let options = {
-            
-            page: req.body.page,
-            limit: 10,
-            lean: true
-        }
 
-        user.paginate(query, options, (err, result) => {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+     // @@@@@@@@@@@@@@@@@@@@@@@  getStaticContent Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+     getStaticContent: (req, res) => {
+        staticContent.find({}, (err, result) => {
             if (err)
-                return commonFile.responseHandler(res, 400, "Internal Error")
+                return commonFile.responseHandler(res, 400, "Internal server error")
             else {
                 return commonFile.responseHandler(res, 200, "Success", result)
             }
         })
     },
+
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@  updateStaticContent Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    updateStaticContent: (req, res) => {
+        console.log(req.body);
+        if (!req.body.field || !req.body.data)
+            return commonFile.responseHandler(res, 400, "Error: Parameters missing")
+        let key, obj = {};
+        if (req.body.field === "termsAndServices")
+            key = "termsAndServices";
+        else if (req.body.field === "aboutUs")
+            key = "aboutUs"
+        else
+            key = "contactUs"
+        let time = key + "CreatedAt"
+        obj = {
+            $set: {}
+        };
+        obj.$set[key] = req.body.data;
+        obj.$set[time] = Date.now()
+        staticContent.findOneAndUpdate({
+            _id: req.body._id
+        }, obj, {
+            new: true
+        }, (err, result) => {
+            if (err)
+                return commonFile.responseHandler(res, 400, "Error: In updateStaticContent")
+            else if (result) {
+                return commonFile.responseHandler(res, 200, "Success: Content Updated")
+            } else
+                return commonFile.responseHandler(res, 400, "Error: No collection exists")
+        })
+    },
+
+
+
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@  deleteStaticContent Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    deleteStaticContent: (req, res) => {
+        if (!req.body.type){
+            return commonFile.responseHandler(res, 400, "Error: Parameters missing")
+        }
+        let type = req.body.type,
+            query, updateObj = {
+                $set: {}
+            };
+        console.log(req.body)
+        query = {};
+        query[req.body.type] = {
+            $exists: true
+        };
+        updateObj.$set[req.body.type] = "";
+        console.log(query);
+        console.log(updateObj)
+        staticContent.findOneAndUpdate(query, updateObj, {
+            new: true
+        }, (err, result) => {
+            if (err) {
+                console.log("1111111")
+                return commonFile.responseHandler(res, 400, "Error: In deleteStaticContent")
+            } else if (result) {
+                console.log("2222line", result)
+                return commonFile.responseHandler(res, 200, "Success: Content deleted")
+            } else {
+                console.log("3333333333333")
+                return commonFile.responseHandler(res, 400, "Error: No collection exists")
+            }
+        })
+    },
+
 
 
 
@@ -1225,25 +1382,6 @@ module.exports = {
 
 
 
-    totalCollection:(req,res)=>{
-        transaction.find({},{amount:1,_id:0},(err,result)=>{
-           if(err){
-            return commonFile.responseHandler(res, 400, "Internal Server Error")
-           }
-           else if(!result.length){
-               var total=0
-            return commonFile.responseHandler(res, 200, "user not found",total)
-           }
-           else{  
-               var total=0;
-               
-            for(var i=0;i<result.length;i++){
-                           total=total+result[i].amount
-            }
-            return commonFile.responseHandler(res, 200, "Success",total)
-           }
-        })
-    }
-
+   
 
 }

@@ -8,44 +8,32 @@ let productSchema = new Schema({
 		type: String,
 		trim:true
 	},
-	productType: {
-		type: String
-	},
 	productPrice: {
 		type: String
 	},
 	productDesc: {
 		type: String
 	},
-	productImage: {
-		type: Array
-	},
-	bodyType:{
+	productLink:{
 		type:String
-	},
-	productSize: {
-		type: Array,
-		default: ["S", "M", "L", "XL", "XXL", "XXXL"]
 	},
 	productColor: {
 		type: Array,
 		default: ["BLACK", "WHITE", "YELLOW", "GREEN", "GREY", "RED"]
 	},
-	productLink:{
-		type:String
+	productSize: {
+		type: Array,
+		default: ["S", "M", "L", "XL", "XXL", "XXXL"]
 	},
-	subscriptionPeriod: {
+	productQuantity: {
 		type: Number
 	},
-	status: {
-		type: String,
-		enum: ["ACTIVE", "DELETED"],
-		default: "ACTIVE"
+	productGender:{
+		type:String,
+		enum:['Male', 'Female', 'Both']
 	},
-	stock: {
-		type: String,
-		enum: ["In Stock", "Out Of Stock"],
-		default: "In Stock"
+	productBodyType:{
+		type:String
 	},
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId, ref: 'admin'
@@ -54,6 +42,28 @@ let productSchema = new Schema({
 		type: Date,
 		default: Date.now
 	}
+	
+	
+	// productType: {
+	// 	type: String
+	// },
+	// productImage: {
+	// 	type: Array
+	// },
+	// subscriptionPeriod: {
+	// 	type: Number
+	// },
+	// status: {
+	// 	type: String,
+	// 	enum: ["ACTIVE", "DELETED"],
+	// 	default: "ACTIVE"
+	// },
+	// stock: {
+	// 	type: String,
+	// 	enum: ["In Stock", "Out Of Stock"],
+	// 	default: "In Stock"
+	// },
+	
 
 })
 

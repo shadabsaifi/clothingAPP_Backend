@@ -669,6 +669,42 @@ var randomstring = require("randomstring")
 
 
 
+
+
+        // @@@@@@@@@@@@@@@@@@@@@@@  Searching Suggestion @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+
+    
+    searchsuggestion:(req, res)=>{
+        if (!req.body.search) {
+            return commonFile.responseHandler(res, 200, "Success.", [])
+        }
+        let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
+        re = new RegExp(pattern, 'gi')
+
+        let options = {
+            page:req.body.page || 1,
+            limit:req.body.limit || 5
+        }
+
+        product.paginate({productName:re}, options, (err, result)=>{
+            if(err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else{
+                let finalResult = result.docs.map((x)=> x.productName)
+                console.log(result)
+                return commonFile.responseHandler(res, 200, "Success.", finalResult)
+            }
+        })
+
+
+
+    },
+
+        
+
+
+
         // @@@@@@@@@@@@@@@@@@@@@@@  productList Api to show the product List with Searching and Filtering and sortBy  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     productList:(req, res)=>{
