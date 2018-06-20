@@ -369,14 +369,17 @@ var randomstring = require("randomstring")
 
         completeProfileSetup:(req,res)=>{
             console.log("req.body========>>>>",req.body)
-            if( !(req.body.email || req.body.userId) || !req.body.bodyType || !req.body.gender || !req.body.height || !req.body.weight){
+            if( !req.body.userId || !req.body.bodyType || !req.body.gender || !req.body.height || !req.body.weight){
                 return commonFile.responseHandler(res, 400, "Parameters Missing.")
             }
             let query = { _id:req.body.userId }
             let update = { status:"ACTIVE" }
 
-            if(req.body.gender){
-                update.gender = req.body.gender
+            if(req.body.gender.toLowerCase() === 'male'){
+                update.gender = 'Male'
+            }
+            if(req.body.gender.toLowerCase() === 'female'){
+                update.gender = 'Female'
             }
             if(req.body.height){
                 update.height = req.body.height
@@ -717,12 +720,15 @@ var randomstring = require("randomstring")
         // let pattern = new RegExp('^'+req.body.search,'i')
         re = new RegExp(pattern, 'gi');
 
-        user.findOne({_id:req.body.userId}).populate('myFavourite.product').exec((err, userResult)=>{
+        user.findById({_id:req.body.userId}).populate('myFavourite.product').exec((err, userResult)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else{
-                
-                let query = { bodyType:userResult.bodyType }
+                console.log(userResult)
+                if(!userResult.bodyType){
+                    return commonFile.responseHandler(res, 400, "Please Select Your Body Type.")
+                }else{
+                    let query = { bodyType:userResult.bodyType }
 
                 if(req.body.search && req.body.productName.length){
             
@@ -769,6 +775,9 @@ var randomstring = require("randomstring")
                     }
                         
                 })
+                }
+
+                
             }
         })
     },

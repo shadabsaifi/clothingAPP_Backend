@@ -25,7 +25,7 @@ let User = mongoose.Schema({
     },
     gender: {
         type: String,
-        enum: ['male', 'female']
+        enum: ['Male', 'Female']
     },
     selfie: {
         type: String,
@@ -39,9 +39,6 @@ let User = mongoose.Schema({
     },
     bodyType:{
         type:String
-    },
-    productImage: { 
-        type: Array 
     },
     myFavourite: [{
         product: { type: mongoose.Schema.Types.ObjectId, ref: 'product' },
