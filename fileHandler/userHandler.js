@@ -429,6 +429,7 @@ var randomstring = require("randomstring")
 
         userDetail:(req, res)=>{
             console.log("req.body========>>>>",req.body)
+            
             if(!req.body.userId){
                 return commonFile.responseHandler(res, 400, "Parameters Missing.")
             }
@@ -787,14 +788,36 @@ var randomstring = require("randomstring")
 
       // @@@@@@@@@@@@@@@@@@@@@@@  productDetail Api to show the product Detail   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-    productDetail:(req, res)=>{
-        console.log("req.body========>>>>",req.body)
-        product.findById({ _id:req.body.productId, status:"ACTIVE" }, (err, result)=>{
+      productDetail: (req, res) => {
+        console.log("req.body========>>>>", req.body)
+        if (!req.body.userId || !req.body.productId) {
+            return commonFile.responseHandler(res, 400, "Parameters missing.");
+        }
+        user.findById({ _id: req.body.userId, status: "ACTIVE" }, (err, user) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else
-                return commonFile.responseHandler(res, 200, "Success", result)
+            else if(!user)
+                return commonFile.responseHandler(res, 200, "User not found.")
+            else{
+
+                product.findById({ _id: req.body.productId, status: "ACTIVE" }).lean().exec((err, result) => {
+                    if (err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                    else{
+                        let index = user.myFavourite.findIndex((x)=> x.product == req.body.productId)
+                        if(index != -1){
+                            result.isLike = true
+                            return commonFile.responseHandler(res, 200, "Success", result)
+                        }
+                        else{
+                            result.isLike = false
+                            return commonFile.responseHandler(res, 200, "Success", result)
+                        }
+                    }
+                })
+            }
         })
+       
 
     },
 

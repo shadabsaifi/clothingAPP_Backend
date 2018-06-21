@@ -196,6 +196,8 @@ module.exports = {
 
     getAllUsers: (req, res) => {
 
+        console.log("getAllUsers req.body====>>>>",req.body)
+
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
         let re = new RegExp(pattern, 'gi');
 
@@ -209,15 +211,15 @@ module.exports = {
             query.bodyType = req.body.bodyType
         }
 
-        if (req.body.gender) {
+        if (req.body.gender){
             query.gender = req.body.gender
         }
 
 
         let options = {
 
-            page: req.body.page,
-            limit: 10,
+            page: req.body.page || 1,
+            limit:req.body.limit || 10,
             lean: true,
             sort: {
                 createdAt:-1
@@ -454,15 +456,15 @@ module.exports = {
         }
 
         let newUserObj = { createdBy: req.body.createdBy }
+        let query = { }
 
         if (req.body.brandGender.toLowerCase() === 'male') {
             newUserObj.brandGender = 'Male'
+            query.brandGender = 'Male'
         }
         if (req.body.brandGender.toLowerCase() === 'female') {
             newUserObj.brandGender = 'Female'
-        }
-        if (req.body.brandGender.toLowerCase() === 'both') {
-            newUserObj.brandGender = 'Both'
+            query.brandGender = 'Female'
         }
 
         var brandName = (req.body.brandName).toLowerCase();
@@ -476,14 +478,129 @@ module.exports = {
             i++;
         } while (i < array.length)
 
-        newUserObj.brandName = fullName
+        newUserObj.brandName = fullName.trim()
 
-        new brand(newUserObj).save((err, result) => {
+        query.brandName = newUserObj.brandName
+        
+
+        brand.find(query, (err, final)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else
-                return commonFile.responseHandler(res, 200, "Brand Successfully Added.")
+            else if (!final.length){
+                    
+                    async.waterfall([(callback)=>{
+                        if (req.body.brandGender.toLowerCase() === 'both') {
+                            console.log("both")
+                                newUserObj.brandGender = 'Male'
+                                new brand(newUserObj).save((err, Male) => {
+                                    if (err)
+                                        callback(err)
+                                    else{
+                                        newUserObj.brandGender = 'Female'
+                                        new brand(newUserObj).save((err, Female) => {
+                                            if (err)
+                                                callback(err)
+                                            else{
+                                                callback(null, "done")
+                                            }
+                                                
+                                        })
+                                    }
+                                        
+                                })
+                        }else{
+                            callback(null, "done")
+                        }
+                        
+                    }, (next, callback)=>{
+                        if (req.body.brandGender.toLowerCase() === 'male') {
+                            console.log("Male")
+                            newUserObj.brandGender = 'Male'
+                            new brand(newUserObj).save((err, Female) => {
+                                if (err)
+                                    callback(err)
+                                else
+                                    callback(null, "done")
+                            })
+                        }else{
+                            callback(null, "done")
+                        }
+                    },(next, callback)=>{
+                        if (req.body.brandGender.toLowerCase() === 'female') {
+                            console.log("Female")
+                            newUserObj.brandGender = 'Female'
+                            new brand(newUserObj).save((err, Female) => {
+                                if (err)
+                                    callback(err)
+                                else
+                                    callback(null, "done")
+                            })
+                        }else{
+                            callback(null, "done")
+                        }
+                    }],(err, finalResult)=>{
+                        if (err)
+                            return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                        if(finalResult)
+                            return commonFile.responseHandler(res, 200, "Brand Successfully Added for "+ req.body.brandGender +" Gender")
+    
+                    })
+                
+            }
+            else{
+                
+                console.log("final length====>>",final.length)
+                if(final.length == 2){
+                    return commonFile.responseHandler(res, 409, "Brand Already Having for Both Gender")
+                }
+                else{
+
+                    if (req.body.brandGender.toLowerCase() != 'both') {
+                        
+                        if (final[0].brandGender == query.brandGender) {
+                            return commonFile.responseHandler(res, 409, "Brand Already Having for "+ newUserObj.brandGender +" Gender")
+                        }else{
+    
+                            new brand(newUserObj).save((err, result) => {
+                                if (err)
+                                    return commonFile.responseHandler(res, 400, "Internal Server Error.")(err)
+                                else
+                                    return commonFile.responseHandler(res, 200, "Brand Successfully Added for "+ newUserObj.brandGender +" Gender")
+                            })
+                        }
+                    }
+                    else{
+                        if(final[0].brandGender === 'Male'){
+                            newUserObj.brandGender = 'Female'
+                            new brand(newUserObj).save((err, result) => {
+                                if (err)
+                                    return commonFile.responseHandler(res, 400, "Internal Server Error.")(err)
+                                else
+                                    return commonFile.responseHandler(res, 200, "Brand Successfully Added for Both Gender")
+                            })
+                        }
+                        if(final[0].brandGender === 'Female'){
+                            newUserObj.brandGender = 'Male'
+                            new brand(newUserObj).save((err, result) => {
+                                if (err)
+                                    return commonFile.responseHandler(res, 400, "Internal Server Error.")(err)
+                                else
+                                    return commonFile.responseHandler(res, 200, "Brand Successfully Added for Both Gender")
+                            })
+                        }
+                        
+                    }
+
+                    
+                    
+                    
+                }
+                
+            }
+                
         })
+
+        
 
     },
 
@@ -511,42 +628,37 @@ module.exports = {
             limit: m || 10
         }
 
-        let masterQuery = [
-
-            {
-                $match: query
-            },
-            {
-                $group: {
-
-                    _id: "$brandGender", brandQuantity:{$sum:1},
-                    array: { $push: { item: "$brandName" } }
-
-                }
-
-            }
-        ]
-
-        brand.aggregate(masterQuery, (err, result) => {
+        brand.find(query, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else {
-
-                let finalResult = {  }
+                
+                let men = []
                 result.map((x)=>{
-
-                    if(x._id == 'Male'){
-                        finalResult.menList = x.array
-                        // finalResult.bothList = x.array
-                    }
-                    if(x._id == 'Female'){
-                        finalResult.womenList = x.array
-                        // finalResult.bothList.concat(x.array)
+                    if(x.brandGender === 'Male'){
+                        men.push(x.brandName)
                     }
                 })
 
+                let women = []
+                result.map((x)=>{
+                    if(x.brandGender ==='Female'){
+                        women.push(x.brandName)
+                    }
+                })
 
-                // let finalResult = { menList, womenList }
+                let both = []
+                
+                result.map((x)=>{
+                    both.push(x.brandName)
+                })
+
+                let finalResult = { 
+                    menList:men,
+                    womenList:women,
+                    both:both
+                 }
+
                 return commonFile.responseHandler(res, 200, "Success", finalResult)
             }
 
@@ -653,9 +765,10 @@ module.exports = {
 
     // @@@@@@@@@@@@@@@@@@@@@@@  productDetail Api to show the product Detail   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-    productDetail: (req, res) => {
-        console.log("req.body========>>>>", req.body)
-        product.findById({ _id: req.body.productId, status: "ACTIVE" }, (err, result) => {
+
+    productDetail:(req, res)=>{
+        console.log("req.body========>>>>",req.body)
+        product.findById({ _id:req.body.productId, status:"ACTIVE" }, (err, result)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else
