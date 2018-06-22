@@ -10,7 +10,7 @@ let brandSchema = new Schema({
     },
     brandGender:{
         type:String,
-		enum:['Male', 'Female', 'Both']
+		enum:['Male', 'Female']
     },
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId, ref: 'admin'

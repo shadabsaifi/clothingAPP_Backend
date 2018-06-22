@@ -1,3 +1,17 @@
+const mongoose = require('mongoose')
+const cloudinary = require('cloudinary')
+const async = require('async')
+const commonFile = require('./commonFile.js')
+const jwt = require('jsonwebtoken')
+const config = require('../config/config-dev.js')
+const pagination = require('pagination')
+const admin = require('../models/admin.js')
+const user = require('../models/user.js')
+const product = require('../models/product.js')
+const favourite = require('../models/favourite.js')
+const transaction = require('../models/product-transaction')
+var randomstring = require("randomstring")
+
 
 //     notification = require('./notification.js'),
 //     forEach = require('async-foreach').forEach,
@@ -15,18 +29,6 @@
 
 
 
-const mongoose = require('mongoose')
-const cloudinary = require('cloudinary')
-const async = require('async')
-const commonFile = require('./commonFile.js')
-const jwt = require('jsonwebtoken')
-const config = require('../config/config-dev.js')
-const pagination = require('pagination')
-const admin = require('../models/admin.js')
-const user = require('../models/user.js')
-const product = require('../models/product.js')
-const transaction = require('../models/product-transaction')
-var randomstring = require("randomstring")
 
 // const stripe = require("stripe")("sk_test_0vKQEflQAPi2Mr9JmWYUtfmx")
 // stripe.charges.retrieve("ch_1CcUppHqVoUdg7uTIGTiT9bN", 
@@ -545,6 +547,8 @@ var randomstring = require("randomstring")
         },
 
 
+
+
         // @@@@@@@@@@@@@@@@@@@@@@@  likeUnlikeProduct Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
         likeUnlikeProduct: (req, res) => {
@@ -556,6 +560,8 @@ var randomstring = require("randomstring")
             let update = {}
             let query = { _id:req.body.userId }
 
+            let favouriteObj = { productId:req.body.productId, likedBy:req.body.userId }
+
             if ((req.body.requestType).toLowerCase() === "like") {
                 update = {
                     $push: {
@@ -564,7 +570,12 @@ var randomstring = require("randomstring")
                         }
                     }
                 }
-
+                new favourite(favouriteObj).save((err, result)=>{
+                    if (err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error")
+                    else
+                        console.log("You Have Successfully Like this product")
+                })
             }
             else if ((req.body.requestType).toLowerCase() === "unlike") {
                 update = {
@@ -574,6 +585,15 @@ var randomstring = require("randomstring")
                         }
                     }
                 }
+                
+                favourite.findOneAndRemove({ productId: req.body.productId }, (err, result) => {
+                    if (err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error")
+                    else if (result)
+                        console.log("You Have Successfully unLike this product")
+                    else
+                        return commonFile.responseHandler(res, 409, "favourite Product not not found")
+                })
 
             } 
             else {
@@ -793,32 +813,50 @@ var randomstring = require("randomstring")
         if (!req.body.userId || !req.body.productId) {
             return commonFile.responseHandler(res, 400, "Parameters missing.");
         }
-        user.findById({ _id: req.body.userId, status: "ACTIVE" }, (err, user) => {
-            if (err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else if(!user)
-                return commonFile.responseHandler(res, 200, "User not found.")
-            else{
-
-                product.findById({ _id: req.body.productId, status: "ACTIVE" }).lean().exec((err, result) => {
-                    if (err)
-                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
-                    else{
-                        let index = user.myFavourite.findIndex((x)=> x.product == req.body.productId)
-                        if(index != -1){
-                            result.isLike = true
-                            return commonFile.responseHandler(res, 200, "Success", result)
-                        }
-                        else{
-                            result.isLike = false
-                            return commonFile.responseHandler(res, 200, "Success", result)
-                        }
+        async.waterfall([(callback)=>{
+            user.findById({ _id: req.body.userId, status: "ACTIVE" }, (err, user) => {
+                if (err)
+                    callback(err)
+                else{
+                    callback(null, user)
+                }
+            })
+        },(user, callback)=>{
+            
+            product.findById({ _id: req.body.productId, status: "ACTIVE" }).lean().exec((err, result) => {
+                if (err)
+                    callback(err)
+                else{
+                    let index = user.myFavourite.findIndex((x)=> x.product == req.body.productId)
+                    if(index != -1){
+                        result.isLike = true
+                        callback(null, result)
                     }
-                })
-            }
-        })
-       
+                    else{
+                        result.isLike = false
+                        callback(null, result)
+                    }
+                }
+            })
 
+
+        }, (result, callback)=>{
+            
+            favourite.find({ productId: req.body.productId }, (err, favourite) => {
+                if (err)
+                    callback(err)
+                else{
+                    result.totalLikedCount = favourite.length
+                    callback(null, result)
+                }
+            })
+        }],(err, finalResult)=>{
+            if(err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            if(finalResult)
+                return commonFile.responseHandler(res, 200, "Success", finalResult)
+            
+        })
     },
 
 
@@ -826,9 +864,6 @@ var randomstring = require("randomstring")
  // @@@@@@@@@@@@@@@@@@@@@@@  productName Api to show the Product Name List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     productNameList:(req, res)=>{
-
-        // let n = req.body.page || 1
-        // let m = req.body.limit || 10
         
         let masterQuery = [
             {
@@ -842,41 +877,30 @@ var randomstring = require("randomstring")
         product.aggregate(masterQuery, (err, result)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else{
-                
-                // pagination start 
-
-                // let showData = result.slice((n-1)*m, n*m)
-                // let finalObj = { 
-                //     BrandList:showData,
-                //     page:n,
-                //     limit:m,
-                //     total:result.length,
-                //     pages:Math.ceil(result.length/m)
-                // }
-                // return commonFile.responseHandler(res, 200, "Success", finalObj)
+            else
                 return commonFile.responseHandler(res, 200, "Success", result)
-            }
         })
 
     },
 
 
 
-        logout:(req, res)=>{
-            
-            if (!req.params.userId) {
-                return commonFile.responseHandler(res, 400, "Parameters missing.");
-            }
+    // @@@@@@@@@@@@@@@@@@@@@@@  logout Api to clear the token the local storage  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-            user.findByIdAndUpdate({ _id:req.body.userId }, {deviceToken:""}, {new:true}, (err, result)=>{
-                if(err)
-                    return commonFile.responseHandler(res, 200, "Interbal Server Error.",err)
-                else
-                    return commonFile.responseHandler(res, 200, "Successfully logout.")
-            })
+    logout:(req, res)=>{
+        
+        if (!req.params.userId) {
+            return commonFile.responseHandler(res, 400, "Parameters missing.");
+        }
 
-        },
+        user.findByIdAndUpdate({ _id:req.body.userId }, { deviceToken:"" }, {new:true}, (err, result)=>{
+            if(err)
+                return commonFile.responseHandler(res, 200, "Interbal Server Error.",err)
+            else
+                return commonFile.responseHandler(res, 200, "Successfully logout.")
+        })
+
+    },
 
 
 

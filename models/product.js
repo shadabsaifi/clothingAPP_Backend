@@ -8,6 +8,9 @@ let productSchema = new Schema({
 		type: String,
 		trim:true
 	},
+	brandName: {
+		type: String
+	},
 	productPrice: {
 		type: String
 	},
@@ -16,6 +19,10 @@ let productSchema = new Schema({
 	},
 	productLink:{
 		type:String
+	},
+	productHaving:{
+		type:String,
+
 	},
 	productColor: {
 		type: Array,

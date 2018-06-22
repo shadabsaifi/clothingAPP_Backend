@@ -24,7 +24,9 @@ const mongoose = require('mongoose')
 const commonFile = require('./commonFile.js')
 const admin = require('../models/admin.js')
 const product = require('../models/product.js')
+const style = require('../models/style.js')
 const transaction = require('../models/product-transaction')
+var unique = require('array-unique');
 
 module.exports = {
 
@@ -191,6 +193,55 @@ module.exports = {
 
 
 
+    // @@@@@@@@@@@@@@@@@@@@@@@  addNewUser Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    addNewUser: (req, res) => {
+        console.log("req.body========>>>>", req.body)
+
+        if (!req.body.name || !req.body.email || !req.body.gender || !req.body.age || !req.body.bodyType || !req.body.height || !req.body.weight) {
+            return commonFile.responseHandler(res, 400, "Parameter missing.")
+        }
+        let newUserObj = {
+            email: req.body.email,
+            age: req.body.age,
+            bodyType: req.body.bodyType,
+            height: req.body.height,
+            weight: req.body.weight,
+            gender:req.body.gender
+        }
+        user.findOne({ email: req.body.email }, (err, firstResult) => {
+            if (err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else if (firstResult)
+                return commonFile.responseHandler(res, 409, "Email id already Registered.")
+            else {
+                var name = (req.body.name).toLowerCase();
+                var fullName = ""
+                let array = name.split(" ")
+
+                var i = 0
+
+                do {
+                    fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
+                    i++;
+                } while (i < array.length)
+
+                newUserObj.name = fullName
+                newUserObj.status = "ACTIVE"
+                new user(newUserObj).save((err, result) => {
+                    if (err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                    else
+                        return commonFile.responseHandler(res, 200, "You have Successfully Add New User.")
+                })
+            }
+        })
+
+    },
+
+
+
+
 
     // @@@@@@@@@@@@@@@@@@@@@@@  getAllUsers Api to show the User List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
@@ -237,55 +288,6 @@ module.exports = {
 
 
 
-
-
-
-
-    // @@@@@@@@@@@@@@@@@@@@@@@  addNewUser Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-
-    addNewUser: (req, res) => {
-        console.log("req.body========>>>>", req.body)
-
-        if (!req.body.name || !req.body.email || !req.body.gender || !req.body.age || !req.body.bodyType || !req.body.height || !req.body.weight) {
-            return commonFile.responseHandler(res, 400, "Parameter missing.")
-        }
-        let newUserObj = {
-            email: req.body.email,
-            age: req.body.age,
-            bodyType: req.body.bodyType,
-            height: req.body.height,
-            weight: req.body.weight,
-            gender:req.body.gender
-        }
-        user.findOne({ email: req.body.email }, (err, firstResult) => {
-            if (err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else if (firstResult)
-                return commonFile.responseHandler(res, 409, "Email id already Registered.")
-            else {
-                var name = (req.body.name).toLowerCase();
-                var fullName = ""
-                let array = name.split(" ")
-
-                var i = 0
-
-                do {
-                    fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
-                    i++;
-                } while (i < array.length)
-
-                newUserObj.name = fullName
-                newUserObj.status = "ACTIVE"
-                new user(newUserObj).save((err, result) => {
-                    if (err)
-                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
-                    else
-                        return commonFile.responseHandler(res, 200, "You have Successfully Add New User.")
-                })
-            }
-        })
-
-    },
 
 
     // @@@@@@@@@@@@@@@@@@@@@@@  userDetail Api to to Show the Details  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
@@ -614,8 +616,12 @@ module.exports = {
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
         re = new RegExp(pattern, 'gi');
 
-        let n = req.body.page
-        let m = req.body.limit
+        let n1 = req.body.menPage || 1
+        let m1 = req.body.menLimit || 10
+        let n2 = req.body.womenPage || 1
+        let m2 = req.body.womenLimit || 10
+        let n3 = req.body.bothPage || 1
+        let m3 = req.body.bothLimit || 10
 
         let query = {}
 
@@ -623,40 +629,79 @@ module.exports = {
             query.brandName = re
         }
 
-        let options = {
-            page: n || 1,
-            limit: m || 10
-        }
-
-        brand.find(query, (err, result) => {
+        brand.find(query).sort({createdAt:-1}).exec((err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else {
                 
-                let men = []
+                let menArray = []
                 result.map((x)=>{
                     if(x.brandGender === 'Male'){
-                        men.push(x.brandName)
+                        menArray.push(x.brandName)
                     }
                 })
 
-                let women = []
+                let womenArray = []
                 result.map((x)=>{
                     if(x.brandGender ==='Female'){
-                        women.push(x.brandName)
+                        womenArray.push(x.brandName)
                     }
                 })
 
-                let both = []
+                let bothArray = []
                 
-                result.map((x)=>{
-                    both.push(x.brandName)
-                })
+                for(let i=0;i<menArray.length;i++){
+                    for(let j=0;j<womenArray.length;j++){
+                        if(menArray[i] == womenArray[j]){
+                            bothArray.push(menArray[i])
+                        }                        
+                    }    
+                }
+
+                let men = menArray.slice((n1-1)*m1, n1*m1)
+
+                let menList = {
+
+                    men,
+                    page:n1,
+                    total:menArray.length,
+                    limit:m1,
+                    pages:Math.ceil(menArray.length/m1)
+
+
+                }
+
+                let women = womenArray.slice((n2-1)*m2, n2*m2)
+
+                let womenList = {
+
+                    women,
+                    page:n2,
+                    total:womenArray.length,
+                    limit:m2,
+                    pages:Math.ceil(womenArray.length/m2)
+
+
+                }
+
+                let both = bothArray.slice((n3-1)*m3, n3*m3)
+
+                let bothList = {
+
+                    both,
+                    page:n3,
+                    total:bothArray.length,
+                    limit:m3,
+                    pages:Math.ceil(bothArray.length/m3)
+
+
+                }
+
 
                 let finalResult = { 
-                    menList:men,
-                    womenList:women,
-                    both:both
+                    menList,
+                    womenList,
+                    bothList
                  }
 
                 return commonFile.responseHandler(res, 200, "Success", finalResult)
@@ -877,6 +922,22 @@ module.exports = {
 
 
 
+     // @@@@@@@@@@@@@@@@@@@@@@@  addNewStyle Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+
+     addNewStyle:(req, res)=>{
+        
+        if (!req.body.createdBy || !req.body.brandName || !req.body.brandGender || !req.body.bodyType) {
+            return commonFile.responseHandler(res, 400, "Error: Parameters missing")
+        }
+
+        async.waterfall([(callback)=>{
+
+        }])
+     },
+
+
+
 
     // @@@@@@@@@@@@@@@@@@@@@@@  DashBoard Collections  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
@@ -884,14 +945,20 @@ module.exports = {
     totalCollection: (req, res) => {
 
         async.waterfall([(callback) => {
-            user.find({}, (err, user) => {
+            user.find({ status:"ACTIVE" }, (err, user) => {
                 if (err)
                     callback(err)
                 else
                     callback(null, user.length)
             })
         }, (user, callback) => {
-            brand.find({}, (err, brand) => {
+            
+            let masterQuery = [
+                {
+                    $group: { _id: "$brandName" }
+                }
+            ]
+            brand.aggregate(masterQuery, (err, brand) => {
                 if (err)
                     callback(err)
                 else
