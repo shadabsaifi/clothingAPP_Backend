@@ -20,10 +20,6 @@ let productSchema = new Schema({
 	productLink:{
 		type:String
 	},
-	productHaving:{
-		type:String,
-
-	},
 	productColor: {
 		type: Array,
 		default: ["BLACK", "WHITE", "YELLOW", "GREEN", "GREY", "RED"]
