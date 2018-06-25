@@ -663,10 +663,10 @@ module.exports = {
                 let menList = {
 
                     men,
-                    page:n1,
-                    total:menArray.length,
-                    limit:m1,
-                    pages:Math.ceil(menArray.length/m1)
+                    menPage:n1,
+                    menTotal:menArray.length,
+                    menLimit:m1,
+                    menPages:Math.ceil(menArray.length/m1)
 
 
                 }
@@ -676,10 +676,10 @@ module.exports = {
                 let womenList = {
 
                     women,
-                    page:n2,
-                    total:womenArray.length,
-                    limit:m2,
-                    pages:Math.ceil(womenArray.length/m2)
+                    womenPage:n2,
+                    womenTotal:womenArray.length,
+                    womenlimit:m2,
+                    womenPages:Math.ceil(womenArray.length/m2)
 
 
                 }
@@ -689,10 +689,10 @@ module.exports = {
                 let bothList = {
 
                     both,
-                    page:n3,
-                    total:bothArray.length,
-                    limit:m3,
-                    pages:Math.ceil(bothArray.length/m3)
+                    bothPage:n3,
+                    bothTotal:bothArray.length,
+                    bothLimit:m3,
+                    bothPages:Math.ceil(bothArray.length/m3)
 
 
                 }
@@ -917,6 +917,30 @@ module.exports = {
         })
 
     },
+
+
+
+
+      // @@@@@@@@@@@@@@@@@@@@@@@  bodyTypeList Api to show BodyType according to gender @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+
+        bodyTypeList:(req, res)=>{
+                
+            if (!req.body.gender) {
+                return commonFile.responseHandler(res, 400, "Parameters missing.")
+            }
+
+            if(req.body.gender.toLowerCase() === 'male'){
+                let  bodyType = ['Slim Jim','Muscle Man','Big Guy','Bulky']
+                return commonFile.responseHandler(res, 200, "Success", bodyType)
+            }
+            
+            if(req.body.gender.toLowerCase() === 'female'){
+                let  bodyType = ['Rectangle','Pear','Triangle','Hourglass']
+                return commonFile.responseHandler(res, 200, "Success", bodyType)
+            }    
+        },
+
 
 
 

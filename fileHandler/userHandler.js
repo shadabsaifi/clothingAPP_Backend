@@ -806,6 +806,8 @@ var randomstring = require("randomstring")
 
 
 
+
+
       // @@@@@@@@@@@@@@@@@@@@@@@  productDetail Api to show the product Detail   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
       productDetail: (req, res) => {
