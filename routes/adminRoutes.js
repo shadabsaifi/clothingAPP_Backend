@@ -30,7 +30,7 @@ adminRoutes.post('/addNewUser',adminHandler.addNewUser)
 adminRoutes.post('/userDetail',adminHandler.userDetail)
 adminRoutes.post('/editUser',adminHandler.editUser)
 adminRoutes.post('/addNewStyle',adminHandler.addNewStyle)
-adminRoutes.post('/bodyTypeList',adminHandler.bodyTypeList)
+adminRoutes.post('/bodyTypeBrandList',adminHandler.bodyTypeBrandList)
 adminRoutes.get('/totalCollection',adminHandler.totalCollection)
 
 // admin api end for clothing app

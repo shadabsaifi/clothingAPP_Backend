@@ -319,6 +319,7 @@ module.exports = {
     // @@@@@@@@@@@@@@@@@@@@@@@  editUser Api to to Show the Details  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     editUser: (req, res) => {
+
         if (!req.body.userId) {
             return commonFile.responseHandler(res, 400, "Parameter missing.")
         }
@@ -333,6 +334,9 @@ module.exports = {
         }
         if (req.body.age) {
             updateObj.age = req.body.age
+        }
+        if (req.body.gender) {
+            updateObj.gender = req.body.gender
         }
         if (req.body.bodyType) {
             updateObj.bodyType = req.body.bodyType
@@ -718,7 +722,7 @@ module.exports = {
 
     addNewProduct: (req, res) => {
         console.log("req.body========>>>>", req.body)
-        if (!req.body.createdBy || !req.body.productName || !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender) {
+        if (!req.body.createdBy || !req.body.productName || !req.body.productBodyType || !req.body.brandName ||  !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
 
@@ -924,21 +928,52 @@ module.exports = {
       // @@@@@@@@@@@@@@@@@@@@@@@  bodyTypeList Api to show BodyType according to gender @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 
-        bodyTypeList:(req, res)=>{
+        bodyTypeBrandList:(req, res)=>{
                 
-            if (!req.body.gender) {
+            if (!req.body.productGender) {
                 return commonFile.responseHandler(res, 400, "Parameters missing.")
             }
 
-            if(req.body.gender.toLowerCase() === 'male'){
-                let  bodyType = ['Slim Jim','Muscle Man','Big Guy','Bulky']
-                return commonFile.responseHandler(res, 200, "Success", bodyType)
+            let query = { }
+            if(req.body.productGender.toLowerCase() === 'male' && req.body.productBodyType){
+                console.log("1")
+                query.productGender ='Male'
+                query.productBodyType = req.body.productBodyType
             }
-            
-            if(req.body.gender.toLowerCase() === 'female'){
-                let  bodyType = ['Rectangle','Pear','Triangle','Hourglass']
-                return commonFile.responseHandler(res, 200, "Success", bodyType)
-            }    
+            if(req.body.productGender.toLowerCase() === 'female' && req.body.productBodyType){
+                console.log("2")
+                query.geproductGendernder ='Female'
+                query.productBodyType = req.body.productBodyType
+            }
+            if(req.body.productGender.toLowerCase() === 'male' && !req.body.productBodyType){
+                console.log("3")
+                let  bodyType = ['Slim Jim','Muscle Man','Big Guy','Bulky']
+                query.productGender ='Male'
+            }
+
+            if(req.body.productGender.toLowerCase() === 'female' && !req.body.productBodyType){
+                console.log("4")
+                let  productGender = ['Rectangle','Pear','Triangle','Hourglass']
+                query.productGender ='Female'
+            }
+            let masterQuery = [
+                {
+                    $match:query
+                },
+                {
+                    $group: { _id: "$brandName" }
+                }
+            ]
+            product.aggregate(masterQuery,(err, result)=>{
+                console.log("result",result)
+                if (err)
+                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                else{
+                    let show = result.map((x)=> x._id)
+                    return commonFile.responseHandler(res, 200, "Success", show)
+                }
+                    
+            })
         },
 
 
