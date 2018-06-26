@@ -722,7 +722,7 @@ module.exports = {
 
     addNewProduct: (req, res) => {
         console.log("req.body========>>>>", req.body)
-        if (!req.body.createdBy || !req.body.productName || !req.body.productBodyType || !req.body.brandName ||  !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender) {
+        if (!req.body.createdBy || !req.body.productName || !req.body.bodyType || !req.body.brandName ||  !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
 
@@ -881,6 +881,7 @@ module.exports = {
 
 
     updateProduct: (req, res) => {
+
         let query = { _id: req.body.productId }
 
         product.findByIdAndUpdate(query, req.body, { new: true }, (err, result) => {
@@ -935,25 +936,22 @@ module.exports = {
             }
 
             let query = { }
-            if(req.body.productGender.toLowerCase() === 'male' && req.body.productBodyType){
-                console.log("1")
+            let bodyType = []
+            if(req.body.productGender.toLowerCase() === 'male' && req.body.bodyType){
                 query.productGender ='Male'
-                query.productBodyType = req.body.productBodyType
+                query.bodyType = req.body.bodyType
             }
-            if(req.body.productGender.toLowerCase() === 'female' && req.body.productBodyType){
-                console.log("2")
-                query.geproductGendernder ='Female'
-                query.productBodyType = req.body.productBodyType
+            if(req.body.productGender.toLowerCase() === 'female' && req.body.bodyType){
+                query.productGender ='Female'
+                query.bodyType = req.body.productBodyType
             }
-            if(req.body.productGender.toLowerCase() === 'male' && !req.body.productBodyType){
-                console.log("3")
-                let  bodyType = ['Slim Jim','Muscle Man','Big Guy','Bulky']
+            if(req.body.productGender.toLowerCase() === 'male' && !req.body.bodyType){
+                bodyType = ['Slim Jim','Muscle Man','Big Guy','Bulky']
                 query.productGender ='Male'
             }
 
-            if(req.body.productGender.toLowerCase() === 'female' && !req.body.productBodyType){
-                console.log("4")
-                let  productGender = ['Rectangle','Pear','Triangle','Hourglass']
+            if(req.body.productGender.toLowerCase() === 'female' && !req.body.bodyType){
+                bodyType = ['Rectangle','Pear','Triangle','Hourglass']
                 query.productGender ='Female'
             }
             let masterQuery = [
@@ -970,6 +968,8 @@ module.exports = {
                     return commonFile.responseHandler(res, 400, "Internal Server Error.")
                 else{
                     let show = result.map((x)=> x._id)
+
+                    console.log("bodyType",bodyType)
                     return commonFile.responseHandler(res, 200, "Success", show)
                 }
                     
@@ -978,21 +978,80 @@ module.exports = {
 
 
 
-
-
-
      // @@@@@@@@@@@@@@@@@@@@@@@  addNewStyle Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 
-     addNewStyle:(req, res)=>{
+     addNewStyleTip:(req, res)=>{
         
-        if (!req.body.createdBy || !req.body.brandName || !req.body.brandGender || !req.body.bodyType) {
+        if (!req.body.createdBy || !req.body.brandName || !req.body.styleGender || !req.body.bodyType) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
+        
+        let newStyle = {
+            brandName:req.body.brandName,
+            styleGender:req.body.styleGender,
+            bodyType:req.body.bodyType,
+            createdBy:req.body.createdBy
+        }
 
-        async.waterfall([(callback)=>{
+        let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
+        style.findOne(query, (err, result)=>{
+            if(err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else if(result)
+                return commonFile.responseHandler(res, 200, "Style Tips Already Having in " + req.body.styleGender + " for this Brand")
+            else{
+                new style(newStyle).save((err, success)=>{
+                    if (err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                    else
+                        return commonFile.responseHandler(res, 200, "Success")
+    
+                })
+            }
+        })
+     },
 
-        }])
+
+
+
+     // @@@@@@@@@@@@@@@@@@@@@@@  DashBoard Collections  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+     styleTipList:(req, res)=>{
+        
+        let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
+        re = new RegExp(pattern, 'gi');
+
+        let query = {}
+
+        if (req.body.search) {
+            query.brandName = re
+        }
+
+        if (req.body.styleGender) {
+            query.styleGender = req.body.styleGender
+        }
+
+        if (req.body.bodyType) {
+            query.bodyType = req.body.bodyType
+        }
+
+        if (req.body.brandName) {
+            query.brandName = req.body.brandName
+        }
+
+        let options = {
+            page: req.body.page || 1,
+            limit: req.body.limit || 10,
+            sort:{createdAt:-1}
+        }
+
+        style.paginate(query, options, (err, result) => {
+            if (err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else
+                return commonFile.responseHandler(res, 200, "Success.", result)
+        })
      },
 
 

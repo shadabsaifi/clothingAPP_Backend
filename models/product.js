@@ -21,12 +21,15 @@ let productSchema = new Schema({
 	productLink:{
 		type:String
 	},
-	productBodyType:{
+	bodyType:{
 		type:String
 	},
 	productColor: {
 		type: Array,
 		default: ["BLACK", "WHITE", "YELLOW", "GREEN", "GREY", "RED"]
+	},
+	productImage: {
+		type: Array
 	},
 	productSize: {
 		type: Array,

@@ -10,6 +10,7 @@ const user = require('../models/user.js')
 const product = require('../models/product.js')
 const favourite = require('../models/favourite.js')
 const transaction = require('../models/product-transaction')
+const style = require('../models/style.js')
 var randomstring = require("randomstring")
 
 
@@ -729,7 +730,7 @@ var randomstring = require("randomstring")
 
 
 
-        // @@@@@@@@@@@@@@@@@@@@@@@  productList Api to show the product List with Searching and Filtering and sortBy  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+    // @@@@@@@@@@@@@@@@@@@@@@@  productList Api to show the product List with Searching and Filtering and sortBy  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     productList:(req, res)=>{
         
@@ -884,6 +885,93 @@ var randomstring = require("randomstring")
         })
 
     },
+
+
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@  StyleList Api to show the StyleList Name List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    styleTipList:(req, res)=>{
+
+        if(!req.body.userId){
+            return commonFile.responseHandler(res, 400, "Parameters missing.")
+        }
+
+        let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
+        // let pattern = new RegExp('^'+req.body.search,'i')
+        re = new RegExp(pattern, 'gi');
+
+        let n = req.body.page || 1
+        let m = req.body.limit || 10
+        let masterQuery = { }
+
+        if(req.body.search){
+            masterQuery.$or = [{brandName:re},{productName:re}]
+        }
+
+        let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
+        let options = {
+            page:1,
+            limit:50,
+            sort:{ createdAt:-1 }
+        }
+
+        async.waterfall([(callback)=>{
+
+            user.findById({_id:req.body.userId}, (err, result)=>{
+                if(err)
+                    callback(err)
+                else{
+                    let user = { }
+                    user.styleGender = result.gender
+                    user.bodyType = result.bodyType
+                    callback(null, user)
+                }
+            })
+            
+        }, (user, callback)=>{
+
+            style.find(user, (err, result)=>{
+                if(err)
+                    callback(err)
+                else{
+                    
+                    let brandList = result.map((x)=> {
+                        return x.brandName
+                    })
+                    let obj = { brandList:brandList, user:user }
+                    callback(null, obj)
+                }
+                    
+            })
+        }, (obj, callback)=>{
+
+            masterQuery.$and = [{ bodyType:obj.user.bodyType }, { brandName:{ $in:obj.brandList} } ]
+            product.paginate(masterQuery, options, (err, result)=>{
+                if(err)
+                    callback(err)
+                else{
+                    let final = { 
+                        styleTipList:result.docs,
+                        total:result.docs.length,
+                        page:n || 1,
+                        limit:m || 10,
+                        pages:Math.ceil(result.docs.length/m)
+                    }
+                    callback(null, final)
+                }
+                    
+            })
+        }], (err, finalResult)=>{
+            if(err)
+                return commonFile.responseHandler(res, 200, "Interbal Server Error.",err)
+            else
+                return commonFile.responseHandler(res, 200, "Success.", finalResult)
+        })
+
+        
+    },
+
 
 
 

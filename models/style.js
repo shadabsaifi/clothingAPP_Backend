@@ -8,7 +8,7 @@ let style = mongoose.Schema({
     brandName: {
 		type: String
     },
-    brandGender:{
+    styleGender:{
         type:String,
 		enum:['Male', 'Female']
     },
