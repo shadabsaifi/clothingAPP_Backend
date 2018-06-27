@@ -23,7 +23,7 @@ userRoutes.get('/brandNameList',userHandler.verifyToken,userHandler.brandNameLis
 userRoutes.post('/productDetail',userHandler.verifyToken,userHandler.productDetail)
 userRoutes.post('/styleBrandList',userHandler.styleBrandList)
 userRoutes.post('/styleTipList',userHandler.styleTipList)
-
+userRoutes.post('/example',userHandler.example)
 
 
 

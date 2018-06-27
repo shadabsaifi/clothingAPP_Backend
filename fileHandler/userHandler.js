@@ -935,7 +935,7 @@ var randomstring = require("randomstring")
                 if(err)
                     callback(err)
                 else
-                    callback(null, result.bodyType)
+                    callback(null, (result.bodyType))
             })
 
         }, (bodyType, callback)=>{
@@ -945,7 +945,7 @@ var randomstring = require("randomstring")
                     $match:{ bodyType:bodyType }
                 },
                 {
-                    $group: { _id: "$brandName", productQuantity: { $sum: 1 } }
+                    $group: { _id: "$brandName" }
                 },
                 { 
                     $sort: {  _id:1 } 
@@ -963,7 +963,7 @@ var randomstring = require("randomstring")
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             if(finalResult)
-                return commonFile.responseHandler(res, 200, "Success", result)
+                return commonFile.responseHandler(res, 200, "Success", finalResult)
         })
         
     },
@@ -987,8 +987,11 @@ var randomstring = require("randomstring")
         let m = req.body.limit || 10
         let masterQuery = { }
 
-        if(req.body.search){
-            masterQuery.$or = [{brandName:re},{productName:re}]
+        if(req.body.brandName.length){
+            masterQuery.brandName = { $in:req.body.brandName }
+        }
+        if(req.body.sortBy){
+            query.productPrice = req.body.sortBy
         }
 
         let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
@@ -1033,8 +1036,10 @@ var randomstring = require("randomstring")
                 if(err)
                     callback(err)
                 else{
+
+                    let show  = result.docs.slice((n-1)*m, n*m)
                     let final = { 
-                        styleTipList:result.docs,
+                        styleTipList:show,
                         total:result.docs.length,
                         page:n || 1,
                         limit:m || 10,
@@ -1075,9 +1080,43 @@ var randomstring = require("randomstring")
     },
 
 
+     // @@@@@@@@@@@@@@@@@@@@@@@  Example  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 
 
+    example:(req, res)=>{
+        
+        let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
+        // let pattern = new RegExp('^'+req.body.search,'i')
+        re = new RegExp(pattern, 'gi');
+        
+        let query = { }
+
+        if(req.body.search){
+            query.brandName = re
+        }
+        let masterQuery = [
+            {
+                $match:{ bodyType:bodyType }
+            },
+            {
+                $group: { _id: "$brandName" }
+            },
+            {
+                $match:{ bodyType:bodyType }
+            },
+            { 
+                $sort: {  _id:1 } 
+            }
+        ]
+
+        product.find(masterQuery, (err, result)=>{
+            if(err)
+                return commonFile.responseHandler(res, 200, "Interbal Server Error.",err)
+            else
+                return commonFile.responseHandler(res, 200, "Successfully logout.")
+        })
+    },
 
 
 

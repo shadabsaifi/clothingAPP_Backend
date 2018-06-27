@@ -956,21 +956,10 @@ module.exports = {
 
             let query = { }
             let bodyType = []
-            if(req.body.productGender.toLowerCase() === 'male' && req.body.bodyType){
-                query.productGender ='Male'
-                query.bodyType = req.body.bodyType
-            }
-            if(req.body.productGender.toLowerCase() === 'female' && req.body.bodyType){
-                query.productGender ='Female'
-                query.bodyType = req.body.bodyType
-            }
-            if(req.body.productGender.toLowerCase() === 'male' && !req.body.bodyType){
-                bodyType = ['Slim Jim','Muscle Man','Big Guy','Bulky']
+            if(req.body.productGender.toLowerCase() === 'male'){
                 query.productGender ='Male'
             }
-
-            if(req.body.productGender.toLowerCase() === 'female' && !req.body.bodyType){
-                bodyType = ['Rectangle','Pear','Triangle','Hourglass']
+            if(req.body.productGender.toLowerCase() === 'female'){
                 query.productGender ='Female'
             }
             let masterQuery = [
@@ -1045,7 +1034,6 @@ module.exports = {
 
         let query = { }
         
-        
         if(req.body.styleGender.toLowerCase() === 'male'){
             query.styleGender ='Male'
         }
@@ -1057,6 +1045,7 @@ module.exports = {
         if(req.body.bodyType){
             query.bodyType = req.body.bodyType
         }
+
         let masterQuery = [
             {
                 $match:query
