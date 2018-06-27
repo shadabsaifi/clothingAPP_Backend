@@ -771,7 +771,26 @@ module.exports = {
                 i++;
             } while (i < array.length)
 
-            req.body.productName = fullName
+            req.body.productName = fullName.trim()
+
+
+            var brandName = (req.body.brandName).toLowerCase();
+            var fullBrandName = ""
+            let brandArray = brandName.split(" ")
+
+            var j = 0
+
+            do {
+                fullBrandName = fullBrandName + brandArray[j].charAt(0).toUpperCase() + brandArray[j].substr(1) + " ";
+                j++;
+            } while (j < brandArray.length)
+
+            req.body.brandName = fullBrandName.trim()
+
+            
+
+
+            console.log("req.body.productName",req.body.productName)
 
             new product(req.body).save((err, success) => {
                 if (err)
@@ -926,7 +945,7 @@ module.exports = {
 
 
 
-      // @@@@@@@@@@@@@@@@@@@@@@@  bodyTypeList Api to show BodyType according to gender @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+      // @@@@@@@@@@@@@@@@@@@@@@@  bodyTypeList Api to show (BodyType according to gender) or (Brand List according to bodyType) on Add New Style Page @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 
         bodyTypeBrandList:(req, res)=>{
@@ -943,7 +962,7 @@ module.exports = {
             }
             if(req.body.productGender.toLowerCase() === 'female' && req.body.bodyType){
                 query.productGender ='Female'
-                query.bodyType = req.body.productBodyType
+                query.bodyType = req.body.bodyType
             }
             if(req.body.productGender.toLowerCase() === 'male' && !req.body.bodyType){
                 bodyType = ['Slim Jim','Muscle Man','Big Guy','Bulky']
@@ -991,7 +1010,7 @@ module.exports = {
             brandName:req.body.brandName,
             styleGender:req.body.styleGender,
             bodyType:req.body.bodyType,
-            createdBy:req.body.createdBy
+            createdBy:req.body.createdByList
         }
 
         let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
@@ -1012,6 +1031,51 @@ module.exports = {
         })
      },
 
+
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@  bodyTypeList Api to show (BodyType according to gender) or (Brand List according to bodyType) on Style Management Screen  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+
+    styleBrandList:(req, res)=>{
+        
+        if (!req.body.styleGender) {
+            return commonFile.responseHandler(res, 400, "Parameters missing.")
+        }
+
+        let query = { }
+        
+        
+        if(req.body.styleGender.toLowerCase() === 'male'){
+            query.styleGender ='Male'
+        }
+
+        if(req.body.styleGender.toLowerCase() === 'female'){
+            query.styleGender ='Female'
+        }
+
+        if(req.body.bodyType){
+            query.bodyType = req.body.bodyType
+        }
+        let masterQuery = [
+            {
+                $match:query
+            },
+            {
+                $group: { _id: "$brandName" }
+            }
+        ]
+        style.aggregate(masterQuery,(err, result)=>{
+            console.log("result",result)
+            if (err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else{
+                let show = result.map((x)=> x._id)
+                return commonFile.responseHandler(res, 200, "Success", show)
+            }
+                
+        })
+    },
 
 
 

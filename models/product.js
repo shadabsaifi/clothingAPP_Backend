@@ -21,6 +21,10 @@ let productSchema = new Schema({
 	productLink:{
 		type:String
 	},
+	productGender:{
+		type:String,
+		enum:['Male', 'Female', 'Both']
+	},
 	bodyType:{
 		type:String
 	},
@@ -38,13 +42,7 @@ let productSchema = new Schema({
 	productQuantity: {
 		type: Number
 	},
-	productGender:{
-		type:String,
-		enum:['Male', 'Female', 'Both']
-	},
-	productBodyType:{
-		type:String
-	},
+	
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId, ref: 'admin'
 	},

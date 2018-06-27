@@ -31,6 +31,7 @@ adminRoutes.post('/userDetail',adminHandler.userDetail)
 adminRoutes.post('/editUser',adminHandler.editUser)
 adminRoutes.post('/bodyTypeBrandList',adminHandler.bodyTypeBrandList)
 adminRoutes.post('/addNewStyleTip',adminHandler.addNewStyleTip)
+adminRoutes.post('/styleBrandList',adminHandler.styleBrandList)
 adminRoutes.post('/styleTipList',adminHandler.styleTipList)
 adminRoutes.get('/totalCollection',adminHandler.totalCollection)
 

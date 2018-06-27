@@ -677,15 +677,16 @@ var randomstring = require("randomstring")
                 })
 
             }],(err, finalResult)=>{
-                let show = finalResult.map((x)=>{
+                let data = finalResult.map((x)=>{
                     return x.product
                 })
+                let show  = data.slice( (n - 1) * m, m * n)
                 let result = {
                     myFavourite:show,
                     page:n,
-                    total:show.length,
+                    total:data.length,
                     limit:m,
-                    pages:Math.ceil(show.length/m)
+                    pages:Math.ceil(data.length/m)
                 }
                 return commonFile.responseHandler(res, 200, "Success.",result)
             })
@@ -702,7 +703,7 @@ var randomstring = require("randomstring")
     
     searchsuggestion:(req, res)=>{
         if (!req.body.search) {
-            return commonFile.responseHandler(res, 200, "Success.", [])
+            return commonFile.responseHandler(res, 200, "Success.")
         }
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
         re = new RegExp(pattern, 'gi')
@@ -733,41 +734,50 @@ var randomstring = require("randomstring")
     // @@@@@@@@@@@@@@@@@@@@@@@  productList Api to show the product List with Searching and Filtering and sortBy  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     productList:(req, res)=>{
-        
+        console.log("req.body "+req.body)
         if (!req.body.userId) {
             return commonFile.responseHandler(res, 400, "Parameters missing.");
         }
 
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
-        // let pattern = new RegExp('^'+req.body.search,'i')
         re = new RegExp(pattern, 'gi');
 
         user.findById({_id:req.body.userId}).populate('myFavourite.product').exec((err, userResult)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else{
-                console.log(userResult)
+                console.log("userId "+userResult)
                 if(!userResult.bodyType){
                     return commonFile.responseHandler(res, 400, "Please Select Your Body Type.")
                 }else{
+
                     let query = { bodyType:userResult.bodyType }
 
-                if(req.body.search && req.body.productName.length){
-            
-                    query.$and = [{productName:{ $in:req.body.productName }},{productName:re}]
-                    console.log("and========>>>",query) 
-                }
-                else{
-                    if(req.body.productName.length){
-                        query.productName = { $in:req.body.productName }
-                        console.log("or========>>>",query)
-                    }
-            
                     if(req.body.search){
+                        console.log("aa gya")
                         query.productName = re
-                        console.log("or========>>>",query)
                     }
-                }
+                    if(req.body.brandName.length){
+                        console.log("phir se aa gya")
+                        query.brandName = {$in:req.body.brandName}
+                    }
+
+                // if(req.body.search && req.body.productName.length){
+            
+                //     query.$and = [{productName:{ $in:req.body.productName }},{productName:re}]
+                //     console.log("and========>>>",query) 
+                // }
+                // else{
+                //     if(req.body.productName.length){
+                //         query.productName = { $in:req.body.productName }
+                //         console.log("or========>>>",query)
+                //     }
+            
+                //     if(req.body.search){
+                //         query.productName = re
+                //         console.log("or========>>>",query)
+                //     }
+                // }
         
                 let options = {
                     lean:true,
@@ -866,24 +876,96 @@ var randomstring = require("randomstring")
 
  // @@@@@@@@@@@@@@@@@@@@@@@  productName Api to show the Product Name List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-    productNameList:(req, res)=>{
-        
-        let masterQuery = [
-            {
-                $group: { _id: "$productName", productQuantity: { $sum: 1 } }
-            },
-            { 
-                $sort: {  _id:1 } 
-            }
-        ]
+    brandNameList:(req, res)=>{
 
-        product.aggregate(masterQuery, (err, result)=>{
+        if (!req.body.userId) {
+            return commonFile.responseHandler(res, 400, "Parameters missing.");
+        }
+
+        async.waterfall([(callback)=>{
+
+            user.findById({_id:req.body.userId}, (err, result)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, result.bodyType)
+            })
+
+        }, (bodyType, callback)=>{
+
+            let masterQuery = [
+                {
+                    $match:{ bodyType:bodyType }
+                },
+                {
+                    $group: { _id: "$brandName", productQuantity: { $sum: 1 } }
+                },
+                { 
+                    $sort: {  _id:1 } 
+                }
+            ]
+
+            product.aggregate(masterQuery, (err, result)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, result)
+            })
+
+        }], (err, finalResult)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else
+            if(finalResult)
                 return commonFile.responseHandler(res, 200, "Success", result)
         })
+    },
 
+
+// @@@@@@@@@@@@@@@@@@@@@@@  StyleBrandList Api to show the Brand Name on filter  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    styleBrandList:(req, res)=>{
+        
+        if (!req.body.userId) {
+            return commonFile.responseHandler(res, 400, "Parameters missing.");
+        }
+
+        async.waterfall([(callback)=>{
+
+            user.findById({_id:req.body.userId}, (err, result)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, result.bodyType)
+            })
+
+        }, (bodyType, callback)=>{
+
+            let masterQuery = [
+                {
+                    $match:{ bodyType:bodyType }
+                },
+                {
+                    $group: { _id: "$brandName", productQuantity: { $sum: 1 } }
+                },
+                { 
+                    $sort: {  _id:1 } 
+                }
+            ]
+
+            style.aggregate(masterQuery, (err, result)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, result)
+            })
+
+        }], (err, finalResult)=>{
+            if (err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            if(finalResult)
+                return commonFile.responseHandler(res, 200, "Success", result)
+        })
+        
     },
 
 
