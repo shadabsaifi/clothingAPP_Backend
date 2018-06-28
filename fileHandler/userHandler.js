@@ -12,6 +12,7 @@ const favourite = require('../models/favourite.js')
 const transaction = require('../models/product-transaction')
 const style = require('../models/style.js')
 var randomstring = require("randomstring")
+var forEach = require('async-foreach').forEach;
 
 
 //     notification = require('./notification.js'),
@@ -587,7 +588,7 @@ var randomstring = require("randomstring")
                     }
                 }
                 
-                favourite.findOneAndRemove({ productId: req.body.productId }, (err, result) => {
+                favourite.findOneAndRemove({ productId: req.body.productId, likedBy:req.body.userId }, (err, result) => {
                     if (err)
                         return commonFile.responseHandler(res, 400, "Internal Server Error")
                     else if (result)
@@ -632,66 +633,192 @@ var randomstring = require("randomstring")
 
         // @@@@@@@@@@@@@@@@@@@@@@@  myFavourite Api to show favourite product List @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-        myFavourite: (req, res) => {
+        // myFavourite: (req, res) => {
+        //     console.log("req.body========>>>>",req.body)
+
+        //     let n = req.body.page || 1
+        //     let m = req.body.limit || 10
+
+        //     if (!req.body.userId) {
+        //         return commonFile.responseHandler(res, 400, "Parameters missing.");
+        //     }
+
+        //     // let query = { _id: mongoose.Types.ObjectId(req.body.userId), status: "ACTIVE" }
+
+        //     let query = {}
+
+        //     if(req.body.brandName.length){
+        //         query["productList.brandName"] = { $in:req.body.brandName }
+        //     }
+        //     let masterQuery = [
+
+        //         { "$lookup": {
+        //           "from": "product",
+        //           "localField": "myFavourite.product",
+        //           "foreignField": "_id",
+        //           "as": "productList"
+        //         }},
+        //         { "$unwind": "$productList" },
+        //         { "$match": query },
+        //         // { "$group": {
+        //         //   "_id": "$_id",
+        //         // //   "dateCreated": { "$first": "$dateCreated" },
+        //         // //   "title": { "$first": "$title" },
+        //         // //   "description": { "$first": "$description" },
+        //         //   "brandList": { "$push": "$brandList" }
+        //         // }}
+        //       ]
+
+        //     async.waterfall([(callback)=>{
+                
+        //         // user.findById(query).populate('myFavourite.product').exec((err, firstResult)=>{
+        //             user.aggregate(masterQuery, (err, firstResult)=>{
+        //                 console.log("err",err)
+        //             if (err)
+        //                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
+        //             else if (!firstResult)
+        //                 return commonFile.responseHandler(res, 409, "User not found.")
+        //             else
+        //             console.log("firstResult",firstResult)
+        //                 callback(null, firstResult)
+
+        //                 // if (firstResult.subscriptionPeriod) {
+        //                 //     if (Date.now() - firstResult.subscriptionPeriod >= 0) {
+        //                 //         let i = 0
+        //                 //         let array = []
+        //                 //         do{ 
+        //                 //             array[i] = firstResult.myFavourite[i]
+        //                 //             if(firstResult.myFavourite.length == 50){
+        //                 //                 callback(null, array)
+        //                 //             }
+        //                 //             i++;
+        //                 //         }
+        //                 //         while(i < 50)        
+        //                 //     }
+        //                 //     else {
+        //                 //         callback(null, firstResult.myFavourite)
+        //                 //     }
+        //                 // }
+        //                 // else{
+        //                 //     callback(null, firstResult.myFavourite)
+        //                 // }
+        //         })
+
+        //     }],(err, finalResult)=>{
+        //         // let data = finalResult.map((x)=>{
+        //         //     return x.product
+        //         // })
+        //         // let show  = data.slice( (n - 1) * m, m * n)
+        //         // let result = {
+        //         //     myFavourite:show,
+        //         //     page:n,
+        //         //     total:data.length,
+        //         //     limit:m,
+        //         //     pages:Math.ceil(data.length/m)
+        //         // }
+        //         return commonFile.responseHandler(res, 200, "Success.",finalResult)
+        //     })
+
+        // },
+
+
+        myFavourite:(req, res)=>{
             console.log("req.body========>>>>",req.body)
 
-            let n = req.body.page || 1
-            let m = req.body.limit || 10
+                if (!req.body.userId) {
+                    return commonFile.responseHandler(res, 400, "Parameters missing.");
+                }
 
+                let options = {
+                    page:req.body.page || 1,
+                    limit:req.body.limit || 10,
+                }
+
+                if(req.body.sortBy){
+                    options.sort = { productPrice:req.body.sortBy }
+                }
+
+                async.waterfall([(callback)=>{
+                    favourite.find({ likedBy:req.body.userId }, (err, result)=>{
+                        if(err)
+                            callback(err)
+                        else{
+                            let array = result.map((x)=>{
+                                return x.productId
+                            })
+                            callback(null, array)
+                        }
+                            
+                    })
+                }, (productList, callback)=>{
+                    let query = { _id: { $in:productList }  }
+                    
+                    if(req.body.brandName.length){
+                        query.brandName = { $in:req.body.brandName }
+                    }
+                    product.paginate(query, options, (err, result)=>{
+                        if(err)
+                            callback(err)
+                        else
+                            callback(null, result)
+                    })
+                }], (err, finalResult)=>{
+                    if(err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                    if(finalResult)
+                        return commonFile.responseHandler(res, 200, "Success.", finalResult)
+                })
+
+                
+        },
+
+
+
+        favouriteBrandList:(req, res)=>{
+            
             if (!req.body.userId) {
                 return commonFile.responseHandler(res, 400, "Parameters missing.");
             }
-
-            let query = { _id: mongoose.Types.ObjectId(req.body.userId), status: "ACTIVE" }
+            
+            let query = { likedBy:req.body.userId }
 
             async.waterfall([(callback)=>{
-                
-                user.findById(query).populate('myFavourite.product').exec((err, firstResult)=>{
-                    if (err)
-                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
-                    else if (!firstResult)
-                        return commonFile.responseHandler(res, 409, "User not found.")
-                    else{
-
-                        if (firstResult.subscriptionPeriod) {
-                            if (Date.now() - firstResult.subscriptionPeriod >= 0) {
-                                let i = 0
-                                let array = []
-                                do{ 
-                                    array[i] = firstResult.myFavourite[i]
-                                    if(firstResult.myFavourite.length == 50){
-                                        callback(null, array)
-                                    }
-                                    i++;
-                                }
-                                while(i < 50)        
-                            }
-                            else {
-                                callback(null, firstResult.myFavourite)
-                            }
-                        }
-                        else{
-                            callback(null, firstResult.myFavourite)
-                        }
-                    }
+                favourite.find(query, (err, result)=>{
+                    if(err)
+                        callback(err)
+                    else
+                    var array = []
+                        array = result.map((x)=>{
+                            return x.productId
+                        })
+                        callback(null, array)
                 })
-
-            }],(err, finalResult)=>{
-                let data = finalResult.map((x)=>{
-                    return x.product
+            }, (list, callback)=>{
+                let masterQuery = [
+                    {
+                        $match:{ _id: { $in:list } }
+                    },
+                    {
+                        $group:{ _id:"$brandName" }
+                    }   
+                ]
+                product.aggregate(masterQuery, (err, result)=>{
+                    if(err)
+                        callback(err)
+                    else
+                        callback(null, result)
                 })
-                let show  = data.slice( (n - 1) * m, m * n)
-                let result = {
-                    myFavourite:show,
-                    page:n,
-                    total:data.length,
-                    limit:m,
-                    pages:Math.ceil(data.length/m)
-                }
-                return commonFile.responseHandler(res, 200, "Success.",result)
+            }], (err, finalResult)=>{
+                if(err)
+                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                else
+                    return commonFile.responseHandler(res, 200, "Success.", finalResult)
             })
 
+            
+
         },
+
 
 
 
@@ -761,23 +888,6 @@ var randomstring = require("randomstring")
                         console.log("phir se aa gya")
                         query.brandName = {$in:req.body.brandName}
                     }
-
-                // if(req.body.search && req.body.productName.length){
-            
-                //     query.$and = [{productName:{ $in:req.body.productName }},{productName:re}]
-                //     console.log("and========>>>",query) 
-                // }
-                // else{
-                //     if(req.body.productName.length){
-                //         query.productName = { $in:req.body.productName }
-                //         console.log("or========>>>",query)
-                //     }
-            
-                //     if(req.body.search){
-                //         query.productName = re
-                //         console.log("or========>>>",query)
-                //     }
-                // }
         
                 let options = {
                     lean:true,
@@ -874,7 +984,7 @@ var randomstring = require("randomstring")
 
 
 
- // @@@@@@@@@@@@@@@@@@@@@@@  productName Api to show the Product Name List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+ // @@@@@@@@@@@@@@@@@@@@@@@  productName Api to show the Product Name List Home Page  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     brandNameList:(req, res)=>{
 
@@ -916,12 +1026,12 @@ var randomstring = require("randomstring")
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             if(finalResult)
-                return commonFile.responseHandler(res, 200, "Success", result)
+                return commonFile.responseHandler(res, 200, "Success", finalResult)
         })
     },
 
 
-// @@@@@@@@@@@@@@@@@@@@@@@  StyleBrandList Api to show the Brand Name on filter  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+// @@@@@@@@@@@@@@@@@@@@@@@  StyleBrandList Api to show the Brand Name on filter (Screen Name Style Tips) @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     styleBrandList:(req, res)=>{
         
@@ -935,7 +1045,7 @@ var randomstring = require("randomstring")
                 if(err)
                     callback(err)
                 else
-                    callback(null, (result.bodyType))
+                    callback(null, result.bodyType)
             })
 
         }, (bodyType, callback)=>{
@@ -1081,42 +1191,6 @@ var randomstring = require("randomstring")
 
 
      // @@@@@@@@@@@@@@@@@@@@@@@  Example  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-
-
-
-    example:(req, res)=>{
-        
-        let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
-        // let pattern = new RegExp('^'+req.body.search,'i')
-        re = new RegExp(pattern, 'gi');
-        
-        let query = { }
-
-        if(req.body.search){
-            query.brandName = re
-        }
-        let masterQuery = [
-            {
-                $match:{ bodyType:bodyType }
-            },
-            {
-                $group: { _id: "$brandName" }
-            },
-            {
-                $match:{ bodyType:bodyType }
-            },
-            { 
-                $sort: {  _id:1 } 
-            }
-        ]
-
-        product.find(masterQuery, (err, result)=>{
-            if(err)
-                return commonFile.responseHandler(res, 200, "Interbal Server Error.",err)
-            else
-                return commonFile.responseHandler(res, 200, "Successfully logout.")
-        })
-    },
 
 
 

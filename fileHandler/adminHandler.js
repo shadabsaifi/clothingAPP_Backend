@@ -859,21 +859,15 @@ module.exports = {
 
         let query = {}
 
-        if (req.body.search && req.body.productName) {
-
-            query.$and = [{ productName: { $in: req.body.productName } }, { productName: re }]
-            console.log("and========>>>", query)
+        if(req.body.search){
+            query.productName = re
         }
-        else {
-            if (req.body.productName) {
-                query.productName = { $in: req.body.productName }
-                console.log("or========>>>", query)
-            }
 
-            if (req.body.search) {
-                query.productName = re
-                console.log("or========>>>", query)
-            }
+        if(req.body.productGender){
+            query.productGender = req.body.productGender
+        }
+        if(req.body.bodyType){
+            query.bodyType = req.body.bodyType
         }
 
         let options = {
@@ -881,9 +875,6 @@ module.exports = {
             limit: req.body.limit || 10
         }
 
-        if (req.body.sortBy) {
-            options.sort = { productPrice: req.body.sortBy }
-        }
         product.paginate(query, options, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
@@ -1027,18 +1018,14 @@ module.exports = {
 
 
     styleBrandList:(req, res)=>{
-        
-        if (!req.body.styleGender) {
-            return commonFile.responseHandler(res, 400, "Parameters missing.")
-        }
 
         let query = { }
         
-        if(req.body.styleGender.toLowerCase() === 'male'){
+        if(req.body.styleGender == 'Male'){
             query.styleGender ='Male'
         }
 
-        if(req.body.styleGender.toLowerCase() === 'female'){
+        if(req.body.styleGender == 'Female'){
             query.styleGender ='Female'
         }
 
@@ -1096,7 +1083,7 @@ module.exports = {
         let options = {
             page: req.body.page || 1,
             limit: req.body.limit || 10,
-            sort:{createdAt:-1}
+            sort: { createdAt:-1 }
         }
 
         style.paginate(query, options, (err, result) => {

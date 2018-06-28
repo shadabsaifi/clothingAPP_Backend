@@ -42,7 +42,9 @@ let productSchema = new Schema({
 	productQuantity: {
 		type: Number
 	},
-	
+	likedBy:{
+		type:mongoose.Schema.Types.ObjectId, ref: 'user'
+	},
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId, ref: 'admin'
 	},

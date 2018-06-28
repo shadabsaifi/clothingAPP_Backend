@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 const userHandler = require('../fileHandler/userHandler.js')
 const commonFile = require('../fileHandler/commonFile.js')
 
+
+
+
 userRoutes.post('/verifyToken',userHandler.verifyToken)
-
-
 userRoutes.post('/login',userHandler.login)
 userRoutes.post('/signup',userHandler.signup)
 userRoutes.post('/forgotPassword',userHandler.forgotPassword)
@@ -19,11 +20,12 @@ userRoutes.post('/myFavourite',userHandler.verifyToken,userHandler.myFavourite)
 userRoutes.get('/logout',userHandler.verifyToken,userHandler.logout)
 userRoutes.post('/searchsuggestion',userHandler.verifyToken,userHandler.searchsuggestion)
 userRoutes.post('/productList',userHandler.verifyToken,userHandler.productList)
-userRoutes.get('/brandNameList',userHandler.verifyToken,userHandler.brandNameList)
+userRoutes.post('/brandNameList',userHandler.verifyToken,userHandler.brandNameList)
 userRoutes.post('/productDetail',userHandler.verifyToken,userHandler.productDetail)
-userRoutes.post('/styleBrandList',userHandler.styleBrandList)
-userRoutes.post('/styleTipList',userHandler.styleTipList)
-userRoutes.post('/example',userHandler.example)
+userRoutes.post('/styleBrandList',userHandler.verifyToken,userHandler.styleBrandList)
+userRoutes.post('/styleTipList',userHandler.verifyToken,userHandler.styleTipList)
+userRoutes.post('/favouriteBrandList',userHandler.verifyToken,userHandler.favouriteBrandList)
+
 
 
 
