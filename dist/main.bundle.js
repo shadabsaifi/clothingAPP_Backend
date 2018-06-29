@@ -236,14 +236,12 @@ var AddUserComponent = /** @class */ (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__add_product_add_product_component__ = __webpack_require__("./src/app/add-product/add-product.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__style_management_style_management_component__ = __webpack_require__("./src/app/style-management/style-management.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__view_user_view_user_component__ = __webpack_require__("./src/app/view-user/view-user.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__edit_user_edit_user_component__ = __webpack_require__("./src/app/edit-user/edit-user.component.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-
 
 
 
@@ -267,7 +265,6 @@ var routes = [
     { path: 'add-product', component: __WEBPACK_IMPORTED_MODULE_8__add_product_add_product_component__["a" /* AddProductComponent */] },
     { path: 'style-management', component: __WEBPACK_IMPORTED_MODULE_9__style_management_style_management_component__["a" /* StyleManagementComponent */] },
     { path: 'view-user', component: __WEBPACK_IMPORTED_MODULE_10__view_user_view_user_component__["a" /* ViewUserComponent */] },
-    { path: 'edit-user', component: __WEBPACK_IMPORTED_MODULE_11__edit_user_edit_user_component__["a" /* EditUserComponent */] }
 ];
 var AppRoutingModule = /** @class */ (function () {
     function AppRoutingModule() {
@@ -451,6 +448,7 @@ module.exports = "<div class=\"mainbox\">\n  <app-side-menu></app-side-menu>\n<d
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("./node_modules/@angular/core/esm5/core.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_forms__ = __webpack_require__("./node_modules/@angular/forms/esm5/forms.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__data_service__ = __webpack_require__("./src/app/data.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__angular_router__ = __webpack_require__("./node_modules/@angular/router/esm5/router.js");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -463,10 +461,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var BrandManagementComponent = /** @class */ (function () {
-    function BrandManagementComponent(formBuilder, service) {
+    function BrandManagementComponent(formBuilder, service, router) {
         this.formBuilder = formBuilder;
         this.service = service;
+        this.router = router;
         this.menBrandList = [];
         this.womenBrandList = [];
         this.bothBrandList = [];
@@ -507,6 +507,14 @@ var BrandManagementComponent = /** @class */ (function () {
                 _this.menTotal = response['data'].menList.menTotal;
                 _this.womenTotal = response['data'].womenList.womenTotal;
                 _this.bothTotal = response['data'].bothList.bothTotal;
+            }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
             }
             else {
                 console.log('Failure', response['responseMessage']);
@@ -635,7 +643,7 @@ var BrandManagementComponent = /** @class */ (function () {
             template: __webpack_require__("./src/app/brand-management/brand-management.component.html"),
             styles: [__webpack_require__("./src/app/brand-management/brand-management.component.css")]
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__angular_forms__["b" /* FormBuilder */], __WEBPACK_IMPORTED_MODULE_2__data_service__["a" /* DataService */]])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__angular_forms__["b" /* FormBuilder */], __WEBPACK_IMPORTED_MODULE_2__data_service__["a" /* DataService */], __WEBPACK_IMPORTED_MODULE_3__angular_router__["a" /* Router */]])
     ], BrandManagementComponent);
     return BrandManagementComponent;
 }());
@@ -665,6 +673,7 @@ module.exports = "<div class=\"mainbox\">\n<app-side-menu></app-side-menu>\n<div
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return DashboardComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("./node_modules/@angular/core/esm5/core.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__data_service__ = __webpack_require__("./src/app/data.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_router__ = __webpack_require__("./node_modules/@angular/router/esm5/router.js");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -676,9 +685,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 
+
 var DashboardComponent = /** @class */ (function () {
-    function DashboardComponent(service) {
+    function DashboardComponent(service, router) {
         this.service = service;
+        this.router = router;
         this.dashboardData = {};
     }
     DashboardComponent.prototype.ngOnInit = function () {
@@ -687,6 +698,14 @@ var DashboardComponent = /** @class */ (function () {
             if (response['responseCode'] == 200) {
                 console.log('success', response['data']);
                 _this.dashboardData = response['data'];
+            }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
             }
             else {
                 console.log('Failure', response['responseMessage']);
@@ -701,7 +720,7 @@ var DashboardComponent = /** @class */ (function () {
             template: __webpack_require__("./src/app/dashboard/dashboard.component.html"),
             styles: [__webpack_require__("./src/app/dashboard/dashboard.component.css")]
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__data_service__["a" /* DataService */]])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__data_service__["a" /* DataService */], __WEBPACK_IMPORTED_MODULE_2__angular_router__["a" /* Router */]])
     ], DashboardComponent);
     return DashboardComponent;
 }());
@@ -731,11 +750,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var DataService = /** @class */ (function () {
     function DataService(http) {
         this.http = http;
-        //   baseUrl = 'http://172.16.6.80:1468/admin'
-        this.baseUrl = 'http://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:1468/admin';
+        this.token = localStorage.getItem("token");
+        this.baseUrl = 'http://172.16.6.80:1468/admin';
+        //   baseUrl = 'http://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:1468/admin'
         this.getHttpOptions = {
             headers: new __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["c" /* HttpHeaders */]({
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "token": this.token
             })
         };
     }
@@ -1025,6 +1046,7 @@ var LoginComponent = /** @class */ (function () {
             if (response['responseCode'] == 200) {
                 console.log('success', response['responseMessage']);
                 localStorage.setItem("adminId", response['data']._id);
+                localStorage.setItem("token", response['data'].token);
                 if (_this.loginData.rememberMe == true) {
                     localStorage.setItem('email', _this.loginData.email);
                     localStorage.setItem('password', _this.loginData.password);
@@ -1050,10 +1072,6 @@ var LoginComponent = /** @class */ (function () {
     return LoginComponent;
 }());
 
-// $("#dealername").on("keypress", function(e) {
-//   if (e.which === 32 && !this.value.length)
-//       e.preventDefault();
-// });  
 
 
 /***/ }),
@@ -1068,7 +1086,7 @@ module.exports = ""
 /***/ "./src/app/product-management/product-management.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"mainbox\">\n  <app-side-menu></app-side-menu>\n<div class=\"right-section\">\n  <div class=\"copyrights\">Copyright © 2018 App name All Rights Reserved.</div>\n  <div class=\"right-inner\">\n      \n    <h1 class=\"heading\">PRODUCT MANAGEMENT</h1>\n    <div class=\"filter-block\">\n          <fieldset class=\"global-fieldset\">\n              <legend>Product Board</legend>\n              <div class=\"filter-content\">\n                <div class=\"row\">\n                    <div class=\"col-sm-6\">\n                       <div class=\"form-group\">\n                          <div class=\"search-icon\">\n                             <input type=\"text\" class=\"form-control max-wt-300 search-input\" placeholder=\"Search\">\n                             <i class=\"fa fa-search\" aria-hidden=\"true\"></i>\n                          </div>\n                       </div>\n                    </div>\n                    <div class=\"col-sm-6\">\n                       <div class=\"btn-right\">\n                          <button class=\"btn btn-red btn-common\" (click)=\"addProduct()\">Add</button>\n                       </div>\n                    </div>\n                 </div>\n                 <div class=\"row\">\n                    <div class=\"col-sm-6\">\n                       <div class=\"form-group d-inline-block\">\n                          <div class=\"show-entries mb0\">\n                             <select class=\"form-control\">\n                                <option>Body Type</option>\n                                <option>Body Type</option>\n                                <option>Body Type</option>\n                             </select>  \n                          </div>\n                        </div>\n                        <div class=\"form-group d-inline-block\">\n                          <div class=\"show-entries mb0\">\n                             <select class=\"form-control\">\n                                <option>Gender</option>\n                                <option>Gender</option>\n                                <option>Gender</option>\n                             </select>  \n                          </div>\n                        </div>\n                    </div>\n                 </div>\n                <div class=\"box box-blue\">\n            <div class=\"box-body\">\n                <div class=\"custom-table table-responsive\">\n              <table class=\"table  table-border\">\n                  <thead>\n                      <tr>\n                        <th>SNo.</th>\n                        <th>Gender</th>\n                        <th>Body Type</th>\n                        <th>Height</th>\n                        <th>Weight</th>\n                        <th>Product Name</th>\n                        <th>Brand Name</th>\n                        <th>Action</th>\n                      </tr>\n                  </thead>\n                  <tbody>\n                      <tr>\n                        <td>01</td>\n                        <td>Female</td>\n                        <td>Curvy</td>\n                        <td>5'1</td>\n                        <td>56</td>\n                        <td>Shirt</td>\n                        <td>Madame</td>\n                        <td>\n                            <div class=\"action-btn\">\n                                <a class=\"btn btn-sm btn-success\" href=\"view-product.html\"><i class=\"fa fa-eye\"></i> View</a>\n                                <a class=\"btn btn-sm btn-primary\" href=\"edit-product.html\"><i class=\"fa fa-edit\"></i> Edit</a>\n                                <a class=\"btn btn-sm btn-danger\" href=\"#delete\"  data-toggle=\"modal\"><i class=\"fa fa-trash\"></i> Delete</a>\n                            </div>  \n                        </td>\n                      </tr>\n                      <tr>\n                        <td>01</td>\n                        <td>Female</td>\n                        <td>Curvy</td>\n                        <td>5'1</td>\n                        <td>56</td>\n                        <td>Shirt</td>\n                        <td>Madame</td>\n                        <td>\n                            <div class=\"action-btn\">\n                                <a class=\"btn btn-sm btn-success\" href=\"view-product.html\"><i class=\"fa fa-eye\"></i> View</a>\n                                <a class=\"btn btn-sm btn-primary\" href=\"edit-product.html\"><i class=\"fa fa-edit\"></i> Edit</a>\n                                <a class=\"btn btn-sm btn-danger\" href=\"#delete\"  data-toggle=\"modal\"><i class=\"fa fa-trash\"></i> Delete</a>\n                            </div>  \n                        </td>\n                      </tr>\n                      <tr>\n                        <td>01</td>\n                        <td>Female</td>\n                        <td>Curvy</td>\n                        <td>5'1</td>\n                        <td>56</td>\n                        <td>Shirt</td>\n                        <td>Madame</td>\n                        <td>\n                            <div class=\"action-btn\">\n                                <a class=\"btn btn-sm btn-success\" href=\"view-product.html\"><i class=\"fa fa-eye\"></i> View</a>\n                                <a class=\"btn btn-sm btn-primary\" href=\"edit-product.html\"><i class=\"fa fa-edit\"></i> Edit</a>\n                                <a class=\"btn btn-sm btn-danger\" href=\"#delete\"  data-toggle=\"modal\"><i class=\"fa fa-trash\"></i> Delete</a>\n                            </div>  \n                        </td>\n                      </tr>\n                      <tr>\n                        <td>01</td>\n                        <td>Female</td>\n                        <td>Curvy</td>\n                        <td>5'1</td>\n                        <td>56</td>\n                        <td>Shirt</td>\n                        <td>Madame</td>\n                        <td>\n                            <div class=\"action-btn\">\n                                <a class=\"btn btn-sm btn-success\" href=\"view-product.html\"><i class=\"fa fa-eye\"></i> View</a>\n                                <a class=\"btn btn-sm btn-primary\" href=\"edit-product.html\"><i class=\"fa fa-edit\"></i> Edit</a>\n                                <a class=\"btn btn-sm btn-danger\" href=\"#delete\"  data-toggle=\"modal\"><i class=\"fa fa-trash\"></i> Delete</a>\n                            </div>  \n                        </td>\n                      </tr>\n                      <tr>\n                        <td>01</td>\n                        <td>Female</td>\n                        <td>Curvy</td>\n                        <td>5'1</td>\n                        <td>56</td>\n                        <td>Shirt</td>\n                        <td>Madame</td>\n                        <td>\n                            <div class=\"action-btn\">\n                                <a class=\"btn btn-sm btn-success\" href=\"view-product.html\"><i class=\"fa fa-eye\"></i> View</a>\n                                <a class=\"btn btn-sm btn-primary\" href=\"edit-product.html\"><i class=\"fa fa-edit\"></i> Edit</a>\n                                <a class=\"btn btn-sm btn-danger\" href=\"#delete\"  data-toggle=\"modal\"><i class=\"fa fa-trash\"></i> Delete</a>\n                            </div>  \n                        </td>\n                      </tr>\n                      <tr>\n                        <td>01</td>\n                        <td>Female</td>\n                        <td>Curvy</td>\n                        <td>5'1</td>\n                        <td>56</td>\n                        <td>Shirt</td>\n                        <td>Madame</td>\n                        <td>\n                            <div class=\"action-btn\">\n                                <a class=\"btn btn-sm btn-success\" href=\"view-product.html\"><i class=\"fa fa-eye\"></i> View</a>\n                                <a class=\"btn btn-sm btn-primary\" href=\"edit-product.html\"><i class=\"fa fa-edit\"></i> Edit</a>\n                                <a class=\"btn btn-sm btn-danger\" href=\"#delete\"  data-toggle=\"modal\"><i class=\"fa fa-trash\"></i> Delete</a>\n                            </div>  \n                        </td>\n                      </tr>\n                  </tbody>\n              </table>\n          </div>  \n                \n            </div>\n         </div>\n              </div>\n          </fieldset>\n      </div>\n        \n          <div class=\"custom-pagination\">\n            <ul class=\"pagination\">\n                <li class=\"page-item\">\n                  <a class=\"page-link\" href=\"#\" aria-label=\"Previous\">\n                    <i class=\"fa fa-angle-double-left\" aria-hidden=\"true\"></i>\n                    <span class=\"sr-only\">Previous</span>\n                  </a>\n                </li>\n                <li class=\"page-item active\"><a class=\"page-link\" href=\"#\">1</a></li>\n                <li class=\"page-item\"><a class=\"page-link\" href=\"#\">2</a></li>\n                <li class=\"page-item\"><a class=\"page-link\" href=\"#\">3</a></li>\n                <li class=\"page-item\">\n                  <a class=\"page-link\" href=\"#\" aria-label=\"Next\">\n                    <i class=\"fa fa-angle-double-right\" aria-hidden=\"true\"></i>\n                    <span class=\"sr-only\">Next</span>\n                  </a>\n                </li>\n              </ul>\n        </div>\n          \n      </div>\n</div>\n</div>\n"
+module.exports = "<div class=\"mainbox\">\n  <app-side-menu></app-side-menu>\n<div class=\"right-section\">\n  <div class=\"copyrights\">Copyright © 2018 App name All Rights Reserved.</div>\n  <div class=\"right-inner\">\n      \n    <h1 class=\"heading\">PRODUCT MANAGEMENT</h1>\n    <div class=\"filter-block\">\n          <fieldset class=\"global-fieldset\">\n              <legend>Product Board</legend>\n              <div class=\"filter-content\">\n                <div class=\"row\">\n                    <div class=\"col-sm-6\">\n                       <div class=\"form-group\">\n                          <div class=\"search-icon\">\n                             <input type=\"text\" [(ngModel)]=\"searchProduct.data\" class=\"form-control max-wt-300 search-input\" placeholder=\"Search\">\n                             <i class=\"fa fa-search\" aria-hidden=\"true\"></i>\n                          </div>\n                       </div>\n                    </div>\n                    <div class=\"col-sm-6\">\n                       <div class=\"btn-right\">\n                          <button class=\"btn btn-red btn-common\" (click)=\"addProduct()\">Add</button>\n                       </div>\n                    </div>\n                 </div>\n                 <div class=\"row\">\n                    <div class=\"col-sm-6\">\n                       <div class=\"form-group d-inline-block\">\n                          <div class=\"show-entries mb0\">\n                             <select class=\"form-control\" (ngModelChange)=\"onSelect($event)\" name=\"gender\" (change)=\"sort()\" [(ngModel)]=\"sortProduct.gender\" [ngModelOptions]=\"{standalone: true}\">\n                                <option value=\"\" >--Select--</option>\n                                <option *ngFor=\"let gen of gender\" value={{gen.name}} >{{gen.name}}</option>\n                             </select> \n                          </div>\n                        </div>\n                        <div class=\"form-group d-inline-block\">\n                          <div class=\"show-entries mb0\">\n                             <select class=\"form-control\" name=\"bodyType\" (change)=\"sort()\" [(ngModel)]=\"sortProduct.bodyType\" [ngModelOptions]=\"{standalone: true}\">\n                                <option value=\"\" >--Select--</option>\n                                <option *ngFor=\"let body of selectedBody\" value={{body.name}}>{{body.name}}</option>\n                             </select>  \n                          </div>\n                        </div>\n                    </div>\n                 </div>\n                <div class=\"box box-blue\">\n            <div class=\"box-body\">\n                <div class=\"custom-table table-responsive\">\n              <table class=\"table  table-border\">\n                  <thead>\n                      <tr>\n                        <th>SNo.</th>\n                        <th>Gender</th>\n                        <th>Body Type</th>\n                        <th>Product Name</th>\n                        <th>Brand Name</th>\n                        <th>Action</th>\n                      </tr>\n                  </thead>\n                  <tbody>\n                      <tr *ngFor=\"let item of product | paginate: { itemsPerPage: 10, currentPage: p ,totalItems: total} ; let i = index \" [attr.data-index] =\"i\">\n                        <td *ngIf=\"p == 1\">{{i + 1}}</td>\n                        <td *ngIf=\"p > 1\">{{i + 1 + 10 * (p-1)}}</td>\n                        <td>{{item.productGender}}</td>\n                        <td>{{item.bodyType}}</td>\n                        <td>{{item.productName}}</td>\n                        <td>{{item.brandName}}</td>\n                        <td>\n                            <div class=\"action-btn\">\n                                <a class=\"btn btn-sm btn-success\" href=\"view-product.html\"><i class=\"fa fa-eye\"></i> View</a>\n                                <a class=\"btn btn-sm btn-primary\" href=\"edit-product.html\"><i class=\"fa fa-edit\"></i> Edit</a>\n                                <a class=\"btn btn-sm btn-danger\" href=\"#delete\"  data-toggle=\"modal\"><i class=\"fa fa-trash\"></i> Delete</a>\n                            </div>  \n                        </td>\n                      </tr>\n                  </tbody>\n              </table>\n          </div>  \n                \n            </div>\n         </div>\n              </div>\n          </fieldset>\n      </div>\n        \n          <div class=\"custom-pagination\">\n                <pagination-controls (pageChange)=\"changePage($event)\" (change)=\"search(p)\"></pagination-controls>\n        </div>\n          \n      </div>\n</div>\n</div>\n"
 
 /***/ }),
 
@@ -1079,6 +1097,7 @@ module.exports = "<div class=\"mainbox\">\n  <app-side-menu></app-side-menu>\n<d
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ProductManagementComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("./node_modules/@angular/core/esm5/core.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__("./node_modules/@angular/router/esm5/router.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__data_service__ = __webpack_require__("./src/app/data.service.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -1090,14 +1109,91 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 
+
 var ProductManagementComponent = /** @class */ (function () {
-    function ProductManagementComponent(router) {
+    function ProductManagementComponent(router, service) {
         this.router = router;
+        this.service = service;
+        this.p = 1;
+        this.searchProduct = { data: "" };
+        this.sortProduct = { gender: "", bodyType: "" };
+        this.gender = [
+            { id: 1, name: "Male" },
+            { id: 2, name: "Female" }
+        ];
+        this.maleBodyType = [
+            { id: 1, name: "Slim Jim" },
+            { id: 2, name: "Muscle Man" },
+            { id: 3, name: "Big Guy" },
+            { id: 4, name: "Bulky" }
+        ];
+        this.femaleBodyType = [
+            { id: 1, name: "Rectangle" },
+            { id: 2, name: "Peer" },
+            { id: 3, name: "Triangle" },
+            { id: 4, name: "Hourglass" }
+        ];
     }
     ProductManagementComponent.prototype.ngOnInit = function () {
+        this.displayProduct();
     };
     ProductManagementComponent.prototype.addProduct = function () {
         this.router.navigate(['/add-product']);
+    };
+    ProductManagementComponent.prototype.displayProduct = function () {
+        var _this = this;
+        var credential = {
+            "page": this.p,
+            "Search": this.searchProduct.data,
+            "productGender": this.sortProduct.gender,
+            "bodyType": this.sortProduct.bodyType
+        };
+        for (var val in credential) {
+            if (credential[val] == '') {
+                delete credential[val];
+            }
+        }
+        this.service.postApi('/productList', credential).subscribe(function (response) {
+            if (response['responseCode'] == 200) {
+                console.log('success', response['data'].docs);
+                _this.product = response['data'].docs;
+                _this.total = response['data'].total;
+            }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else {
+                console.log('Failure', response['responseMessage']);
+            }
+        }, function (error) {
+            console.log('something went wrong');
+        });
+    };
+    ProductManagementComponent.prototype.sort = function () {
+        this.displayProduct();
+    };
+    ProductManagementComponent.prototype.onSelect = function (productId) {
+        this.sortProduct.bodyType = "";
+        if (productId == "") {
+            this.sortProduct.gender = "";
+            this.sortProduct.bodyType = "";
+            this.selectedBody = null;
+        }
+        if (productId == "Male") {
+            this.selectedBody = this.maleBodyType;
+        }
+        else if (productId == "Female") {
+            this.selectedBody = this.femaleBodyType;
+        }
+    };
+    ProductManagementComponent.prototype.changePage = function (page) {
+        this.p = page;
+        this.displayProduct();
     };
     ProductManagementComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
@@ -1105,7 +1201,7 @@ var ProductManagementComponent = /** @class */ (function () {
             template: __webpack_require__("./src/app/product-management/product-management.component.html"),
             styles: [__webpack_require__("./src/app/product-management/product-management.component.css")]
         }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* Router */]])
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* Router */], __WEBPACK_IMPORTED_MODULE_2__data_service__["a" /* DataService */]])
     ], ProductManagementComponent);
     return ProductManagementComponent;
 }());
@@ -1185,7 +1281,10 @@ var SideMenuComponent = /** @class */ (function () {
         // }
     };
     SideMenuComponent.prototype.logout = function () {
-        this.router.navigate(['/login']);
+        localStorage.setItem("token", "");
+        history.go(-(history.length - 1));
+        //this.router.navigate(['/login'])
+        //history.pushState('',"","");
     };
     SideMenuComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
@@ -1285,6 +1384,14 @@ var StyleManagementComponent = /** @class */ (function () {
                 _this.styleTips = response['data'].docs;
                 _this.total = response['data'].total;
             }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
             else {
                 _this.service.error('Invalid Email');
                 console.log('Failure', response['responseMessage']);
@@ -1333,6 +1440,14 @@ var StyleManagementComponent = /** @class */ (function () {
                 console.log('success', response['data']);
                 _this.searchStyleBrands = response['data'];
             }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
             else {
                 console.log('Failure', response['responseMessage']);
             }
@@ -1355,6 +1470,14 @@ var StyleManagementComponent = /** @class */ (function () {
             if (response['responseCode'] == 200) {
                 console.log('success', response['data']);
                 _this.searchStyleBrands = response['data'];
+            }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
             }
             else {
                 console.log('Failure', response['responseMessage']);
@@ -1394,6 +1517,14 @@ var StyleManagementComponent = /** @class */ (function () {
                 console.log('success', response['data']);
                 _this.styleBrands = response['data'];
             }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
             else {
                 console.log('Failure', response['responseMessage']);
             }
@@ -1416,6 +1547,14 @@ var StyleManagementComponent = /** @class */ (function () {
                 _this.service.success(response['responseMessage']);
                 console.log('success', response['responseMessage']);
                 _this.displayStyleTips();
+            }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
             }
             else {
                 _this.service.error(response['responseMessage']);
@@ -1453,7 +1592,7 @@ module.exports = ""
 /***/ "./src/app/user-management/user-management.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"mainbox\">\n<app-side-menu></app-side-menu>\n<div class=\"right-section\">\n  <div class=\"copyrights\">Copyright © 2018 App name All Rights Reserved.</div>\n  <div class=\"right-inner\">\n      \n    <h1 class=\"heading\">USER MANAGEMENT</h1>\n    <div class=\"filter-block\">\n          <fieldset class=\"global-fieldset\">\n              <legend>User Board</legend>\n              <div class=\"filter-content\">\n                <div class=\"row\">\n                    <div class=\"col-sm-6\">\n                       <div class=\"form-group\">\n                          <div class=\"search-icon\">\n                             <input type=\"text\" [(ngModel)]=\"searchData.data\"  (keyup)=\"search()\" class=\"form-control max-wt-300 search-input\" placeholder=\"Search\">\n                             <i class=\"fa fa-search\" aria-hidden=\"true\"></i>\n                          </div>\n                       </div>\n                    </div>\n                    <!-- <div class=\"col-sm-6\">\n                       <div class=\"btn-right\">\n                          <button class=\"btn btn-red btn-common\" (click)=\"addUser()\">Add</button>\n                       </div>\n                    </div> -->\n                 </div>\n                 <div class=\"row\">\n                    <div class=\"col-sm-6\">\n                       <div class=\"form-group d-inline-block\">\n                          <div class=\"show-entries mb0\">\n                                <select (ngModelChange)=\"onSelect($event)\" (change)=\"sort()\" class=\"form-control\" [(ngModel)]=\"searchDataBody.gender\" [ngModelOptions]=\"{standalone: true}\">  \n                                        <option value=\"\" >--Select--</option> \n                                         <option *ngFor=\"let gen of gender\" value={{gen.name}} >{{gen.name}}</option>\n                                     </select>  \n                          </div>\n                        </div>\n                        <div class=\"form-group d-inline-block\">\n                          <div class=\"show-entries mb0\">\n                                <select class=\"form-control\" name=\"bodyType\" (change)=\"sort()\" [(ngModel)]=\"searchDataBody.bodyType\" [ngModelOptions]=\"{standalone: true}\">\n                                        <option value=\"\" >--Select--</option>  \n                                        <option *ngFor=\"let body of selectedBody\" value={{body.name}}>{{body.name}}</option>\n                                   </select> \n                          </div>\n                        </div>\n                    </div>\n                 </div>\n                <div class=\"box box-blue\">\n            <div class=\"box-body\">\n                <div class=\"custom-table table-responsive\">\n              <table class=\"table table-striped table-border\">\n                  <thead>\n                      <tr>\n                        <th>SNo.</th>\n                        <th>Name</th>\n                        <th>Email</th>\n                        <th>Age</th>\n                        <th>Gender</th>\n                        <th>Body Type</th>\n                        <th>Height</th>\n                        <th>Weight</th>\n                        <th>Type</th>\n                        <th>Action</th>\n                      </tr>\n                  </thead>\n                  <tbody>\n                      <tr *ngFor=\"let userList of userData | paginate: { itemsPerPage: 10, currentPage: p ,totalItems: total} ; let i = index \" [attr.data-index] =\"i\">\n                        <td *ngIf=\"p == 1\">{{i + 1}}</td>\n                        <td *ngIf=\"p > 1\">{{i + 1 + 10 * (p-1)}}</td>\n                        <td>{{userList.name}}</td>\n                        <td>{{userList.email}}</td>\n                        <td>{{userList.age}}</td>\n                        <td>{{userList.gender}}</td>\n                        <td>{{userList.bodyType}}</td>\n                        <td>{{userList.height}}</td>\n                        <td>{{userList.weight}}</td>\n                        <td>{{userList.isSubscription}}</td>\n                        <td>\n                            <div class=\"action-btn\">\n                                <button class=\"btn btn-sm btn-success\" (click)=\"view(userList._id)\"><i class=\"fa fa-eye\"></i> View</button>\n                                <button class=\"btn btn-sm btn-primary\" (click)=\"edit(userList._id)\"><i class=\"fa fa-edit\"></i> Edit</button>\n                                <button class=\"btn btn-sm btn-danger\" (click)=\"delete(userList._id)\" ><i class=\"fa fa-trash\"></i> Delete</button>\n                            </div>  \n                        </td>\n                      </tr>\n                     \n                  </tbody>\n              </table>\n             \n          </div>  \n                \n            </div>\n         </div>\n              </div>\n          </fieldset>\n      </div>\n      <!-- <pagination-controls (pageChange)=\"p = $event\"></pagination-controls> -->\n          <div class=\"custom-pagination\">\n                  <pagination-controls (pageChange)=\"changePage($event)\" (change)=\"search(p)\"></pagination-controls>\n          </div>\n          \n      </div>\n</div>\n</div>\n\n<div id=\"delete\" class=\"modal fade\" data-easein=\"bounceIn\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"costumModalLabel\" aria-hidden=\"true\">\n  <div class=\"modal-dialog\">\n      <div class=\"modal-content common-detail-modal\">\n          <div class=\"modal-header\">\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">\n                  ×\n              </button>\n          </div>\n          <div class=\"modal-body\">\n              <p class=\"modal-inner-text\">\n                 Are you sure you want to delete this product?\n              </p>\n\n              <div class=\"button-box mt20\">\n                 <button class=\"btn btn-red mr10\" (click)=\"yes()\">yes</button>\n                 <button class=\"btn btn-danger\" (click)=\"cancelDelete()\">No</button>\n              </div>\n          </div>\n          <div class=\"modal-footer\">\n              \n          </div>\n      </div>\n  </div>\n</div>\n"
+module.exports = "<div class=\"mainbox\">\n<app-side-menu></app-side-menu>\n<div class=\"right-section\">\n  <div class=\"copyrights\">Copyright © 2018 App name All Rights Reserved.</div>\n  <div class=\"right-inner\">\n      \n    <h1 class=\"heading\">USER MANAGEMENT</h1>\n    <div class=\"filter-block\">\n          <fieldset class=\"global-fieldset\">\n              <legend>User Board</legend>\n              <div class=\"filter-content\">\n                <div class=\"row\">\n                    <div class=\"col-sm-6\">\n                       <div class=\"form-group\">\n                          <div class=\"search-icon\">\n                             <input type=\"text\" [(ngModel)]=\"searchData.data\"  (keyup)=\"search()\" class=\"form-control max-wt-300 search-input\" placeholder=\"Search\">\n                             <i class=\"fa fa-search\" aria-hidden=\"true\"></i>\n                          </div>\n                       </div>\n                    </div>\n                    <!-- <div class=\"col-sm-6\">\n                       <div class=\"btn-right\">\n                          <button class=\"btn btn-red btn-common\" (click)=\"addUser()\">Add</button>\n                       </div>\n                    </div> -->\n                 </div>\n                 <div class=\"row\">\n                    <div class=\"col-sm-6\">\n                       <div class=\"form-group d-inline-block\">\n                          <div class=\"show-entries mb0\">\n                                <select (ngModelChange)=\"onSelect($event)\" (change)=\"sort()\" class=\"form-control\" [(ngModel)]=\"searchDataBody.gender\" [ngModelOptions]=\"{standalone: true}\">  \n                                        <option value=\"\" >--Select--</option> \n                                         <option *ngFor=\"let gen of gender\" value={{gen.name}} >{{gen.name}}</option>\n                                     </select>  \n                          </div>\n                        </div>\n                        <div class=\"form-group d-inline-block\">\n                          <div class=\"show-entries mb0\">\n                                <select class=\"form-control\" name=\"bodyType\" (change)=\"sort()\" [(ngModel)]=\"searchDataBody.bodyType\" [ngModelOptions]=\"{standalone: true}\">\n                                        <option value=\"\" >--Select--</option>  \n                                        <option *ngFor=\"let body of selectedBody\" value={{body.name}}>{{body.name}}</option>\n                                   </select> \n                          </div>\n                        </div>\n                    </div>\n                 </div>\n                <div class=\"box box-blue\">\n            <div class=\"box-body\">\n                <div class=\"custom-table table-responsive\">\n              <table class=\"table table-striped table-border\">\n                  <thead>\n                      <tr>\n                        <th>SNo.</th>\n                        <th>Name</th>\n                        <th>Email</th>\n                        <th>Age</th>\n                        <th>Gender</th>\n                        <th>Body Type</th>\n                        <th>Height</th>\n                        <th>Weight</th>\n                        <th>Type</th>\n                        <th>Action</th>\n                      </tr>\n                  </thead>\n                  <tbody>\n                      <tr *ngFor=\"let userList of userData | paginate: { itemsPerPage: 10, currentPage: p ,totalItems: total} ; let i = index \" [attr.data-index] =\"i\">\n                        <td *ngIf=\"p == 1\">{{i + 1}}</td>\n                        <td *ngIf=\"p > 1\">{{i + 1 + 10 * (p-1)}}</td>\n                        <td>{{userList.name}}</td>\n                        <td>{{userList.email}}</td>\n                        <td>{{userList.age}}</td>\n                        <td>{{userList.gender}}</td>\n                        <td>{{userList.bodyType}}</td>\n                        <td>{{userList.height}}</td>\n                        <td>{{userList.weight}}</td>\n                        <td>{{userList.isSubscription}}</td>\n                        <td>\n                            <div class=\"action-btn\">\n                                <button class=\"btn btn-sm btn-success\" (click)=\"view(userList._id)\"><i class=\"fa fa-eye\"></i> View</button>\n                                <!-- <button class=\"btn btn-sm btn-primary\" (click)=\"edit(userList._id)\"><i class=\"fa fa-edit\"></i> Edit</button> -->\n                                <button class=\"btn btn-sm btn-danger\" (click)=\"delete(userList._id)\" ><i class=\"fa fa-trash\"></i> Delete</button>\n                            </div>  \n                        </td>\n                      </tr>\n                     \n                  </tbody>\n              </table>\n             \n          </div>  \n                \n            </div>\n         </div>\n              </div>\n          </fieldset>\n      </div>\n      <!-- <pagination-controls (pageChange)=\"p = $event\"></pagination-controls> -->\n          <div class=\"custom-pagination\">\n                  <pagination-controls (pageChange)=\"changePage($event)\" (change)=\"search(p)\"></pagination-controls>\n          </div>\n          \n      </div>\n</div>\n</div>\n\n<div id=\"delete\" class=\"modal fade\" data-easein=\"bounceIn\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"costumModalLabel\" aria-hidden=\"true\">\n  <div class=\"modal-dialog\">\n      <div class=\"modal-content common-detail-modal\">\n          <div class=\"modal-header\">\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">\n                  ×\n              </button>\n          </div>\n          <div class=\"modal-body\">\n              <p class=\"modal-inner-text\">\n                 Are you sure you want to delete this product?\n              </p>\n\n              <div class=\"button-box mt20\">\n                 <button class=\"btn btn-red mr10\" (click)=\"yes()\">yes</button>\n                 <button class=\"btn btn-danger\" (click)=\"cancelDelete()\">No</button>\n              </div>\n          </div>\n          <div class=\"modal-footer\">\n              \n          </div>\n      </div>\n  </div>\n</div>\n"
 
 /***/ }),
 
@@ -1568,10 +1707,10 @@ var UserManagementComponent = /** @class */ (function () {
         localStorage.setItem('userId', id);
         this.router.navigate(['/view-user']);
     };
-    UserManagementComponent.prototype.edit = function (id) {
-        localStorage.setItem('userId', id);
-        this.router.navigate(['/edit-user']);
-    };
+    // edit(id) {
+    //   localStorage.setItem('userId',id)
+    // this.router.navigate(['/edit-user'])
+    // }
     UserManagementComponent.prototype.changePage = function (page) {
         this.p = page;
         this.displayUser();
@@ -1602,6 +1741,14 @@ var UserManagementComponent = /** @class */ (function () {
                         _this.userData[i].isSubscription = 'Paid';
                     }
                 }
+            }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
             }
             else {
                 console.log('Failure', response['responseMessage']);
@@ -1635,7 +1782,7 @@ module.exports = ""
 /***/ "./src/app/view-user/view-user.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"mainbox\">\n  <app-side-menu></app-side-menu>\n<div class=\"right-section\">\n  <div class=\"copyrights\">Copyright © 2018 App name All Rights Reserved.</div>\n  <div class=\"right-inner\">\n            <div class=\"filter-block\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Edit User</legend>\n                  <div class=\"filter-content\">\n                      \n                       <div class=\"common-detail-box\">\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6  label-right\">Name</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.name}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Email</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.email}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Age</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.age}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Gender</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.gender}}\n\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Body Type</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.bodyType}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Height</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.height}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Weight</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.weight}}\n                             </div>\n                          </div>\n                          <div class=\"table-button text-center mt30\">\n                             <button (click)=\"editUser()\" class=\"btn btn-red\">Edit </button>\n                             <button (click)=\"cancel()\" class=\"btn btn-danger\">Cancel</button>\n                          </div>\n                       </div>\n\n                  </div>\n              </fieldset>\n            </div>        \n        </div>  \n      </div>\n</div>\n\n\n\n\n\n"
+module.exports = "<div class=\"mainbox\">\n  <app-side-menu></app-side-menu>\n<div class=\"right-section\">\n  <div class=\"copyrights\">Copyright © 2018 App name All Rights Reserved.</div>\n  <div class=\"right-inner\">\n            <div class=\"filter-block\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Edit User</legend>\n                  <div class=\"filter-content\">\n                      \n                       <div class=\"common-detail-box\">\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6  label-right\">Name</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.name}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Email</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.email}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Age</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.age}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Gender</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.gender}}\n\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Body Type</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.bodyType}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Height</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.height}}\n                             </div>\n                          </div>\n                          <div class=\"form-group row\">\n                             <label class=\"col-sm-6 label-right\">Weight</label>\n                             <div class=\"col-sm-6\">\n                                {{viewUserDetail.weight}}\n                             </div>\n                          </div>\n                          <div class=\"table-button text-center mt30\">\n                             <!-- <button (click)=\"editUser()\" class=\"btn btn-red\">Edit </button> -->\n                             <button (click)=\"cancel()\" class=\"btn btn-danger\">Cancel</button>\n                          </div>\n                       </div>\n\n                  </div>\n              </fieldset>\n            </div>        \n        </div>  \n      </div>\n</div>\n\n\n\n\n\n"
 
 /***/ }),
 
@@ -1673,6 +1820,14 @@ var ViewUserComponent = /** @class */ (function () {
             if (response['responseCode'] == 200) {
                 console.log('success', response['data']);
                 _this.viewUserDetail = response['data'];
+            }
+            else if (response['responseCode'] == 402) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
+            }
+            else if (response['responseCode'] == 403) {
+                _this.service.error(response['responseMessage']);
+                _this.router.navigate(['/login']);
             }
             else {
                 console.log('Failure', response['responseMessage']);
