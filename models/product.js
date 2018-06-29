@@ -13,7 +13,7 @@ let productSchema = new Schema({
 		trim:true
 	},
 	productPrice: {
-		type: String
+		type: Number
 	},
 	productDesc: {
 		type: String

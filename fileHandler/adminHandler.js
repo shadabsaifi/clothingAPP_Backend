@@ -442,7 +442,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error")
             else if (result)
-                return commonFile.responseHandler(res, 200, "You Have Successfully Delete this User.")
+                return commonFile.responseHandler(res, 200, "User Deleted Successfully.")
             else
                 return commonFile.responseHandler(res, 409, "user not found")
         })
@@ -1101,6 +1101,8 @@ module.exports = {
 
 
     totalCollection: (req, res) => {
+        console.log("req.body====>>>",req.body)
+        console.log("req.headers====>>>",req.headers)
 
         async.waterfall([(callback) => {
             user.find({ status:"ACTIVE" }, (err, user) => {
@@ -1140,7 +1142,6 @@ module.exports = {
 
         })
     },
-
 
 
 
@@ -1535,11 +1536,11 @@ module.exports = {
     verifyToken: (req, res, next) => {
         console.log("1111111111111111 here", req.headers.token, "{{{}}", typeof req.headers.token)
         if (req.headers.token == "null" || req.headers.token == "" || req.headers.token == "undefined" || req.headers.token == null || req.headers.token == undefined) {
-            return commonFile.responseHandler(res, 400, "Token Missing")
+            return commonFile.responseHandler(res, 402, "Token Missing")
         }
         jwt.verify(req.headers.token, config.jwtSecretKey, (err, decoded) => {
             if (err) {
-                return commonFile.responseHandler(res, 400, "Token Invalid")
+                return commonFile.responseHandler(res, 403, "Token Expired.")
             } else {
                 console.log("Token verified successfully")
                 next();

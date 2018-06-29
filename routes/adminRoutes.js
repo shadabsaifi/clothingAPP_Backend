@@ -1,39 +1,46 @@
 let adminRoutes=require('express').Router()
 let adminHandler=require('../fileHandler/adminHandler.js')
 
-adminRoutes.post('/login',adminHandler.login);
-adminRoutes.post('/forgotPassword',adminHandler.forgotPassword)
-adminRoutes.post('/resetPassword',adminHandler.resetPassword)
-adminRoutes.get('/adminDetail',adminHandler.adminDetail)
+
+
 adminRoutes.get('/activeUsers',adminHandler.verifyToken,adminHandler.activeUsers)
 adminRoutes.get('/getStaticContent',adminHandler.getStaticContent)
 
 adminRoutes.post('/tempCld',adminHandler.verifyToken,adminHandler.uploadMultipleImagesCld)
 adminRoutes.post('/addNewPackage',adminHandler.addNewPackage)
 adminRoutes.post('/blockUnblockUser',adminHandler.blockUnblockUser)
-adminRoutes.post('/deleteUser',adminHandler.deleteUser)
 adminRoutes.post('/updateStaticContent',adminHandler.verifyToken,adminHandler.updateStaticContent)
 adminRoutes.post('/deleteStaticContent',adminHandler.verifyToken,adminHandler.deleteStaticContent)
 adminRoutes.post('/searchFromUserMgmt',adminHandler.verifyToken,adminHandler.searchFromUserMgmt)
 
+
+
 // admin api start for clothing app
-adminRoutes.post('/getAllUsers',adminHandler.getAllUsers)
-adminRoutes.post('/addNewBrand',adminHandler.addNewBrand)
-adminRoutes.post('/brandNameList',adminHandler.brandNameList)
-adminRoutes.post('/addNewProduct',adminHandler.addNewProduct)
-adminRoutes.post('/deleteProduct',adminHandler.deleteProduct)
-adminRoutes.post('/productDetail',adminHandler.productDetail)
-adminRoutes.post('/productList',adminHandler.productList)
-adminRoutes.get('/productNameList',adminHandler.productNameList)
-adminRoutes.post('/updateProduct',adminHandler.updateProduct)
-adminRoutes.post('/addNewUser',adminHandler.addNewUser)
-adminRoutes.post('/userDetail',adminHandler.userDetail)
-adminRoutes.post('/editUser',adminHandler.editUser)
-adminRoutes.post('/bodyTypeBrandList',adminHandler.bodyTypeBrandList)
-adminRoutes.post('/addNewStyleTip',adminHandler.addNewStyleTip)
-adminRoutes.post('/styleBrandList',adminHandler.styleBrandList)
-adminRoutes.post('/styleTipList',adminHandler.styleTipList)
-adminRoutes.get('/totalCollection',adminHandler.totalCollection)
+adminRoutes.post('/login',adminHandler.login)
+adminRoutes.post('/forgotPassword',adminHandler.forgotPassword)
+adminRoutes.post('/resetPassword',adminHandler.resetPassword)
+adminRoutes.get('/adminDetail',adminHandler.verifyToken,adminHandler.adminDetail)
+adminRoutes.post('/getAllUsers',adminHandler.verifyToken,adminHandler.getAllUsers)
+adminRoutes.post('/addNewBrand',adminHandler.verifyToken,adminHandler.addNewBrand)
+adminRoutes.post('/brandNameList',adminHandler.verifyToken,adminHandler.brandNameList)
+adminRoutes.post('/addNewProduct',adminHandler.verifyToken,adminHandler.addNewProduct)
+adminRoutes.post('/deleteProduct',adminHandler.verifyToken,adminHandler.deleteProduct)
+adminRoutes.post('/productDetail',adminHandler.verifyToken,adminHandler.productDetail)
+adminRoutes.post('/productList',adminHandler.verifyToken,adminHandler.productList)
+adminRoutes.get('/productNameList',adminHandler.verifyToken,adminHandler.productNameList)
+adminRoutes.post('/updateProduct',adminHandler.verifyToken,adminHandler.updateProduct)
+
+// ankit sir ne htwa diya hai
+adminRoutes.post('/addNewUser',adminHandler.verifyToken,adminHandler.addNewUser)
+adminRoutes.post('/editUser',adminHandler.verifyToken,adminHandler.editUser)
+
+adminRoutes.post('/userDetail',adminHandler.verifyToken,adminHandler.userDetail)
+adminRoutes.post('/deleteUser',adminHandler.verifyToken,adminHandler.deleteUser)
+adminRoutes.post('/bodyTypeBrandList',adminHandler.verifyToken,adminHandler.bodyTypeBrandList)
+adminRoutes.post('/addNewStyleTip',adminHandler.verifyToken,adminHandler.addNewStyleTip)
+adminRoutes.post('/styleBrandList',adminHandler.verifyToken,adminHandler.styleBrandList)
+adminRoutes.post('/styleTipList',adminHandler.verifyToken,adminHandler.styleTipList)
+adminRoutes.get('/totalCollection',adminHandler.verifyToken,adminHandler.totalCollection)
 
 // admin api end for clothing app
 

@@ -56,13 +56,48 @@ var forEach = require('async-foreach').forEach;
         verifyToken: (req, res, next) => {
             console.log("req.headers.jwt-=========>>>>",req.headers.jwt)
             if (req.headers.jwt == "null" || req.headers.jwt == "" || req.headers.jwt == "undefined" || req.headers.jwt == null || req.headers.jwt == undefined) {
-                return commonFile.responseHandler(res, 400, "Token Missing")
+                return commonFile.responseHandler(res, 402, "Token Missing.")
             }
             jwt.verify(req.headers.jwt, config.jwtSecretKey, (err, decoded) => {
                 console.log("verify token",decoded)
                 if (err) {
-                    return commonFile.responseHandler(res, 403, "Token Invalid", err)
+                    return commonFile.responseHandler(res, 403, "Session Expired.")
                 } else {
+                    next();
+                }
+            })
+        },
+
+        checkSubscription:(req, res, next)=>{
+            console.log("req.body",req.body)
+            async.waterfall([(callback)=>{
+                user.findOne({_id:req.body.userId}, (err, result)=>{
+                    if(err)
+                        callback(err)
+                    else
+                    console.log("result.subscriptionPeriod",result)
+                        callback(null, result.subscriptionPeriod)
+                })
+            }, (subscriptionPeriod, callback)=>{
+                let update = { }
+                if(new Date().getTime() < subscriptionPeriod.getTime()){
+                    console.log("subscription Hai")
+                    update.isSubscription = true
+                }
+                else{
+                    update.isSubscription = false
+                }
+                user.findByIdAndUpdate({ _id:req.body.userId }, update, {new:true}, (err, result)=>{
+                    if(err)
+                        callback(err)
+                    else
+                        callback(null, result)
+                })
+            }], (err, finalResult)=>{
+                if(err)
+                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                if(finalResult){
+                    console.log("next me gya hai")
                     next();
                 }
             })
@@ -881,12 +916,10 @@ var forEach = require('async-foreach').forEach;
                     let query = { bodyType:userResult.bodyType }
 
                     if(req.body.search){
-                        console.log("aa gya")
                         query.productName = re
                     }
                     if(req.body.brandName.length){
-                        console.log("phir se aa gya")
-                        query.brandName = {$in:req.body.brandName}
+                        query.brandName = { $in:req.body.brandName }
                     }
         
                 let options = {
@@ -1089,26 +1122,16 @@ var forEach = require('async-foreach').forEach;
             return commonFile.responseHandler(res, 400, "Parameters missing.")
         }
 
-        let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
-        // let pattern = new RegExp('^'+req.body.search,'i')
-        re = new RegExp(pattern, 'gi');
-
         let n = req.body.page || 1
         let m = req.body.limit || 10
         let masterQuery = { }
 
-        if(req.body.brandName.length){
-            masterQuery.brandName = { $in:req.body.brandName }
-        }
-        if(req.body.sortBy){
-            query.productPrice = req.body.sortBy
+        let options = {
+            page:1
         }
 
-        let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
-        let options = {
-            page:1,
-            limit:50,
-            sort:{ createdAt:-1 }
+        if(req.body.sortBy){
+            options.sort = { productPrice:req.body.sortBy }
         }
 
         async.waterfall([(callback)=>{
@@ -1117,10 +1140,22 @@ var forEach = require('async-foreach').forEach;
                 if(err)
                     callback(err)
                 else{
+
                     let user = { }
+                    
+                    if(result.isSubscription == true){
+                        options.limit = 100
+                    }
+                    else{
+                        options.limit = 50
+                    }
+
                     user.styleGender = result.gender
                     user.bodyType = result.bodyType
-                    callback(null, user)
+                    if(user){
+                        callback(null, user)
+                    }
+                    
                 }
             })
             
@@ -1142,20 +1177,25 @@ var forEach = require('async-foreach').forEach;
         }, (obj, callback)=>{
 
             masterQuery.$and = [{ bodyType:obj.user.bodyType }, { brandName:{ $in:obj.brandList} } ]
+            
+            if(req.body.brandName.length){
+                masterQuery.brandName = { $in:req.body.brandName }
+            }
+
             product.paginate(masterQuery, options, (err, result)=>{
                 if(err)
                     callback(err)
                 else{
 
-                    let show  = result.docs.slice((n-1)*m, n*m)
-                    let final = { 
-                        styleTipList:show,
-                        total:result.docs.length,
-                        page:n || 1,
-                        limit:m || 10,
-                        pages:Math.ceil(result.docs.length/m)
-                    }
-                    callback(null, final)
+                    // let show  = result.docs.slice((n-1)*m, n*m)
+                    // let final = { 
+                    //     styleTipList:show,
+                    //     total:result.docs.length,
+                    //     page:n || 1,
+                    //     limit:m || 10,
+                    //     pages:Math.ceil(result.docs.length/m)
+                    // }
+                    callback(null, result)
                 }
                     
             })

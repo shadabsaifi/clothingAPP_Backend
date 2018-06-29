@@ -63,7 +63,8 @@ let User = mongoose.Schema({
         default:false
     },
     subscriptionPeriod: {
-        type: Date
+        type: Date,
+        default: Date.now
     },
     createdAt: {
         type: Date,
