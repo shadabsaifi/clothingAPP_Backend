@@ -4,24 +4,23 @@ let Schema=mongoose.Schema;
 
 let transactionSchema= new Schema({
 	
-	productName:{
+	
+	purchaseBy:{
+		type:mongoose.Schema.Types.ObjectId, ref:'user'
+	},
+	packegPrice:{
 		type:String
 	},
 	transactionId:{
 		type:String
 	},
-	productBought:{
-		type:mongoose.Schema.Types.ObjectId, ref:'product'
-	},
-	amount:{
-		type:Number
+	purchaseDate:{
+		type:Date,
+		default:Date.now
 	},
 	createdAt:{
 		type:Date,
 		default:Date.now
-	},
-	purchaseBy:{
-		type:mongoose.Schema.Types.ObjectId, ref:'user'
 	},
 	days:{
 		type:Number

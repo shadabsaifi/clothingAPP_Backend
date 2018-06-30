@@ -5,6 +5,7 @@ const commonFile = require('../fileHandler/commonFile.js')
 
 
 
+// clothing App API start 
 
 userRoutes.post('/verifyToken',userHandler.verifyToken)
 userRoutes.post('/checkSubscription',userHandler.checkSubscription)
@@ -14,21 +15,22 @@ userRoutes.post('/forgotPassword',userHandler.forgotPassword)
 userRoutes.post('/verifyOTP',userHandler.verifyOTP)
 userRoutes.post('/changePassword',userHandler.changePassword)
 userRoutes.post('/completeProfileSetup',userHandler.verifyToken,userHandler.completeProfileSetup)
+userRoutes.post('/paymentGetway',userHandler.verifyToken,userHandler.paymentGetway)
 userRoutes.post('/userDetail',userHandler.verifyToken,userHandler.userDetail)
 userRoutes.post('/updateUserDetail',userHandler.verifyToken,userHandler.updateUserDetail)
 userRoutes.post('/likeUnlikeProduct',userHandler.verifyToken,userHandler.likeUnlikeProduct)
 userRoutes.post('/myFavourite',userHandler.verifyToken,userHandler.myFavourite)
 userRoutes.get('/logout',userHandler.verifyToken,userHandler.logout)
 userRoutes.post('/searchsuggestion',userHandler.verifyToken,userHandler.searchsuggestion)
-userRoutes.post('/productList',userHandler.checkSubscription,userHandler.productList)
+userRoutes.post('/productList',userHandler.verifyToken,userHandler.checkSubscription,userHandler.productList)
 userRoutes.post('/brandNameList',userHandler.verifyToken,userHandler.brandNameList)
 userRoutes.post('/productDetail',userHandler.verifyToken,userHandler.productDetail)
-userRoutes.post('/styleBrandList',userHandler.styleBrandList)
-userRoutes.post('/styleTipList',userHandler.checkSubscription,userHandler.styleTipList)
-userRoutes.post('/favouriteBrandList',userHandler.favouriteBrandList)
+userRoutes.post('/styleBrandList',userHandler.verifyToken,userHandler.styleBrandList)
+userRoutes.post('/styleTipList',userHandler.verifyToken,userHandler.checkSubscription,userHandler.styleTipList)
+userRoutes.post('/favouriteBrandList',userHandler.verifyToken,userHandler.favouriteBrandList)
 
 
-
+// clothing App API end 
 
 
 
@@ -39,19 +41,14 @@ userRoutes.post('/favouriteBrandList',userHandler.favouriteBrandList)
 
 userRoutes.post('/addSocialAccounts',userHandler.verifyToken,userHandler.addSocialAccounts)
 userRoutes.post('/profileSetup',userHandler.verifyToken,userHandler.profileSetup)
-
 userRoutes.get('/fetchUserDetails',userHandler.verifyToken,userHandler.fetchUserDetails)
 userRoutes.get('/shopList',userHandler.verifyToken,userHandler.shopList)
 userRoutes.get('/showSubscriptionList',userHandler.verifyToken,userHandler.showSubscriptionList)
 userRoutes.post('/getUsers',userHandler.verifyToken,userHandler.getUsers)
 userRoutes.post('/login',userHandler.login)
-
 userRoutes.post('/nearByUsers',userHandler.verifyToken,userHandler.nearByUsers)
 userRoutes.post('/sendFeedback',userHandler.verifyToken,userHandler.sendFeedback)
-
-
 userRoutes.post('/updateUserProfile',userHandler.verifyToken,userHandler.updateUserProfile)
-
 userRoutes.post('/getPopularUsers',userHandler.verifyToken,userHandler.getPopularUsers)
 userRoutes.post('/likeUnlikeUser',userHandler.verifyToken,userHandler.likeUnlikeUser)
 userRoutes.post('/viewUser',userHandler.verifyToken,userHandler.viewUser)

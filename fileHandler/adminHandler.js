@@ -25,7 +25,7 @@ const commonFile = require('./commonFile.js')
 const admin = require('../models/admin.js')
 const product = require('../models/product.js')
 const style = require('../models/style.js')
-const transaction = require('../models/product-transaction')
+const transaction = require('../models/transaction')
 var unique = require('array-unique');
 
 module.exports = {
@@ -874,7 +874,6 @@ module.exports = {
             page: req.body.page || 1,
             limit: req.body.limit || 10
         }
-
         product.paginate(query, options, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
@@ -944,7 +943,6 @@ module.exports = {
             if (!req.body.productGender) {
                 return commonFile.responseHandler(res, 400, "Parameters missing.")
             }
-
             let query = { }
             let bodyType = []
             if(req.body.productGender.toLowerCase() === 'male'){
@@ -952,6 +950,9 @@ module.exports = {
             }
             if(req.body.productGender.toLowerCase() === 'female'){
                 query.productGender ='Female'
+            }
+            if(req.body.bodyType){
+                query.bodyType = req.body.bodyType
             }
             let masterQuery = [
                 {
@@ -993,22 +994,30 @@ module.exports = {
             createdBy:req.body.createdByList
         }
 
-        let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
-        style.findOne(query, (err, result)=>{
-            if(err)
+        new style(newStyle).save((err, success)=>{
+            if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else if(result)
-                return commonFile.responseHandler(res, 200, "Style Tips Already Having in " + req.body.styleGender + " for this Brand")
-            else{
-                new style(newStyle).save((err, success)=>{
-                    if (err)
-                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
-                    else
-                        return commonFile.responseHandler(res, 200, "Success")
-    
-                })
-            }
+            else
+                return commonFile.responseHandler(res, 200, "Success")
+
         })
+
+        // let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
+        // style.findOne(query, (err, result)=>{
+        //     if(err)
+        //         return commonFile.responseHandler(res, 400, "Internal Server Error.")
+        //     else if(result)
+        //         return commonFile.responseHandler(res, 200, "Style Tips Already Having in " + req.body.styleGender + " for this Brand")
+        //     else{
+        //         new style(newStyle).save((err, success)=>{
+        //             if (err)
+        //                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
+        //             else
+        //                 return commonFile.responseHandler(res, 200, "Success")
+    
+        //         })
+        //     }
+        // })
      },
 
 
