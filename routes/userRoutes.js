@@ -22,11 +22,11 @@ userRoutes.post('/likeUnlikeProduct',userHandler.verifyToken,userHandler.likeUnl
 userRoutes.post('/myFavourite',userHandler.verifyToken,userHandler.myFavourite)
 userRoutes.get('/logout',userHandler.verifyToken,userHandler.logout)
 userRoutes.post('/searchsuggestion',userHandler.verifyToken,userHandler.searchsuggestion)
-userRoutes.post('/productList',userHandler.checkSubscription,userHandler.productList)
+userRoutes.post('/productList',userHandler.verifyToken,userHandler.checkSubscription,userHandler.productList)
 userRoutes.post('/brandNameList',userHandler.verifyToken,userHandler.checkSubscription,userHandler.brandNameList)
 userRoutes.post('/productDetail',userHandler.verifyToken,userHandler.productDetail)
 userRoutes.post('/styleBrandList',userHandler.verifyToken,userHandler.checkSubscription,userHandler.styleBrandList)
-userRoutes.post('/styleTipList',userHandler.checkSubscription,userHandler.styleTipList)
+userRoutes.post('/styleTipList',userHandler.verifyToken,userHandler.checkSubscription,userHandler.styleTipList)
 userRoutes.post('/favouriteBrandList',userHandler.verifyToken,userHandler.favouriteBrandList)
 
 
