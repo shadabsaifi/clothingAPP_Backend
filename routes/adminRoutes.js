@@ -13,8 +13,6 @@ adminRoutes.post('/updateStaticContent',adminHandler.verifyToken,adminHandler.up
 adminRoutes.post('/deleteStaticContent',adminHandler.verifyToken,adminHandler.deleteStaticContent)
 adminRoutes.post('/searchFromUserMgmt',adminHandler.verifyToken,adminHandler.searchFromUserMgmt)
 
-
-
 // admin api start for clothing app
 adminRoutes.post('/login',adminHandler.login)
 adminRoutes.post('/forgotPassword',adminHandler.forgotPassword)
@@ -36,8 +34,8 @@ adminRoutes.post('/editUser',adminHandler.verifyToken,adminHandler.editUser)
 
 adminRoutes.post('/userDetail',adminHandler.verifyToken,adminHandler.userDetail)
 adminRoutes.post('/deleteUser',adminHandler.verifyToken,adminHandler.deleteUser)
-adminRoutes.post('/bodyTypeBrandList',adminHandler.bodyTypeBrandList)
-adminRoutes.post('/addNewStyleTip',adminHandler.addNewStyleTip)
+adminRoutes.post('/bodyTypeBrandList',adminHandler.verifyToken,adminHandler.bodyTypeBrandList)
+adminRoutes.post('/addNewStyleTip',adminHandler.verifyToken,adminHandler.addNewStyleTip)
 adminRoutes.post('/styleBrandList',adminHandler.verifyToken,adminHandler.styleBrandList)
 adminRoutes.post('/styleTipList',adminHandler.verifyToken,adminHandler.styleTipList)
 adminRoutes.get('/totalCollection',adminHandler.verifyToken,adminHandler.totalCollection)

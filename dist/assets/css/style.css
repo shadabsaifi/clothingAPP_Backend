@@ -221,12 +221,14 @@ a, input, button {
 	transition:500ms;
 	background: #f8f8f8;
 	box-sizing: border-box;
+	height: calc(100vh - -55px);
+
 }
 .right-inner{
 	width: 100%;
 	height: 100%;
-	overflow: auto;
-	overflow-x: hidden;
+	/* overflow: auto;
+	overflow-x: hidden; */
 	padding: 20px;
 	background: #ecf0f5;
 	box-sizing: border-box;

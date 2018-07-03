@@ -457,11 +457,11 @@ module.exports = {
 
     addNewBrand: (req, res) => {
 
-        if (!req.body.createdBy || !req.body.brandName || !req.body.brandGender) {
+        if (!req.body.createdBy || !req.body.brandName || !req.body.brandGender || !req.body.brandType) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
 
-        let newUserObj = { createdBy: req.body.createdBy }
+        let newUserObj = { createdBy: req.body.createdBy, brandType:req.body.brandType }
         let query = { }
 
         if (req.body.brandGender.toLowerCase() === 'male') {
@@ -954,6 +954,7 @@ module.exports = {
             if(req.body.bodyType){
                 query.bodyType = req.body.bodyType
             }
+
             let masterQuery = [
                 {
                     $match:query
@@ -994,30 +995,22 @@ module.exports = {
             createdBy:req.body.createdByList
         }
 
-        new style(newStyle).save((err, success)=>{
-            if (err)
+        let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
+        style.findOne(query, (err, result)=>{
+            if(err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else
-                return commonFile.responseHandler(res, 200, "Success")
-
-        })
-
-        // let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
-        // style.findOne(query, (err, result)=>{
-        //     if(err)
-        //         return commonFile.responseHandler(res, 400, "Internal Server Error.")
-        //     else if(result)
-        //         return commonFile.responseHandler(res, 200, "Style Tips Already Having in " + req.body.styleGender + " for this Brand")
-        //     else{
-        //         new style(newStyle).save((err, success)=>{
-        //             if (err)
-        //                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-        //             else
-        //                 return commonFile.responseHandler(res, 200, "Success")
+            else if(result)
+                return commonFile.responseHandler(res, 200, "Style Tips Already Having in " + req.body.styleGender + " for this Brand")
+            else{
+                new style(newStyle).save((err, success)=>{
+                    if (err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                    else
+                        return commonFile.responseHandler(res, 200, "Success")
     
-        //         })
-        //     }
-        // })
+                })
+            }
+        })
      },
 
 

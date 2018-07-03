@@ -11,6 +11,9 @@ let brandSchema = new Schema({
     brandGender:{
         type:String,
 		enum:['Male', 'Female']
+	},
+	brandType: {
+		type: String
     },
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId, ref: 'admin'

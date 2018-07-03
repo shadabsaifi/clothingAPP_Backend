@@ -8,16 +8,20 @@ const pagination = require('pagination')
 const admin = require('../models/admin.js')
 const user = require('../models/user.js')
 const product = require('../models/product.js')
+const brand = require('../models/brand.js')
 const favourite = require('../models/favourite.js')
 const transaction = require('../models/transaction.js')
 const style = require('../models/style.js')
 var randomstring = require("randomstring")
 var forEach = require('async-foreach').forEach
+
 // stripr Payment Getway start
-const keyPublishable = 'pk_test_TfxRGGRlj5ei0V55cYpLmLmK';
-const keySecret = 'sk_test_8UJFwi9hMfZfForAtFiMfCXe';
+const keyPublishable = 'pk_test_a3o6GZZXrNDlLjDnpL4dfOaf';
+const keySecret = 'sk_test_0vKQEflQAPi2Mr9JmWYUtfmx';
 const stripe = require("stripe")(keySecret);
 // stripr Payment Getway end
+
+
 
 //     notification = require('./notification.js'),
 //     forEach = require('async-foreach').forEach,
@@ -105,6 +109,8 @@ module.exports = {
             }
         })
     },
+
+
 
 
     login: (req, res) => {
@@ -227,7 +233,6 @@ module.exports = {
                                     if (err)
                                         return commonFile.responseHandler(res, 400, "Internal Server Error.")
                                     else {
-
                                         let token = jwt.sign({
                                             _id: result._id
                                         }, config.jwtSecretKey)
@@ -678,95 +683,6 @@ module.exports = {
 
     // @@@@@@@@@@@@@@@@@@@@@@@  myFavourite Api to show favourite product List @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-    // myFavourite: (req, res) => {
-    //     console.log("req.body========>>>>",req.body)
-
-    //     let n = req.body.page || 1
-    //     let m = req.body.limit || 10
-
-    //     if (!req.body.userId) {
-    //         return commonFile.responseHandler(res, 400, "Parameters missing.");
-    //     }
-
-    //     // let query = { _id: mongoose.Types.ObjectId(req.body.userId), status: "ACTIVE" }
-
-    //     let query = {}
-
-    //     if(req.body.brandName.length){
-    //         query["productList.brandName"] = { $in:req.body.brandName }
-    //     }
-    //     let masterQuery = [
-
-    //         { "$lookup": {
-    //           "from": "product",
-    //           "localField": "myFavourite.product",
-    //           "foreignField": "_id",
-    //           "as": "productList"
-    //         }},
-    //         { "$unwind": "$productList" },
-    //         { "$match": query },
-    //         // { "$group": {
-    //         //   "_id": "$_id",
-    //         // //   "dateCreated": { "$first": "$dateCreated" },
-    //         // //   "title": { "$first": "$title" },
-    //         // //   "description": { "$first": "$description" },
-    //         //   "brandList": { "$push": "$brandList" }
-    //         // }}
-    //       ]
-
-    //     async.waterfall([(callback)=>{
-
-    //         // user.findById(query).populate('myFavourite.product').exec((err, firstResult)=>{
-    //             user.aggregate(masterQuery, (err, firstResult)=>{
-    //                 console.log("err",err)
-    //             if (err)
-    //                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-    //             else if (!firstResult)
-    //                 return commonFile.responseHandler(res, 409, "User not found.")
-    //             else
-    //             console.log("firstResult",firstResult)
-    //                 callback(null, firstResult)
-
-    //                 // if (firstResult.subscriptionPeriod) {
-    //                 //     if (Date.now() - firstResult.subscriptionPeriod >= 0) {
-    //                 //         let i = 0
-    //                 //         let array = []
-    //                 //         do{ 
-    //                 //             array[i] = firstResult.myFavourite[i]
-    //                 //             if(firstResult.myFavourite.length == 50){
-    //                 //                 callback(null, array)
-    //                 //             }
-    //                 //             i++;
-    //                 //         }
-    //                 //         while(i < 50)        
-    //                 //     }
-    //                 //     else {
-    //                 //         callback(null, firstResult.myFavourite)
-    //                 //     }
-    //                 // }
-    //                 // else{
-    //                 //     callback(null, firstResult.myFavourite)
-    //                 // }
-    //         })
-
-    //     }],(err, finalResult)=>{
-    //         // let data = finalResult.map((x)=>{
-    //         //     return x.product
-    //         // })
-    //         // let show  = data.slice( (n - 1) * m, m * n)
-    //         // let result = {
-    //         //     myFavourite:show,
-    //         //     page:n,
-    //         //     total:data.length,
-    //         //     limit:m,
-    //         //     pages:Math.ceil(data.length/m)
-    //         // }
-    //         return commonFile.responseHandler(res, 200, "Success.",finalResult)
-    //     })
-
-    // },
-
-
     myFavourite: (req, res) => {
         console.log("req.body========>>>>", req.body)
 
@@ -923,9 +839,7 @@ module.exports = {
             query.productName = re
         }
 
-        if (req.body.brandName.length) {
-            query.brandName = { $in: req.body.brandName }
-        }
+        
 
         let options = {
             lean: true,
@@ -936,79 +850,78 @@ module.exports = {
         if (req.body.sortBy) {
             options.sort = { productPrice: req.body.sortBy }
         }
+
         async.waterfall([(callback) => {
 
             user.findById({ _id: req.body.userId }).populate('myFavourite.product').exec((err, userResult) => {
                 if (err)
                     callback(err)
                 else
-                    query.bodyType = userResult.bodyType
-                callback(null, query, userResult)
+                    callback(null, userResult)
             })
-        }, (query, userResult, callback) => {
+
+        }, (userResult, callback) => {
+
+            let internalQuery = {  brandGender:userResult.gender }
+
+            console.log("isSubscription====<>>>>>",userResult.isSubscription)
+            if(userResult.isSubscription == false){
+                internalQuery.brandType = 'Free'  
+            }
+
+            let masterQuery = [
+                {
+                    $match:internalQuery
+                },
+                {
+                    $group: { _id: "$brandName", productQuantity: { $sum: 1 } }
+                },
+                {
+                    $sort: { _id: 1 }
+                }
+            ]
+
+            brand.aggregate(masterQuery, (err, result) => {
+                if (err)
+                    callback(err)
+                else{
+                    var brandList = [];
+                    result.map((x)=>{
+                        brandList.push(x._id)
+                    })
+                    callback(null, brandList, userResult)
+                }
+            })            
+
+        }, (brandList, userResult, callback) => {
+
+            query.bodyType = userResult.bodyType
+            query.brandName = { $in:brandList }
+            
+            if (req.body.brandName.length) {
+                query.brandName = { $in: req.body.brandName }
+            }
 
             product.paginate(query, options, (err, result) => {
                 if (err)
                     callback(err)
                 else {
-                    result.docs.map((x) => {
-                        let index = userResult.myFavourite.findIndex((y) => y.product._id.toString() === x._id.toString())
-                        if (index != -1) {
-                            x.isLike = true
-                        }
-                        else {
-                            x.isLike = false
-                        }
-                    })
-                    callback(null, result, userResult)
+                    if(result.docs.length){
+                        result.docs.map((x) => {
+                            let index = userResult.myFavourite.findIndex((y) => y.product._id.toString() === x._id.toString())
+                            if (index != -1) {
+                                x.isLike = true
+                            }
+                            else {
+                                x.isLike = false
+                            }
+                        })
+                    }
+                    callback(null, result)
                 }
 
             })
 
-        }, (result, userResult, callback) => {
-
-            if (result.total > 50) {
-                console.log("result.length is greater then 50")
-                var page, total;
-                if (userResult.isSubscription == true) {
-                    console.log("isSubscription == true")
-                    if (result.total > 100) {
-                        console.log("result.length is greater then 100")
-                        page = Math.ceil(100 / m)
-                        result.page = n
-                        result.total = 100
-                        result.pages = page
-                        result.limit = m
-                    }
-                }
-                else {
-                    if (result.total > 50) {
-                        console.log("isSubscription == false")
-                        page = Math.ceil(50 / m)
-                        result.page = n
-                        result.total = 50
-                        result.pages = page
-                        result.limit = m
-                    }
-                    else {
-                        console.log("result.length is less then 50")
-                        callback(null, result)
-                    }
-                }
-                if (n > page) {
-                    console.log("req.body.page is greater then limited result length")
-                    result.docs = []
-                    callback(null, result)
-                }
-                else {
-                    console.log("under limit length")
-                    callback(null, result)
-                }
-            }
-            else {
-                console.log("first result less then 50")
-                callback(null, result)
-            }
         }], (err, finalResult) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
@@ -1085,20 +998,27 @@ module.exports = {
             return commonFile.responseHandler(res, 400, "Parameters missing.");
         }
 
+        
         async.waterfall([(callback) => {
 
             user.findById({ _id: req.body.userId }, (err, result) => {
                 if (err)
                     callback(err)
                 else
-                    callback(null, result.bodyType)
+                    callback(null, result.gender, result.isSubscription)
             })
 
-        }, (bodyType, callback) => {
+        }, (gender, isSubscription, callback) => {
+
+            let query = {  brandGender:gender }
+
+            if(isSubscription == false){
+                query.brandType = 'Free'  
+            }
 
             let masterQuery = [
                 {
-                    $match: { bodyType: bodyType }
+                    $match:query
                 },
                 {
                     $group: { _id: "$brandName", productQuantity: { $sum: 1 } }
@@ -1108,7 +1028,8 @@ module.exports = {
                 }
             ]
 
-            product.aggregate(masterQuery, (err, result) => {
+            brand.aggregate(masterQuery, (err, result) => {
+                console.log("result",result)
                 if (err)
                     callback(err)
                 else
@@ -1122,6 +1043,17 @@ module.exports = {
                 return commonFile.responseHandler(res, 200, "Success", finalResult)
         })
     },
+
+
+
+
+
+
+
+    
+
+
+
 
 
     // @@@@@@@@@@@@@@@@@@@@@@@  StyleBrandList Api to show the Brand Name on filter (Screen Name Style Tips) @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
@@ -1143,9 +1075,15 @@ module.exports = {
 
         }, (bodyType, callback) => {
 
+            let query = {  bodyType:bodyType }
+
+            if(isSubscription == false){
+                query.brandType = 'Free'  
+            }
+
             let masterQuery = [
                 {
-                    $match: { bodyType: bodyType }
+                    $match:query
                 },
                 {
                     $group: { _id: "$brandName" }
@@ -1155,7 +1093,7 @@ module.exports = {
                 }
             ]
 
-            style.aggregate(masterQuery, (err, result) => {
+            brand.aggregate(masterQuery, (err, result) => {
                 if (err)
                     callback(err)
                 else
@@ -1197,36 +1135,76 @@ module.exports = {
 
         async.waterfall([(callback) => {
 
-            user.findById({ _id: req.body.userId }, (err, result) => {
+            user.findById({ _id: req.body.userId }, (err, userResult) => {
+                if (err)
+                    callback(err)
+                else
+                    callback(null, userResult)
+            })
+
+        }, (userResult, callback) => {
+
+            let internalQuery = {  brandGender:userResult.gender }
+
+            if(userResult.isSubscription == false){
+                internalQuery.brandType = 'Free'  
+            }
+
+            let query = [
+                {
+                    $match:internalQuery
+                },
+                {
+                    $group: { _id: "$brandName", productQuantity: { $sum: 1 } }
+                },
+                {
+                    $sort: { _id: 1 }
+                }
+            ]
+
+            brand.aggregate(query, (err, result) => {
+                if (err)
+                    callback(err)
+                else
+                    callback(null, result, userResult)
+            })
+
+        }, (resultList, userResult, callback) => {
+
+            let user = { styleGender:userResult.gender, bodyType:userResult.bodyType }
+            let query = [
+                {
+                    $match:user
+                },
+                {
+                    $group: { _id: "$brandName", productQuantity: { $sum: 1 } }
+                },
+                {
+                    $sort: { _id: 1 }
+                }
+            ]
+            style.aggregate(query, (err, result) => {
                 if (err)
                     callback(err)
                 else {
-                    let object = { user: { styleGender: result.gender, bodyType: result.bodyType }, isSubscription: result.isSubscription }
-                    if (object) {
-                        callback(null, object)
-                    }
-
-                }
-            })
-
-        }, (object, callback) => {
-            let user = { styleGender: object.user.styleGender, bodyType: object.user.bodyType }
-            style.find(user, (err, result) => {
-                if (err)
-                    callback(err)
-                else {
-
-                    let brandList = result.map((x) => {
-                        return x.brandName
-                    })
-                    let obj = { brandList: brandList, user: user, isSubscription: object.isSubscription }
-                    callback(null, obj)
+                    let brandList = []
+                    resultList.map((x) => {
+                        result.map((y)=>{
+                            if(x._id == y._id){
+                                brandList.push(x._id)
+                            }
+                        })
+                    }) 
+                    
+                    callback(null, brandList, userResult)
                 }
 
             })
-        }, (obj, callback) => {
 
-            masterQuery.$and = [{ bodyType: obj.user.bodyType }, { brandName: { $in: obj.brandList } }]
+           
+        }, (brandList, userResult, callback)=>{
+            
+            masterQuery.$and = [{ bodyType: userResult.bodyType }, { brandName: { $in: brandList } }]
 
             if (req.body.brandName.length) {
                 masterQuery.brandName = { $in: req.body.brandName }
@@ -1235,53 +1213,11 @@ module.exports = {
             product.paginate(masterQuery, options, (err, result) => {
                 if (err)
                     callback(err)
-                else {
-
-                    if (result.total > 50) {
-                        console.log("result.length is greater then 50")
-                        var page, total;
-                        if (obj.isSubscription == true) {
-                            console.log("isSubscription == true")
-                            if (result.total > 100) {
-                                console.log("result.length is greater then 100")
-                                page = Math.ceil(100 / m)
-                                result.page = n
-                                result.total = 100
-                                result.pages = page
-                                result.limit = m
-                            }
-                        }
-                        else {
-                            if (result.total > 50) {
-                                console.log("isSubscription == false")
-                                page = Math.ceil(50 / m)
-                                result.page = n
-                                result.total = 50
-                                result.pages = page
-                                result.limit = m
-                            }
-                            else {
-                                console.log("result.length is less then 50")
-                                callback(null, result)
-                            }
-                        }
-                        if (n > page) {
-                            console.log("req.body.page is greater then limited result length")
-                            result.docs = []
-                            callback(null, result)
-                        }
-                        else {
-                            console.log("under limit length")
-                            callback(null, result)
-                        }
-                    }
-                    else {
-                        console.log("first result less then 50")
-                        callback(null, result)
-                    }
-                }
+                else 
+                    callback(null, result)
 
             })
+
         }], (err, finalResult) => {
             if (err)
                 return commonFile.responseHandler(res, 200, "Interbal Server Error.", err)
