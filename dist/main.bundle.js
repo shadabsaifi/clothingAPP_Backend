@@ -1292,7 +1292,7 @@ var SideMenuComponent = /** @class */ (function () {
         // }
     };
     SideMenuComponent.prototype.logout = function () {
-        localStorage.setItem("token", "");
+        localStorage.removeItem("token");
         // var url = location.href;
         // history.go(-(window.history.length-1));
         // location.href = url;

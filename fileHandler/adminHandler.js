@@ -55,11 +55,14 @@ module.exports = {
             else if (result) {
                 commonFile.compareHash(req.body.password, result.password, (resultHash) => {
                     if (resultHash === true) {
+                        // let token = jwt.sign({
+                        //     _id: result._id
+                        // }, config.jwtSecretKey, {
+                        //         expiresIn: '1000s'
+                        //     })
                         let token = jwt.sign({
                             _id: result._id
-                        }, config.jwtSecretKey, {
-                                expiresIn: '1000s'
-                            })
+                        }, config.jwtSecretKey)
                         delete result.password
                         result["token"] = token;
                         return commonFile.responseHandler(res, 200, "Successful login", result)
