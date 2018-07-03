@@ -752,8 +752,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var DataService = /** @class */ (function () {
     function DataService(http) {
         this.http = http;
-        this.token = localStorage.getItem("token");
-        // baseUrl = 'http://172.16.6.80:1468/admin'
+        this.token = localStorage.getItem("token") == undefined ? '' : localStorage.getItem("token");
+        //baseUrl = 'http://172.16.6.80:1468/admin'
         this.baseUrl = 'http://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:1468/admin';
         this.getHttpOptions = {
             headers: new __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["c" /* HttpHeaders */]({
