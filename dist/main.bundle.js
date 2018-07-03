@@ -695,6 +695,9 @@ var DashboardComponent = /** @class */ (function () {
         this.dashboardData = {};
     }
     DashboardComponent.prototype.ngOnInit = function () {
+        this.getDashboardDetail();
+    };
+    DashboardComponent.prototype.getDashboardDetail = function () {
         var _this = this;
         this.service.getApi('/totalCollection').subscribe(function (response) {
             if (response['responseCode'] == 200) {
@@ -752,13 +755,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var DataService = /** @class */ (function () {
     function DataService(http) {
         this.http = http;
-        this.token = localStorage.getItem("token") == undefined ? '' : localStorage.getItem("token");
         //baseUrl = 'http://172.16.6.80:1468/admin'
         this.baseUrl = 'http://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:1468/admin';
         this.getHttpOptions = {
             headers: new __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["c" /* HttpHeaders */]({
                 "Content-Type": "application/json",
                 "token": this.token
+            })
+        };
+        this.getHttpOptions = {
+            headers: new __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["c" /* HttpHeaders */]({
+                "Content-Type": "application/json",
+                "token": localStorage.getItem("token") == undefined ? '' : localStorage.getItem("token")
             })
         };
     }
@@ -1044,6 +1052,7 @@ var LoginComponent = /** @class */ (function () {
             "email": this.loginData.email,
             "password": this.loginData.password
         };
+        console.log('');
         this.service.postApi('/login', credential).subscribe(function (response) {
             if (response['responseCode'] == 200) {
                 console.log('success', response['responseMessage']);
