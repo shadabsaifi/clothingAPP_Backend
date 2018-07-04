@@ -407,76 +407,123 @@ module.exports = {
     },
 
 
-    
 
 
-    paymentGetway: (req, res) => {
+
+     // @@@@@@@@@@@@@@@@@@@@@@@  Ative Subscription Api   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+
+    activeSubsciption: (req, res) => {
 
         if(!req.body.email || !req.body.stripeToken || !req.body.userId){
             return commonFile.responseHandler(res, 400, "Parameters Missing.")
         }
-        let days = req.body.days || 28 
-        var date = new Date(new Date().getTime()+ days * 86400000)
-        let update = { subscriptionPeriod:date, isSubscription:true  }
-        // create a customer 
-        stripe.customers.create({
-            email: req.body.email, // customer email, which user need to enter while making payment
-            source: req.body.stripeToken // token for the given card 
-        })
-        .then((customer) => {
-            stripe.charges.create({ // charge the customer
-                // amount: req.body.amount,
-                amount: 2.99,
-                currency: "usd",
-                customer: customer.id
-            })
-            console.log("customer=====>", customer)
-        })
-        .then((charge) => {
-            if (!charge)
-                console.log("Cannot charge a customer that has no active card", charge)
-            else {
-            
-                async.waterfall([(callback)=>{
-                    new transaction({
-                        purchaseBy:req.body.userId,
-                        packegPrice:req.body.amount,
-                        // transactionId:chargeId,
-                        days:days
-                    }).save((err, success)=>{
-                        if(err)
-                            callback(err)
-                        else
-                            callback(null, "done")
-                    })
-                }, (next, callback)=>{
-                    
-                    user.findByIdAndUpdate({ _id:req.body.userId }, update, {new:true}, (err, result)=>{
-                        if(err)
-                            callback(err)
-                        else
-                            callback(null, result)
-                    })
 
-                }], (err, finalResult)=>{
-                    if (err)
-                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
-                    if(finalResult)
-                        return commonFile.responseHandler(res, 200, "Success.")
-                })
-                
-                
-                console.log("success", charge)
+        async.waterfall([(callback)=>{
+            stripe.customers.create({
+                email: req.body.email, // customer email, which user need to enter while making payment
+                source: req.body.stripeToken // token for the given card 
+            }, (err, customer)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, customer)
+            })
+        }, (customer, callback)=>{
+            console.log("customer Created Successfully")
+            stripe.subscriptions.create({
+                customer: customer.id,
+                items: [
+                  {
+                    plan: "plan_DAVuND8QNM8xFB",
+                  },
+                ]
+              }, (err, subscription)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, customer, subscription)
+              })
+
+        }, (customer, subscription, callback)=>{
+            let update = {
+                userId:req.body.userId,
+                userEmail:req.body.email,
+                packegPrice:2.99,
+                stripeId:customer.id,
+                subscriptionsId:subscription.id,
             }
+            new transaction(update).save((err, save)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, customer, subscription)
+            })
+        }, (customer, subscription, callback)=>{
+            let update = { isSubscription:true, stripeId:customer.id, subscriptionsId:subscription.id  }
+            user.findByIdAndUpdate({ _id:req.body.userId }, update, { new:true }, (err, result)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, "done")
+            })
+        }], (err, finalResult)=>{
+            console.log("err========>",err)
+            if(err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            if(finalResult)
+                return commonFile.responseHandler(res, 200, "Subscription Successfully Added.")
         })
-        .catch((err) => {
-            if (!err) {
-                console.log("err occur", err)
-            }
-            else {
-                console.log("err occur", err)
-                response.sendResponseWithData(res, responseCode.INTERNAL_SERVER_ERROR, "Error Occured", err)
-            }
+    },
+
+
+
+
+
+
+
+    // @@@@@@@@@@@@@@@@@@@@@@@  cancel Subscription Api   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    cancelSubsciption:(req, res)=>{
+        if(!req.body.userId || !req.body.subscriptionsId){
+            return commonFile.responseHandler(res, 400, "Parameters Missing.")
+        }
+
+        
+        async.waterfall([(callback)=>{
+            
+            stripe.subscriptions.del( req.body.subscriptionsId, (err, confirmation)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, "user")
+            })
+        }, (done, callback)=>{
+            
+            let updateUser = { isSubscription:false, stripeId:"", subscriptionsId:"" }
+            user.findByIdAndUpdate({ _id:req.body.userId }, updateUser, { new:true }, (err, user)=>{
+                console.log("user====>>>",err, user)
+                if(err)
+                    callback(err)
+                else
+                    callback(null, "user")
+            })
+
+        }, (next, callback)=>{
+            console.log("console 2")
+            let updateTransaction = { status:"CANCEL" }
+            transaction.findOneAndUpdate({ subscriptionsId:req.body.subscriptionsId }, updateTransaction, { new:true }, (err, transaction)=>{
+                console.log("transcation", err, transaction)
+                if(err)
+                    callback(err)
+                else
+                    callback(null, "transaction")
+            })
+        }], (err, finalResult)=>{
+            if(err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            if(finalResult)
+                return commonFile.responseHandler(res, 200, "You Have Successfully Cancel Subscription")
         })
     },
 

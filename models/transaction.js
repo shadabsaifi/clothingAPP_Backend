@@ -2,17 +2,28 @@ const mongoose=require('mongoose')
 const mongoosePaginate=require('mongoose-paginate')
 let Schema=mongoose.Schema;
 
-let transactionSchema= new Schema({
+let transactionSchema = new Schema({
 	
 	
-	purchaseBy:{
+	userId:{
 		type:mongoose.Schema.Types.ObjectId, ref:'user'
 	},
-	packegPrice:{
+	userEmail:{
 		type:String
 	},
-	transactionId:{
-		type:String
+	packegPrice:{
+		type:Number
+	},
+	stripeId:{
+        type:String
+    },
+    subscriptionsId:{
+        type:String
+	},
+	status:{
+		type:String,
+		enum:["ACTIVE","CANCEL"],
+		default:"ACTIVE"
 	},
 	purchaseDate:{
 		type:Date,
@@ -21,9 +32,6 @@ let transactionSchema= new Schema({
 	createdAt:{
 		type:Date,
 		default:Date.now
-	},
-	days:{
-		type:Number
 	}
 })
 

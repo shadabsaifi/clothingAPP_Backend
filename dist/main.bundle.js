@@ -436,7 +436,7 @@ module.exports = ""
 /***/ "./src/app/brand-management/brand-management.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"mainbox\">\n  <app-side-menu></app-side-menu>\n<div class=\"right-section\">\n  <div class=\"copyrights\">Copyright © 2018 App name All Rights Reserved.</div>\n  <div class=\"right-inner\">\n      \n    <h1 class=\"heading\">BRAND MANAGEMENT</h1>\n    <div class=\"filter-block\">\n        <fieldset class=\"global-fieldset\">\n           <legend>Brands</legend>\n           <div class=\"filter-content\">\n              <div class=\"row\">\n                 <div class=\"col-sm-6\">\n                    <div class=\"form-group\">\n                      <div class=\"search-icon\">\n                         <input type=\"text\" [(ngModel)]=\"searchBrand.data\"  (keyup)=\"search()\" class=\"form-control max-wt-300 search-input\" placeholder=\"Search\">\n                         <i class=\"fa fa-search\" aria-hidden=\"true\"></i>\n                      </div>\n                   </div>\n                 </div>\n                 <div class=\"col-sm-6\">\n                   <div class=\"btn-right\">\n                      <a class=\"btn btn-red btn-common\"  href=\"#add_brand\" data-toggle=\"modal\">Add</a>\n                   </div>\n                 </div>\n              </div>\n           </div>\n           <div class=\"filter-content pt0\" *ngIf=\"menBrandList.length\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Men</legend>\n                 <div class=\"brand-block\">\n                    <ul>\n                       <li *ngFor=\"let brands of menBrandList\">{{brands}}</li>\n                    </ul>\n                 </div>\n                 <button  *ngIf=\"menBrandList.length < menTotal\" (click)=\"seeMoreMan()\">See more</button>\n              </fieldset>\n           </div>\n           <div class=\"filter-content pt0\" *ngIf=\"!menBrandList.length\">\n                <fieldset class=\"global-fieldset\">\n                   <legend>Men</legend>\n                   <div class=\"brand-block\">\n                      <ul style=\"text-align:center\" >\n                         <li>No Brand Found!!</li>\n                     </ul>\n                  </div>\n                </fieldset>\n             </div>\n           <div class=\"filter-content pt0\" *ngIf=\"womenBrandList.length\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Women</legend>\n                 <div class=\"brand-block\">\n                    <ul>\n                       <li *ngFor=\"let brands of womenBrandList\">{{brands}}</li>\n                    </ul>\n                 </div>\n                 <button  *ngIf=\"womenBrandList.length < womenTotal\" (click)=\"seeMoreWoman()\">See more</button>\n              </fieldset>\n           </div>\n           <div class=\"filter-content pt0\" *ngIf=\"!womenBrandList.length\">\n                <fieldset class=\"global-fieldset\">\n                   <legend>Women</legend>\n                   <div class=\"brand-block\">\n                      <ul style=\"text-align:center\" >\n                         <li>No Brand Found!!</li>\n                     </ul>\n                  </div>\n                </fieldset>\n             </div>\n           <div class=\"filter-content pt0\" *ngIf=\"bothBrandList.length\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Both</legend>\n                 <div class=\"brand-block\">\n                    <ul>\n                       <li *ngFor=\"let brands of bothBrandList\">{{brands}}</li>\n                   </ul>\n                </div>\n                <button  *ngIf=\"bothBrandList.length < bothTotal\" (click)=\"seeMoreBoth()\">See more</button>\n              </fieldset>\n           </div>\n           <div class=\"filter-content pt0\" *ngIf=\"!bothBrandList.length\">\n                <fieldset class=\"global-fieldset\">\n                   <legend>Both</legend>\n                   <div class=\"brand-block\">\n                      <ul style=\"text-align:center\" >\n                         <li>No Brand Found!!</li>\n                     </ul>\n                  </div>\n                </fieldset>\n             </div>\n        </fieldset>\n     </div>\n          \n     </div>\n</div>\n</div>\n\n<div id=\"add_brand\" class=\"modal fade\" data-easein=\"bounceIn\"  tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"costumModalLabel\" aria-hidden=\"true\">\n  <div class=\"modal-dialog max-wt-800\">\n      <div class=\"modal-content\">\n          <div class=\"modal-header border0\">\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">\n                  ×\n              </button>\n          </div>\n          <div class=\"modal-body pt0\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Add Brands</legend>\n                 <div class=\"max-wt-400 mrgn-0-auto mt20 mb30\">\n                        <form class=\"login_box_outer\" [formGroup]='addBrandForm' novalidate>\n                    <div class=\"form-group mb30\" [ngClass]=\"{'has-error': (addBrandForm.controls['brandName'].dirty && addBrandForm.controls['brandName'].invalid)}\">\n                       <label>Brand Name:</label>\n                       <input class=\"form-control\" name=\"name\" [(ngModel)]=\"brandDetail.name\" placeholder=\"Enter the name of the Brand\" type=\"text\" [formControl]=\"addBrandForm.controls['brandName']\" maxlength=\"20\" />\n                       <div class=\"errMsg\" *ngIf=\"addBrandForm.controls['brandName'].dirty && addBrandForm.controls['brandName'].invalid\">\n                            <span style='color:red' [ngClass]=\"{error:addBrandForm.controls['brandName'].hasError('required')}\" *ngIf=\"addBrandForm.controls['brandName'].hasError('required')\">*Please enter brand name.</span>\n                            <span style='color:red' [ngClass]=\"{error:addBrandForm.controls['brandName'].hasError('minlength') && !addBrandForm.controls['brandName'].hasError('pattern')}\" *ngIf=\"addBrandForm.controls['brandName'].hasError('minlength') && !addBrandForm.controls['brandName'].hasError('pattern')\">*Brand name must be minimum 2 characters.</span>\n                            <span style='color:red' [ngClass]=\"{error:!addBrandForm.controls['brandName'].hasError('minlength') && addBrandForm.controls['brandName'].hasError('pattern')}\" *ngIf=\"!addBrandForm.controls['brandName'].hasError('minlength') && addBrandForm.controls['brandName'].hasError('pattern')\">*Please enter valid brand name.</span>\n                          </div>\n                    </div>\n                    <div class=\"form-group\">\n                       <label>Select Gender:</label>\n                       <select class=\"form-control angle\" [(ngModel)]=\"brandDetail.gender\" [ngModelOptions]=\"{standalone: true}\">\n                        <option value=\"\" disabled>--Select--</option>  \n                        <option value=\"male\">Male</option>\n                        <option value=\"female\">Female</option>\n                        <option value=\"both\">Both</option>\n                       </select>\n                    </div>\n                    <div class=\"form-group\">\n                      <label>Status:</label>\n                      <select class=\"form-control angle\" [(ngModel)]=\"brandDetail.status\" [ngModelOptions]=\"{standalone: true}\">\n                       <option value=\"\" disabled>--Select--</option>  \n                       <option value=\"Paid\">Paid</option>\n                       <option value=\"Free\">Free</option>\n                      </select>\n                   </div>\n                    <div class=\"button-box mt40\">\n                       <button class=\"btn btn-red mr10 btn-common\" [disabled]=\"addBrandForm.invalid\" data-dismiss=\"modal\" (click)=\"addBrand()\">Add</button>\n                    </div>\n                    </form>\n                 </div>\n              </fieldset>\n          </div>\n      </div>\n  </div>\n</div>"
+module.exports = "<div class=\"mainbox\">\n  <app-side-menu></app-side-menu>\n<div class=\"right-section\">\n  <div class=\"copyrights\">Copyright © 2018 App name All Rights Reserved.</div>\n  <div class=\"right-inner\">\n      \n    <h1 class=\"heading\">BRAND MANAGEMENT</h1>\n    <div class=\"filter-block\">\n        <fieldset class=\"global-fieldset\">\n           <legend>Brands</legend>\n           <div class=\"filter-content\">\n              <div class=\"row\">\n                 <div class=\"col-sm-6\">\n                    <div class=\"form-group\">\n                      <div class=\"search-icon\">\n                         <input type=\"text\" [(ngModel)]=\"searchBrand.data\"  (keyup)=\"search()\" class=\"form-control max-wt-300 search-input\" placeholder=\"Search\">\n                         <i class=\"fa fa-search\" aria-hidden=\"true\"></i>\n                      </div>\n                   </div>\n                 </div>\n                 <div class=\"col-sm-6\">\n                   <div class=\"btn-right\">\n                      <a class=\"btn btn-red btn-common\"  href=\"#add_brand\" data-toggle=\"modal\">Add</a>\n                   </div>\n                 </div>\n              </div>\n           </div>\n           <div class=\"filter-content pt0\" *ngIf=\"menBrandList.length\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Men</legend>\n                 <div class=\"brand-block\">\n                    <ul>\n                       <li *ngFor=\"let brands of menBrandList\">{{brands}}</li>\n                    </ul>\n                 </div>\n                 <button  *ngIf=\"menBrandList.length < menTotal\" (click)=\"seeMoreMan()\">See more</button>\n              </fieldset>\n           </div>\n           <div class=\"filter-content pt0\" *ngIf=\"!menBrandList.length\">\n                <fieldset class=\"global-fieldset\">\n                   <legend>Men</legend>\n                   <div class=\"brand-block\">\n                      <ul style=\"text-align:center\" >\n                         <li>No Brand Found!!</li>\n                     </ul>\n                  </div>\n                </fieldset>\n             </div>\n           <div class=\"filter-content pt0\" *ngIf=\"womenBrandList.length\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Women</legend>\n                 <div class=\"brand-block\">\n                    <ul>\n                       <li *ngFor=\"let brands of womenBrandList\">{{brands}}</li>\n                    </ul>\n                 </div>\n                 <button  *ngIf=\"womenBrandList.length < womenTotal\" (click)=\"seeMoreWoman()\">See more</button>\n              </fieldset>\n           </div>\n           <div class=\"filter-content pt0\" *ngIf=\"!womenBrandList.length\">\n                <fieldset class=\"global-fieldset\">\n                   <legend>Women</legend>\n                   <div class=\"brand-block\">\n                      <ul style=\"text-align:center\" >\n                         <li>No Brand Found!!</li>\n                     </ul>\n                  </div>\n                </fieldset>\n             </div>\n           <div class=\"filter-content pt0\" *ngIf=\"bothBrandList.length\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Both</legend>\n                 <div class=\"brand-block\">\n                    <ul>\n                       <li *ngFor=\"let brands of bothBrandList\">{{brands}}</li>\n                   </ul>\n                </div>\n                <button  *ngIf=\"bothBrandList.length < bothTotal\" (click)=\"seeMoreBoth()\">See more</button>\n              </fieldset>\n           </div>\n           <div class=\"filter-content pt0\" *ngIf=\"!bothBrandList.length\">\n                <fieldset class=\"global-fieldset\">\n                   <legend>Both</legend>\n                   <div class=\"brand-block\">\n                      <ul style=\"text-align:center\" >\n                         <li>No Brand Found!!</li>\n                     </ul>\n                  </div>\n                </fieldset>\n             </div>\n        </fieldset>\n     </div>\n          \n     </div>\n</div>\n</div>\n\n<div id=\"add_brand\" class=\"modal fade\" data-easein=\"bounceIn\"  tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"costumModalLabel\" aria-hidden=\"true\">\n  <div class=\"modal-dialog max-wt-800\">\n      <div class=\"modal-content\">\n          <div class=\"modal-header border0\">\n              <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">\n                  ×\n              </button>\n          </div>\n          <div class=\"modal-body pt0\">\n              <fieldset class=\"global-fieldset\">\n                 <legend>Add Brands</legend>\n                 <div class=\"max-wt-400 mrgn-0-auto mt20 mb30\">\n                        <form class=\"login_box_outer\" [formGroup]='addBrandForm' novalidate>\n                    <div class=\"form-group mb30\" [ngClass]=\"{'has-error': (addBrandForm.controls['brandName'].dirty && addBrandForm.controls['brandName'].invalid)}\">\n                       <label>Brand Name:</label>\n                       <input class=\"form-control\" name=\"name\" [(ngModel)]=\"brandDetail.name\" placeholder=\"Enter the name of the Brand\" type=\"text\" [formControl]=\"addBrandForm.controls['brandName']\" maxlength=\"20\" />\n                       <div class=\"errMsg\" *ngIf=\"addBrandForm.controls['brandName'].dirty && addBrandForm.controls['brandName'].invalid\">\n                            <span style='color:red' [ngClass]=\"{error:addBrandForm.controls['brandName'].hasError('required')}\" *ngIf=\"addBrandForm.controls['brandName'].hasError('required')\">*Please enter brand name.</span>\n                            <span style='color:red' [ngClass]=\"{error:addBrandForm.controls['brandName'].hasError('minlength') && !addBrandForm.controls['brandName'].hasError('pattern')}\" *ngIf=\"addBrandForm.controls['brandName'].hasError('minlength') && !addBrandForm.controls['brandName'].hasError('pattern')\">*Brand name must be minimum 2 characters.</span>\n                            <span style='color:red' [ngClass]=\"{error:!addBrandForm.controls['brandName'].hasError('minlength') && addBrandForm.controls['brandName'].hasError('pattern')}\" *ngIf=\"!addBrandForm.controls['brandName'].hasError('minlength') && addBrandForm.controls['brandName'].hasError('pattern')\">*Please enter valid brand name.</span>\n                          </div>\n                    </div>\n                    <div class=\"form-group\">\n                       <label>Select Gender:</label>\n                       <select class=\"form-control angle\" [(ngModel)]=\"brandDetail.gender\" [ngModelOptions]=\"{standalone: true}\">\n                        <option value=\"\" disabled>--Select--</option>  \n                        <option value=\"male\">Male</option>\n                        <option value=\"female\">Female</option>\n                        <option value=\"both\">Both</option>\n                       </select>\n                    </div>\n                    <div class=\"button-box mt40\">\n                       <button class=\"btn btn-red mr10 btn-common\" [disabled]=\"addBrandForm.invalid\" data-dismiss=\"modal\" (click)=\"addBrand()\">Add</button>\n                    </div>\n                    </form>\n                 </div>\n              </fieldset>\n          </div>\n      </div>\n  </div>\n</div>"
 
 /***/ }),
 
@@ -471,7 +471,7 @@ var BrandManagementComponent = /** @class */ (function () {
         this.womenBrandList = [];
         this.bothBrandList = [];
         this.searchBrand = { data: "" };
-        this.brandDetail = { "name": "", "gender": "", "status": "" };
+        this.brandDetail = { "gender": "" };
         this.menPage = 1;
         this.womenPage = 1;
         this.bothPage = 1;
@@ -618,13 +618,11 @@ var BrandManagementComponent = /** @class */ (function () {
         var credential = {
             "createdBy": localStorage.getItem("adminId"),
             "brandName": this.brandDetail.name,
-            "brandGender": this.brandDetail.gender,
-            "brandType": this.brandDetail.status
+            "brandGender": this.brandDetail.gender
         };
         this.service.postApi('/addNewBrand', credential).subscribe(function (response) {
             console.log(JSON.stringify(credential));
             if (response['responseCode'] == 200) {
-                window.location.reload();
                 _this.service.success(response['responseMessage']);
                 console.log('success', response['responseMessage']);
                 _this.displayBrand();
@@ -695,9 +693,6 @@ var DashboardComponent = /** @class */ (function () {
         this.dashboardData = {};
     }
     DashboardComponent.prototype.ngOnInit = function () {
-        this.getDashboardDetail();
-    };
-    DashboardComponent.prototype.getDashboardDetail = function () {
         var _this = this;
         this.service.getApi('/totalCollection').subscribe(function (response) {
             if (response['responseCode'] == 200) {
@@ -755,26 +750,35 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var DataService = /** @class */ (function () {
     function DataService(http) {
         this.http = http;
-        //baseUrl = 'http://172.16.6.80:1468/admin'
+        this.token = localStorage.getItem("token");
+        //   baseUrl = 'http://172.16.6.80:1468/admin'
         this.baseUrl = 'http://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:1468/admin';
-        this.getHttpOptions = {
+    }
+    DataService.prototype.getApi = function (url) {
+        var getHttpOptions = {
             headers: new __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["c" /* HttpHeaders */]({
                 "Content-Type": "application/json",
                 "token": this.token
             })
         };
-        this.getHttpOptions = {
+        return this.http.get(this.baseUrl + url, getHttpOptions);
+    };
+    DataService.prototype.loginPostApi = function (url, data) {
+        var getHttpOptions = {
             headers: new __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["c" /* HttpHeaders */]({
                 "Content-Type": "application/json",
-                "token": localStorage.getItem("token") == undefined ? '' : localStorage.getItem("token")
             })
         };
-    }
-    DataService.prototype.getApi = function (url) {
-        return this.http.get(this.baseUrl + url, this.getHttpOptions);
+        return this.http.post(this.baseUrl + url, data, getHttpOptions);
     };
     DataService.prototype.postApi = function (url, data) {
-        return this.http.post(this.baseUrl + url, data, this.getHttpOptions);
+        var getHttpOptions = {
+            headers: new __WEBPACK_IMPORTED_MODULE_1__angular_common_http__["c" /* HttpHeaders */]({
+                "Content-Type": "application/json",
+                "token": this.token
+            })
+        };
+        return this.http.post(this.baseUrl + url, data, getHttpOptions);
     };
     DataService.prototype.error = function (title) {
         toastr.error(title);
@@ -1052,8 +1056,7 @@ var LoginComponent = /** @class */ (function () {
             "email": this.loginData.email,
             "password": this.loginData.password
         };
-        console.log('');
-        this.service.postApi('/login', credential).subscribe(function (response) {
+        this.service.loginPostApi('/login', credential).subscribe(function (response) {
             if (response['responseCode'] == 200) {
                 console.log('success', response['responseMessage']);
                 localStorage.setItem("adminId", response['data']._id);
@@ -1292,12 +1295,9 @@ var SideMenuComponent = /** @class */ (function () {
         // }
     };
     SideMenuComponent.prototype.logout = function () {
-        localStorage.removeItem("token");
-        // var url = location.href;
-        // history.go(-(window.history.length-1));
-        // location.href = url;
-        // console.log(this.router.url)
-        this.router.navigate(['/login']);
+        localStorage.setItem("token", "");
+        history.go(-(history.length - 1));
+        //this.router.navigate(['/login'])
         //history.pushState('',"","");
     };
     SideMenuComponent = __decorate([
@@ -1558,7 +1558,6 @@ var StyleManagementComponent = /** @class */ (function () {
         this.service.postApi('/addNewStyleTip', credential).subscribe(function (response) {
             console.log(JSON.stringify(credential));
             if (response['responseCode'] == 200) {
-                window.location.reload();
                 _this.service.success(response['responseMessage']);
                 console.log('success', response['responseMessage']);
                 _this.displayStyleTips();

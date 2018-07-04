@@ -5,7 +5,6 @@ let adminHandler=require('../fileHandler/adminHandler.js')
 
 adminRoutes.get('/activeUsers',adminHandler.verifyToken,adminHandler.activeUsers)
 adminRoutes.get('/getStaticContent',adminHandler.getStaticContent)
-
 adminRoutes.post('/tempCld',adminHandler.verifyToken,adminHandler.uploadMultipleImagesCld)
 adminRoutes.post('/addNewPackage',adminHandler.addNewPackage)
 adminRoutes.post('/blockUnblockUser',adminHandler.blockUnblockUser)
