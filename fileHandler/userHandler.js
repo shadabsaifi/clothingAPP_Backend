@@ -407,6 +407,8 @@ module.exports = {
     },
 
 
+    
+
 
     paymentGetway: (req, res) => {
 
@@ -1125,6 +1127,7 @@ module.exports = {
         let masterQuery = {}
 
         let options = {
+            lean:true,
             page: n,
             limit: m
         }
@@ -1194,8 +1197,7 @@ module.exports = {
                                 brandList.push(x._id)
                             }
                         })
-                    }) 
-                    
+                    })
                     callback(null, brandList, userResult)
                 }
 
@@ -1213,8 +1215,23 @@ module.exports = {
             product.paginate(masterQuery, options, (err, result) => {
                 if (err)
                     callback(err)
-                else 
-                    callback(null, result)
+                else{
+                    if(result.docs.length){
+                        result.docs.map((x) => {
+                            let index = userResult.myFavourite.findIndex((y) => y.product.toString() === x._id.toString())
+                            if (index != -1) {
+                                x.isLike = true
+                            }
+                            else {
+                                x.isLike = false
+                            }
+                        })
+                        callback(null, result)
+                    }else{
+                        callback(null, result)
+                    }
+                    
+                }
 
             })
 

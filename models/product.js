@@ -32,19 +32,13 @@ let productSchema = new Schema({
 		type: Array,
 		default: ["BLACK", "WHITE", "YELLOW", "GREEN", "GREY", "RED"]
 	},
-	productImage: {
-		type: Array
-	},
+	productDetail: [{ productImage:{ type:Array }, productColor:{ type:String }, productSize:{ type:Array }, productPrice:{ type:Number } } ],
+
 	productSize: {
 		type: Array,
 		default: ["S", "M", "L", "XL", "XXL", "XXXL"]
 	},
-	productQuantity: {
-		type: Number
-	},
-	likedBy:{
-		type:mongoose.Schema.Types.ObjectId, ref: 'user'
-	},
+
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId, ref: 'admin'
 	},
@@ -52,28 +46,6 @@ let productSchema = new Schema({
 		type: Date,
 		default: Date.now
 	}
-	
-	
-	// productType: {
-	// 	type: String
-	// },
-	// productImage: {
-	// 	type: Array
-	// },
-	// subscriptionPeriod: {
-	// 	type: Number
-	// },
-	// status: {
-	// 	type: String,
-	// 	enum: ["ACTIVE", "DELETED"],
-	// 	default: "ACTIVE"
-	// },
-	// stock: {
-	// 	type: String,
-	// 	enum: ["In Stock", "Out Of Stock"],
-	// 	default: "In Stock"
-	// },
-	
 
 })
 
