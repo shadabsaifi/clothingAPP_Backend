@@ -123,7 +123,7 @@ module.exports = {
         if (req.body.location)
             updateObj.location = req.body.location;
 
-        admin.findOneAndUpdate({ "_id": "req.body._id" }, {
+        admin.findOneAndUpdate({ _id: req.body.adminId }, {
             $set: {
                 updateObj
             }
@@ -153,8 +153,8 @@ module.exports = {
             if (err)
                 commonFile.responseHandler(res, 400, "Error: in forgot password")
             else if (result) {
-                let link = 'http://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:4646/#/resetPassword/' + result._id
-                commonFile.sendEmail(req.body.email, "Tap Culture", "Your getFriends Password reset link", "Click on this link to <a href=" + link + ">reset Password</a>", null, null, (result) => {
+                let link = 'http://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:1468/#/resetPassword/' + result._id
+                commonFile.sendEmail(req.body.email, "Clothing", "Your getFriends Password reset link", "Click on this link to <a href=" + link + ">reset Password</a>", null, null, (result) => {
                     if (result)
                         return commonFile.responseHandler(res, 200, "Success");
                     else
@@ -172,7 +172,7 @@ module.exports = {
     // @@@@@@@@@@@@@@@@@@@@@@@  resetPassword Api to to change The password  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     resetPassword: (req, res) => {
-        console.log("req.body" + JSON.stringify(req.body))
+        // console.log("req.body" + JSON.stringify(req.body))
 
         if (!req.body.adminId || !req.body.password)
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")

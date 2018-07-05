@@ -430,7 +430,6 @@ module.exports = {
                     callback(null, customer)
             })
         }, (customer, callback)=>{
-            console.log("customer Created Successfully")
             stripe.subscriptions.create({
                 customer: customer.id,
                 items: [
@@ -464,15 +463,16 @@ module.exports = {
             user.findByIdAndUpdate({ _id:req.body.userId }, update, { new:true }, (err, result)=>{
                 if(err)
                     callback(err)
-                else
-                    callback(null, "done")
+                else{
+                    let object = { subscriptionsId:subscription.id }
+                    callback(null, object)
+                }
             })
         }], (err, finalResult)=>{
-            console.log("err========>",err)
             if(err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             if(finalResult)
-                return commonFile.responseHandler(res, 200, "Subscription Successfully Added.")
+                return commonFile.responseHandler(res, 200, "Subscription Successfully Added.", finalResult)
         })
     },
 
@@ -521,7 +521,7 @@ module.exports = {
             })
         }], (err, finalResult)=>{
             if(err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                return commonFile.responseHandler(res, 400, "Internal Server Error.",err)
             if(finalResult)
                 return commonFile.responseHandler(res, 200, "You Have Successfully Cancel Subscription")
         })
@@ -550,6 +550,8 @@ module.exports = {
         })
 
     },
+
+
 
 
 
@@ -741,7 +743,7 @@ module.exports = {
 
         let options = {
             page: req.body.page || 1,
-            limit: req.body.limit || 10,
+            limit: req.body.limit || 6,
         }
 
         if (req.body.sortBy) {
@@ -877,7 +879,7 @@ module.exports = {
         }
 
         let n = req.body.page || 1
-        let m = req.body.limit || 10
+        let m = req.body.limit || 6
 
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
         re = new RegExp(pattern, 'gi');
@@ -888,12 +890,10 @@ module.exports = {
             query.productName = re
         }
 
-        
-
         let options = {
             lean: true,
             page: req.body.page || 1,
-            limit: req.body.limit || 10
+            limit: req.body.limit || 6
         }
 
         if (req.body.sortBy) {
@@ -1170,7 +1170,7 @@ module.exports = {
         }
 
         let n = req.body.page || 1
-        let m = req.body.limit || 10
+        let m = req.body.limit || 6
         let masterQuery = {}
 
         let options = {
@@ -2127,7 +2127,7 @@ module.exports = {
                                 // select: " -email",
                                 lean: true,
                                 page: req.body.pageNumber || 1,
-                                limit: req.body.pageLimit || 10,
+                                limit: req.body.pageLimit || 6,
                                 // 'dist.calculated':{sort:-1},
                             }
 

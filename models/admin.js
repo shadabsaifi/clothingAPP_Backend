@@ -43,8 +43,8 @@ AdminModel.findOne({}, (error, success) => {
                     console.log(err)
                 else{
                     new AdminModel({
-                        email: "dubeyanuj639@gmail.com",
-                        password: password,
+                        email: "clothing@clothing.com",
+                        password: clothing,
                         name: "Anuj",
                         phoneNumber: "8273242159",
                         profilePic: "http://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg"
