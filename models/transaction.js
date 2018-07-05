@@ -11,12 +11,15 @@ let transactionSchema = new Schema({
 	userEmail:{
 		type:String
 	},
-	packegPrice:{
+	subscriptionPrice:{
 		type:Number
 	},
 	stripeId:{
         type:String
-    },
+	},
+	planId:{
+		type:String
+	},
     subscriptionsId:{
         type:String
 	},
@@ -25,9 +28,12 @@ let transactionSchema = new Schema({
 		enum:["ACTIVE","CANCEL"],
 		default:"ACTIVE"
 	},
-	purchaseDate:{
+	subscriptionStartDate:{
 		type:Date,
 		default:Date.now
+	},
+	subscriptionEndDate:{
+		type:Date,
 	},
 	createdAt:{
 		type:Date,

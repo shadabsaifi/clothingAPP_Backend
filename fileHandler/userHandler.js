@@ -218,7 +218,6 @@ module.exports = {
                                 var name = (req.body.name).toLowerCase();
                                 var fullName = ""
                                 let array = name.split(" ")
-
                                 var i = 0
 
                                 do {
@@ -415,62 +414,95 @@ module.exports = {
 
     activeSubsciption: (req, res) => {
 
-        if(!req.body.email || !req.body.stripeToken || !req.body.userId){
+        if(!req.body.email || !req.body.userId || !req.body.stripeToken || !req.body.subscriptionPrice){
             return commonFile.responseHandler(res, 400, "Parameters Missing.")
         }
 
         async.waterfall([(callback)=>{
-            stripe.customers.create({
-                email: req.body.email, // customer email, which user need to enter while making payment
-                source: req.body.stripeToken // token for the given card 
-            }, (err, customer)=>{
-                if(err)
-                    callback(err)
-                else
-                    callback(null, customer)
-            })
-        }, (customer, callback)=>{
-            stripe.subscriptions.create({
-                customer: customer.id,
-                items: [
-                  {
-                    plan: "plan_DAVuND8QNM8xFB",
-                  },
-                ]
-              }, (err, subscription)=>{
-                if(err)
-                    callback(err)
-                else
-                    callback(null, customer, subscription)
-              })
 
-        }, (customer, subscription, callback)=>{
+            user.findById({ _id:req.body.userId }, (err, result) => {
+                if (err)
+                    callback(err)
+                else
+                    callback(null, result.stripeId)
+            })
+
+            
+        }, (stripeId, callback)=>{
+            if(stripeId){
+                callback(null, stripeId)
+            }
+            else{
+                
+                stripe.customers.create({
+                    email: req.body.email, // customer email, which user need to enter while making payment
+                    source: req.body.stripeToken // token for the given card 
+                }, (err, customer)=>{
+                    if(err)
+                        callback(err)
+                    else
+                        callback(null, customer.id)
+                })
+            }            
+
+        }, (customerId, callback)=>{
+            stripe.plans.list((err, plans)=>{
+                if(err)
+                    callback(err)
+                else{
+                    let plan;
+                    let money = req.body.subscriptionPrice * 100
+                    let index = plans.data.findIndex((x)=> x.amount == money)
+                    if(index != -1){
+                        planId = plans.data[index].id
+                        console.log("plan found",planId)
+                        callback(null, customerId, planId)
+                    }
+                    else{
+                        callback("No such Plan Found")
+                    }
+                }
+            })
+        }, (customerId, planId, callback)=>{
+
+            stripe.subscriptions.create({
+                customer: customerId,
+                items: [ { plan:planId } ]
+                }, (err, subscription)=>{
+                if(err)
+                    callback(err)
+                else
+                    callback(null, customerId, subscription.id, planId)
+                })
+        }, (customerId, subscriptionId, planId, callback)=>{
             let update = {
                 userId:req.body.userId,
                 userEmail:req.body.email,
-                packegPrice:2.99,
-                stripeId:customer.id,
-                subscriptionsId:subscription.id,
+                planId:planId,
+                subscriptionPrice:2.99,
+                stripeId:customerId,
+                subscriptionsId:subscriptionId,
+                subscriptionStartDate:new Date()
             }
             new transaction(update).save((err, save)=>{
                 if(err)
                     callback(err)
                 else
-                    callback(null, customer, subscription)
+                    callback(null, customerId, subscriptionId)
             })
-        }, (customer, subscription, callback)=>{
-            let update = { isSubscription:true, stripeId:customer.id, subscriptionsId:subscription.id  }
+        }, (customerId, subscriptionId, callback)=>{
+            let update = { isSubscription:true, stripeId:customerId, subscriptionsId:subscriptionId }
             user.findByIdAndUpdate({ _id:req.body.userId }, update, { new:true }, (err, result)=>{
                 if(err)
                     callback(err)
                 else{
-                    let object = { subscriptionsId:subscription.id }
+                    let object = { isSubscription:"true" }
                     callback(null, object)
                 }
             })
         }], (err, finalResult)=>{
             if(err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                return commonFile.responseHandler(res, 400, "Internal Server Error.",err)
             if(finalResult)
                 return commonFile.responseHandler(res, 200, "Subscription Successfully Added.", finalResult)
         })
@@ -479,51 +511,59 @@ module.exports = {
 
 
 
-
-
-
     // @@@@@@@@@@@@@@@@@@@@@@@  cancel Subscription Api   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     cancelSubsciption:(req, res)=>{
-        if(!req.body.userId || !req.body.subscriptionsId){
+        if(!req.body.userId){
             return commonFile.responseHandler(res, 400, "Parameters Missing.")
         }
-
         
         async.waterfall([(callback)=>{
             
-            stripe.subscriptions.del( req.body.subscriptionsId, (err, confirmation)=>{
-                if(err)
+            user.findById({ _id:req.body.userId }, (err, result) => {
+                if (err)
                     callback(err)
                 else
-                    callback(null, "user")
+                    callback(null, result.subscriptionsId)
             })
-        }, (done, callback)=>{
+
+        }, (subscriptionsId, callback)=>{
             
-            let updateUser = { isSubscription:false, stripeId:"", subscriptionsId:"" }
-            user.findByIdAndUpdate({ _id:req.body.userId }, updateUser, { new:true }, (err, user)=>{
-                console.log("user====>>>",err, user)
+            stripe.subscriptions.del( subscriptionsId, (err, confirmation)=>{
                 if(err)
                     callback(err)
                 else
-                    callback(null, "user")
+                    callback(null, "confirmation")
             })
 
         }, (next, callback)=>{
-            console.log("console 2")
-            let updateTransaction = { status:"CANCEL" }
-            transaction.findOneAndUpdate({ subscriptionsId:req.body.subscriptionsId }, updateTransaction, { new:true }, (err, transaction)=>{
-                console.log("transcation", err, transaction)
+            
+            let updateUser = { isSubscription:false, subscriptionsId:"" }
+            user.findByIdAndUpdate({ _id:req.body.userId }, updateUser, { new:true }, (err, user)=>{
                 if(err)
                     callback(err)
                 else
-                    callback(null, "transaction")
+                    callback(null, user.subscriptionsId)
+            })
+
+        }, (subscriptionsId, callback)=>{
+            console.log("console 2", subscriptionsId)
+            let updateTransaction = { status:"CANCEL", subscriptionEndDate:new Date() }
+            transaction.findOneAndUpdate({ subscriptionsId:subscriptionsId }, updateTransaction, { new:true }, (err, transaction)=>{
+                console.log("transcation", err, transaction)
+                if(err)
+                    callback(err)
+                else{
+                    let object = { isSubscription:"false" }
+                    callback(null, object)
+                }
+                    
             })
         }], (err, finalResult)=>{
             if(err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.",err)
             if(finalResult)
-                return commonFile.responseHandler(res, 200, "You Have Successfully Cancel Subscription")
+                return commonFile.responseHandler(res, 200, "You Have Successfully Cancel Subscription", finalResult)
         })
     },
 

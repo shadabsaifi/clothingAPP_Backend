@@ -45,7 +45,7 @@ AdminModel.findOne({}, (error, success) => {
                     new AdminModel({
                         email: "clothing@clothing.com",
                         password: clothing,
-                        name: "Anuj",
+                        name: "Shadab Saifi",
                         phoneNumber: "8273242159",
                         profilePic: "http://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg"
                     }).save((error, success) => {

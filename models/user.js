@@ -63,10 +63,12 @@ let User = mongoose.Schema({
         default:false
     },
     stripeId:{
-        type:String
+        type:String,
+        default:""
     },
     subscriptionsId:{
-        type:String
+        type:String,
+        default:""
     },
     createdAt: {
         type: Date,
