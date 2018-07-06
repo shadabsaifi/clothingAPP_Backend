@@ -9,17 +9,10 @@ let productSchema = new Schema({
 		trim:true
 	},
 	brandName: {
-		type: String,
-		trim:true
-	},
-	productPrice: {
-		type: Number
+		type: String
 	},
 	productDesc: {
 		type: String
-	},
-	productLink:{
-		type:String
 	},
 	productGender:{
 		type:String,
@@ -28,24 +21,29 @@ let productSchema = new Schema({
 	bodyType:{
 		type:String
 	},
-	productColor: {
-		type: Array,
-		default: ["BLACK", "WHITE", "YELLOW", "GREEN", "GREY", "RED"]
-	},
 	productDetail: [{ productImage:{ type:Array }, productColor:{ type:String }, productSize:{ type:Array }, productPrice:{ type:Number } } ],
-
-	productSize: {
-		type: Array,
-		default: ["S", "M", "L", "XL", "XXL", "XXXL"]
+	
+	productLink:{
+		type:String
 	},
-
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId, ref: 'admin'
 	},
 	createdAt: {
 		type: Date,
 		default: Date.now
-	}
+	},
+	// productPrice: {
+	// 	type: Number
+	// },
+	// productSize: {
+	// 	type: Array,
+	// 	default: ["S", "M", "L", "XL", "XXL", "XXXL"]
+	// },
+	// productColor: {
+	// 	type: Array,
+	// 	default: ["BLACK", "WHITE", "YELLOW", "GREEN", "GREY", "RED"]
+	// },
 
 })
 

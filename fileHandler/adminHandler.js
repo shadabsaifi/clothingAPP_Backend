@@ -723,37 +723,183 @@ module.exports = {
 
     // @@@@@@@@@@@@@@@@@@@@@@@  addNewProduct Api to add product by admin panel   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
+    // addNewProduct: (req, res) => {
+    //     console.log("req.body========>>>>", req.body)
+    //     if (!req.body.createdBy || !req.body.productName || !req.body.bodyType || !req.body.brandName ||  !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender) {
+    //         return commonFile.responseHandler(res, 400, "Error: Parameters missing")
+    //     }
+
+
+    //     if (req.body.productGender.toLowerCase() === 'male') {
+    //         req.body.productGender = 'Male'
+    //     }
+    //     if (req.body.productGender.toLowerCase() === 'female') {
+    //         req.body.productGender = 'Female'
+    //     }
+    //     if (req.body.productGender.toLowerCase() === 'both') {
+    //         req.body.productGender = 'Both'
+    //     }
+
+
+    //     async.waterfall([(callback) => {
+
+    //         admin.findById({ _id: req.body.createdBy }, (err, result) => {
+    //             if (err)
+    //                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
+    //             else if (!result)
+    //                 return commonFile.responseHandler(res, 409, "admin not found.")
+    //             else
+    //                 callback(null, "done")
+    //         })
+
+    //     }, (next, callback) => {
+
+    //         commonFile.uploadMultipleImages(req.body.productImage, (url) => {
+    //             if (url != undefined) {
+    //                 req.body.productImage = url;
+    //                 callback(null, "done")
+    //             }
+    //         })
+
+    //     }, (next, callback) => {
+
+    //         var productName = (req.body.productName).toLowerCase();
+    //         var fullName = ""
+    //         let array = productName.split(" ")
+
+    //         var i = 0
+
+    //         do {
+    //             fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
+    //             i++;
+    //         } while (i < array.length)
+
+    //         req.body.productName = fullName.trim()
+
+
+    //         var brandName = (req.body.brandName).toLowerCase();
+    //         var fullBrandName = ""
+    //         let brandArray = brandName.split(" ")
+
+    //         var j = 0
+
+    //         do {
+    //             fullBrandName = fullBrandName + brandArray[j].charAt(0).toUpperCase() + brandArray[j].substr(1) + " ";
+    //             j++;
+    //         } while (j < brandArray.length)
+
+    //         req.body.brandName = fullBrandName.trim()
+
+            
+
+
+    //         console.log("req.body.productName",req.body.productName)
+
+    //         new product(req.body).save((err, success) => {
+    //             if (err)
+    //                 return commonFile.responseHandler(res, 400, "Internal Server Error.", err)
+    //             else
+    //                 callback(null, success)
+    //         })
+
+    //     }], (err, finalResult) => {
+
+    //         if (err)
+    //             return commonFile.responseHandler(res, 400, "Internal Server Error.")
+    //         else
+    //             return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
+    //     })
+    // },
+
+
+
+
     addNewProduct: (req, res) => {
         console.log("req.body========>>>>", req.body)
-        if (!req.body.createdBy || !req.body.productName || !req.body.bodyType || !req.body.brandName ||  !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender) {
+        if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc ||  !req.body.productGender || !req.body.bodyType || !req.body.productImage.length || !req.body.productColor || !req.body.productSize.length || !req.body.productPrice || !req.body.productLink || !req.body.createdBy) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
 
+        let newProduct = {
+
+         }
 
         if (req.body.productGender.toLowerCase() === 'male') {
-            req.body.productGender = 'Male'
+            newProduct.productGender = 'Male'
         }
         if (req.body.productGender.toLowerCase() === 'female') {
-            req.body.productGender = 'Female'
+            newProduct.productGender = 'Female'
         }
-        if (req.body.productGender.toLowerCase() === 'both') {
-            req.body.productGender = 'Both'
-        }
+
+
+        var productName = (req.body.productName).toLowerCase();
+            var fullName = ""
+            let array = productName.split(" ")
+
+            var i = 0
+
+            do {
+                fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
+                i++
+            } while (i < array.length)
+
+            req.body.productName = fullName.trim()
 
 
         async.waterfall([(callback) => {
 
             admin.findById({ _id: req.body.createdBy }, (err, result) => {
                 if (err)
-                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                    callback({resCode:400, msg:"Internal Sever Error."})
                 else if (!result)
-                    return commonFile.responseHandler(res, 409, "admin not found.")
+                    callback({resCode:409, msg:"admin not found."})
                 else
                     callback(null, "done")
             })
 
         }, (next, callback) => {
 
+            product.findOne({ productName:req.body.productName, brandName:req.body.brandName, bodyType:req.body.bodyType }, (err, mixture)=>{
+                if (err)
+                    callback({resCode:400, msg:"Internal Sever Error."})
+                else
+                    callback(null, mixture)
+            })     
+
+        }, (mixture, callback)=>{
+
+            if(mixture){
+                let found = { }
+                console.log("Product Successfully Found")
+                let indColor = mixture.productDetail.findIndex((x)=> x.productColor === req.body.productColor)
+                    if(indColor != -1){
+                        console.log("Product Color Found")
+                        let size = []
+                        mixture.productDetail[indColor].productSize.map((y)=>{
+                            req.body.productSize.map((z)=> {
+                                if(z != y){
+                                    size.push(z)
+                                }
+                            })
+                        })
+                        if(size.length){
+                            // found.productDetail.push()
+                        }
+                        commonFile.uploadMultipleImages(req.body.productImage, (url) => {
+                            if (url != undefined) {
+                                req.body.productImage = url;
+                                callback(null, "done")
+                            }
+                        })
+                    }
+                    else{
+                        console.log("Product Color not Found")
+                    }
+            }
+            else{
+
+            }
+            
             commonFile.uploadMultipleImages(req.body.productImage, (url) => {
                 if (url != undefined) {
                     req.body.productImage = url;
@@ -763,41 +909,12 @@ module.exports = {
 
         }, (next, callback) => {
 
-            var productName = (req.body.productName).toLowerCase();
-            var fullName = ""
-            let array = productName.split(" ")
-
-            var i = 0
-
-            do {
-                fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
-                i++;
-            } while (i < array.length)
-
-            req.body.productName = fullName.trim()
-
-
-            var brandName = (req.body.brandName).toLowerCase();
-            var fullBrandName = ""
-            let brandArray = brandName.split(" ")
-
-            var j = 0
-
-            do {
-                fullBrandName = fullBrandName + brandArray[j].charAt(0).toUpperCase() + brandArray[j].substr(1) + " ";
-                j++;
-            } while (j < brandArray.length)
-
-            req.body.brandName = fullBrandName.trim()
-
             
-
-
             console.log("req.body.productName",req.body.productName)
 
             new product(req.body).save((err, success) => {
                 if (err)
-                    return commonFile.responseHandler(res, 400, "Internal Server Error.", err)
+                    callback({resCode:400, msg:"Internal Sever Error."})
                 else
                     callback(null, success)
             })
@@ -805,13 +922,11 @@ module.exports = {
         }], (err, finalResult) => {
 
             if (err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                return commonFile.responseHandler(res, err.resCode, err.msg)
             else
                 return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
         })
     },
-
-
 
 
 
