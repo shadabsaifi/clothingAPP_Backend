@@ -12,7 +12,7 @@ adminRoutes.get('/adminDetail',adminHandler.verifyToken,adminHandler.adminDetail
 adminRoutes.post('/getAllUsers',adminHandler.verifyToken,adminHandler.getAllUsers)
 adminRoutes.post('/addNewBrand',adminHandler.verifyToken,adminHandler.addNewBrand)
 adminRoutes.post('/brandNameList',adminHandler.verifyToken,adminHandler.brandNameList)
-adminRoutes.post('/addNewProduct',adminHandler.verifyToken,adminHandler.addNewProduct)
+adminRoutes.post('/addNewProduct',adminHandler.addNewProduct)
 adminRoutes.post('/deleteProduct',adminHandler.verifyToken,adminHandler.deleteProduct)
 adminRoutes.post('/productDetail',adminHandler.verifyToken,adminHandler.productDetail)
 adminRoutes.post('/productList',adminHandler.verifyToken,adminHandler.productList)

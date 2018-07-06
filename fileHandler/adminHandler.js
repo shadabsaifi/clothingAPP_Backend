@@ -26,7 +26,8 @@ const admin = require('../models/admin.js')
 const product = require('../models/product.js')
 const style = require('../models/style.js')
 const transaction = require('../models/transaction')
-var unique = require('array-unique');
+var uniqueArray = require('array-unique');
+var sortArray = require('sort-array');
 
 module.exports = {
 
@@ -815,13 +816,22 @@ module.exports = {
 
 
     addNewProduct: (req, res) => {
-        console.log("req.body========>>>>", req.body)
-        if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc ||  !req.body.productGender || !req.body.bodyType || !req.body.productImage.length || !req.body.productColor || !req.body.productSize.length || !req.body.productPrice || !req.body.productLink || !req.body.createdBy) {
+        // console.log("req.body========>>>>", req.body)
+        if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc ||  !req.body.productGender || !req.body.bodyType || !req.body.productImage.length || !req.body.productColor || !req.body.productSize.length || !req.body.productPrice || !req.body.productLink) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
 
-        let newProduct = {
+        let arrayOfSize = req.body.productSize.sort((a, b)=>{
+                return a-b
+        })
 
+        let newProduct = { 
+            createdBy:req.body.createdBy,
+            brandName:req.body.brandName,
+            productDesc:req.body.productDesc,
+            bodyType:req.body.bodyType,
+            productLink:req.body.productLink,
+            productDetail:{ productColor:req.body.productColor, productPrice:req.body.productPrice, productSize:arrayOfSize, $position:0 } 
          }
 
         if (req.body.productGender.toLowerCase() === 'male') {
@@ -843,14 +853,16 @@ module.exports = {
                 i++
             } while (i < array.length)
 
-            req.body.productName = fullName.trim()
+            newProduct.productName = fullName.trim()
 
+
+            let query = { productName:newProduct.productName, brandName:req.body.brandName, bodyType:req.body.bodyType }
 
         async.waterfall([(callback) => {
 
             admin.findById({ _id: req.body.createdBy }, (err, result) => {
                 if (err)
-                    callback({resCode:400, msg:"Internal Sever Error."})
+                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
                 else if (!result)
                     callback({resCode:409, msg:"admin not found."})
                 else
@@ -859,9 +871,9 @@ module.exports = {
 
         }, (next, callback) => {
 
-            product.findOne({ productName:req.body.productName, brandName:req.body.brandName, bodyType:req.body.bodyType }, (err, mixture)=>{
+            product.findOne(query, (err, mixture)=>{
                 if (err)
-                    callback({resCode:400, msg:"Internal Sever Error."})
+                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
                 else
                     callback(null, mixture)
             })     
@@ -869,65 +881,61 @@ module.exports = {
         }, (mixture, callback)=>{
 
             if(mixture){
-                let found = { }
-                console.log("Product Successfully Found")
                 let indColor = mixture.productDetail.findIndex((x)=> x.productColor === req.body.productColor)
+                let found =  { productDetail:{ $position:indColor, productPrice:req.body.productPrice, productColor:req.body.productColor, $addToSet:{ productSize:{ $each:req.body.productSize } } } }
                     if(indColor != -1){
                         console.log("Product Color Found")
-                        let size = []
-                        mixture.productDetail[indColor].productSize.map((y)=>{
-                            req.body.productSize.map((z)=> {
-                                if(z != y){
-                                    size.push(z)
-                                }
-                            })
+                        // if(req.body.productSize.length){
+                        //         found.productDetail.$addToSet.productSize.$each = req.body.productSize
+                        // }
+                        // commonFile.uploadMultipleImages(req.body.productImage, (url) => {
+                        //     if (url != undefined) {
+                        //         found.productDetail.$addToSet.productImage.$each = url
+                        //     }
+                        // })
+                        console.log("found==========>>>",found)
+                        product.findOneAndUpdate(query, found, {new:true}, (err, result)=>{
+                            if(err)
+                                callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                            else
+                                callback({err:result, resCode:200, msg:"You Have Successfully Update Product."})
                         })
-                        if(size.length){
-                            // found.productDetail.push()
-                        }
-                        commonFile.uploadMultipleImages(req.body.productImage, (url) => {
-                            if (url != undefined) {
-                                req.body.productImage = url;
-                                callback(null, "done")
-                            }
-                        })
+
                     }
                     else{
                         console.log("Product Color not Found")
                     }
+                // callback({resCode:409, msg:"You Have Already Added Product for "+req.body.bodyType+" BodyType"})
             }
             else{
-
+                commonFile.uploadMultipleImages(req.body.productImage, (url) => {
+                    if (url != undefined){
+                        newProduct.productDetail.productImage = url
+                        callback(null, "done")
+                    }
+                })
             }
-            
-            commonFile.uploadMultipleImages(req.body.productImage, (url) => {
-                if (url != undefined) {
-                    req.body.productImage = url;
-                    callback(null, "done")
-                }
-            })
 
         }, (next, callback) => {
-
-            
-            console.log("req.body.productName",req.body.productName)
-
-            new product(req.body).save((err, success) => {
+        
+            new product(newProduct).save((err, success) => {
                 if (err)
-                    callback({resCode:400, msg:"Internal Sever Error."})
+                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
                 else
                     callback(null, success)
             })
 
         }], (err, finalResult) => {
-
             if (err)
-                return commonFile.responseHandler(res, err.resCode, err.msg)
+                return commonFile.responseHandler(res, err.resCode, err.msg, err.err)
             else
                 return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
         })
     },
 
+
+
+    
 
 
 
@@ -1062,7 +1070,6 @@ module.exports = {
                 return commonFile.responseHandler(res, 400, "Parameters missing.")
             }
             let query = { }
-            let bodyType = []
             if(req.body.productGender.toLowerCase() === 'male'){
                 query.productGender ='Male'
             }
@@ -1088,7 +1095,6 @@ module.exports = {
                 else{
                     let show = result.map((x)=> x._id)
 
-                    console.log("bodyType",bodyType)
                     return commonFile.responseHandler(res, 200, "Success", show)
                 }
                     

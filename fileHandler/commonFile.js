@@ -88,14 +88,12 @@ module.exports = {
     imageUploadToCloudinary: (imageB64, callback) => {
         // console.log(imageB64)
         cloudinary.v2.uploader.upload(imageB64, (err, result) => {
-            console.log("err==============+>>>>>"+err+"\n\n\n Result=================>>>"+result);
             callback(result.url);
         })
     },
 
     uploadMultipleImages: (imagesB64, callback) => {
         let a = [];
-        console.log("uploadMultipleImages");
         async.eachSeries(imagesB64, (item, callbackNextIteratn) => {
             module.exports.imageUploadToCloudinary(item, (url) => {
                 a[a.length] = url;
@@ -105,7 +103,6 @@ module.exports = {
             callback(a);
             console.log("Done with async loop")
         })
-        console.log(a);
     },
 
     generateOTP: (callback) => {

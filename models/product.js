@@ -26,6 +26,11 @@ let productSchema = new Schema({
 	productLink:{
 		type:String
 	},
+	status:{
+		type:String,
+		enum:["ACTIVE","DELETED"],
+		default:"ACTIVE"
+	},
 	createdBy: {
 		type: mongoose.Schema.Types.ObjectId, ref: 'admin'
 	},

@@ -38,13 +38,13 @@ AdminModel.findOne({}, (error, success) => {
         console.log(error)
     } else {
         if (!success) {
-            commonFile.createHash("tapculture", (err, password) => {
+            commonFile.createHash("clothing", (err, password) => {
                 if (err)
                     console.log(err)
                 else{
                     new AdminModel({
                         email: "clothing@clothing.com",
-                        password: clothing,
+                        password: password,
                         name: "Shadab Saifi",
                         phoneNumber: "8273242159",
                         profilePic: "http://eadb.org/wp-content/uploads/2015/08/profile-placeholder.jpg"
