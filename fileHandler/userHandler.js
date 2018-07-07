@@ -522,26 +522,32 @@ module.exports = {
             
             user.findById({ _id:req.body.userId }, (err, result) => {
                 if (err)
-                    callback(err)
+                    callback({resCode:400, msg:"Internal Server Error.", err:err})
                 else
                     callback(null, result.subscriptionsId)
             })
 
         }, (subscriptionsId, callback)=>{
-            
-            stripe.subscriptions.del( subscriptionsId, (err, confirmation)=>{
-                if(err)
-                    callback(err)
-                else
-                    callback(null, "confirmation")
-            })
+
+            if(subscriptionsId){
+                
+                stripe.subscriptions.del( subscriptionsId, (err, confirmation)=>{
+                    if(err)
+                        callback({resCode:400, msg:"Internal Server Error.", err:err})
+                    else
+                        callback(null, "confirmation")
+                })
+            }
+            else{
+                callback({resCode:409, msg:"You Have Already UnSubscribed"})
+            }
 
         }, (next, callback)=>{
             
             let updateUser = { isSubscription:false, subscriptionsId:"" }
             user.findByIdAndUpdate({ _id:req.body.userId }, updateUser, { new:true }, (err, user)=>{
                 if(err)
-                    callback(err)
+                    callback({resCode:400, msg:"Internal Server Error.", err:err})
                 else
                     callback(null, user.subscriptionsId)
             })
@@ -552,7 +558,7 @@ module.exports = {
             transaction.findOneAndUpdate({ subscriptionsId:subscriptionsId }, updateTransaction, { new:true }, (err, transaction)=>{
                 console.log("transcation", err, transaction)
                 if(err)
-                    callback(err)
+                    callback({resCode:400, msg:"Internal Server Error.", err:err})
                 else{
                     let object = { isSubscription:"false" }
                     callback(null, object)
@@ -561,7 +567,7 @@ module.exports = {
             })
         }], (err, finalResult)=>{
             if(err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.",err)
+                return commonFile.responseHandler(res, err.resCode, err.msg)
             if(finalResult)
                 return commonFile.responseHandler(res, 200, "You Have Successfully Cancel Subscription", finalResult)
         })
@@ -826,50 +832,50 @@ module.exports = {
 
 
 
-    favouriteBrandList: (req, res) => {
+    // favouriteBrandList: (req, res) => {
 
-        if (!req.body.userId) {
-            return commonFile.responseHandler(res, 400, "Parameters missing.");
-        }
+    //     if (!req.body.userId) {
+    //         return commonFile.responseHandler(res, 400, "Parameters missing.");
+    //     }
 
-        let query = { likedBy: req.body.userId }
+    //     let query = { likedBy: req.body.userId }
 
-        async.waterfall([(callback) => {
-            favourite.find(query, (err, result) => {
-                if (err)
-                    callback(err)
-                else
-                    var array = []
-                array = result.map((x) => {
-                    return x.productId
-                })
-                callback(null, array)
-            })
-        }, (list, callback) => {
-            let masterQuery = [
-                {
-                    $match: { _id: { $in: list } }
-                },
-                {
-                    $group: { _id: "$brandName" }
-                }
-            ]
-            product.aggregate(masterQuery, (err, result) => {
-                if (err)
-                    callback(err)
-                else
-                    callback(null, result)
-            })
-        }], (err, finalResult) => {
-            if (err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else
-                return commonFile.responseHandler(res, 200, "Success.", finalResult)
-        })
+    //     async.waterfall([(callback) => {
+    //         favourite.find(query, (err, result) => {
+    //             if (err)
+    //                 callback(err)
+    //             else
+    //                 var array = []
+    //             array = result.map((x) => {
+    //                 return x.productId
+    //             })
+    //             callback(null, array)
+    //         })
+    //     }, (list, callback) => {
+    //         let masterQuery = [
+    //             {
+    //                 $match: { _id: { $in: list } }
+    //             },
+    //             {
+    //                 $group: { _id: "$brandName" }
+    //             }
+    //         ]
+    //         product.aggregate(masterQuery, (err, result) => {
+    //             if (err)
+    //                 callback(err)
+    //             else
+    //                 callback(null, result)
+    //         })
+    //     }], (err, finalResult) => {
+    //         if (err)
+    //             return commonFile.responseHandler(res, 400, "Internal Server Error.")
+    //         else
+    //             return commonFile.responseHandler(res, 200, "Success.", finalResult)
+    //     })
 
 
 
-    },
+    // },
 
 
 
@@ -1147,56 +1153,56 @@ module.exports = {
 
     // @@@@@@@@@@@@@@@@@@@@@@@  StyleBrandList Api to show the Brand Name on filter (Screen Name Style Tips) @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-    styleBrandList: (req, res) => {
+    // styleBrandList: (req, res) => {
 
-        if (!req.body.userId) {
-            return commonFile.responseHandler(res, 400, "Parameters missing.");
-        }
+    //     if (!req.body.userId) {
+    //         return commonFile.responseHandler(res, 400, "Parameters missing.");
+    //     }
 
-        async.waterfall([(callback) => {
+    //     async.waterfall([(callback) => {
 
-            user.findById({ _id: req.body.userId }, (err, result) => {
-                if (err)
-                    callback(err)
-                else
-                    callback(null, result.bodyType)
-            })
+    //         user.findById({ _id: req.body.userId }, (err, result) => {
+    //             if (err)
+    //                 callback(err)
+    //             else
+    //                 callback(null, result.bodyType)
+    //         })
 
-        }, (bodyType, callback) => {
+    //     }, (bodyType, callback) => {
 
-            let query = {  bodyType:bodyType }
+    //         let query = {  bodyType:bodyType }
 
-            if(isSubscription == false){
-                query.brandType = 'Free'  
-            }
+    //         if(isSubscription == false){
+    //             query.brandType = 'Free'  
+    //         }
 
-            let masterQuery = [
-                {
-                    $match:query
-                },
-                {
-                    $group: { _id: "$brandName" }
-                },
-                {
-                    $sort: { _id: 1 }
-                }
-            ]
+    //         let masterQuery = [
+    //             {
+    //                 $match:query
+    //             },
+    //             {
+    //                 $group: { _id: "$brandName" }
+    //             },
+    //             {
+    //                 $sort: { _id: 1 }
+    //             }
+    //         ]
 
-            brand.aggregate(masterQuery, (err, result) => {
-                if (err)
-                    callback(err)
-                else
-                    callback(null, result)
-            })
+    //         brand.aggregate(masterQuery, (err, result) => {
+    //             if (err)
+    //                 callback(err)
+    //             else
+    //                 callback(null, result)
+    //         })
 
-        }], (err, finalResult) => {
-            if (err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            if (finalResult)
-                return commonFile.responseHandler(res, 200, "Success", finalResult)
-        })
+    //     }], (err, finalResult) => {
+    //         if (err)
+    //             return commonFile.responseHandler(res, 400, "Internal Server Error.")
+    //         if (finalResult)
+    //             return commonFile.responseHandler(res, 200, "Success", finalResult)
+    //     })
 
-    },
+    // },
 
 
 

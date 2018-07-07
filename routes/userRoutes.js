@@ -15,8 +15,8 @@ userRoutes.post('/forgotPassword',userHandler.forgotPassword)
 userRoutes.post('/verifyOTP',userHandler.verifyOTP)
 userRoutes.post('/changePassword',userHandler.changePassword)
 userRoutes.post('/completeProfileSetup',userHandler.verifyToken,userHandler.completeProfileSetup)
-userRoutes.post('/activeSubsciption',userHandler.activeSubsciption)
-userRoutes.post('/cancelSubsciption',userHandler.cancelSubsciption)
+userRoutes.post('/activeSubsciption',userHandler.verifyToken,userHandler.activeSubsciption)
+userRoutes.post('/cancelSubsciption',userHandler.verifyToken,userHandler.cancelSubsciption)
 userRoutes.post('/userDetail',userHandler.verifyToken,userHandler.userDetail)
 userRoutes.post('/updateUserDetail',userHandler.verifyToken,userHandler.updateUserDetail)
 userRoutes.post('/likeUnlikeProduct',userHandler.verifyToken,userHandler.likeUnlikeProduct)
@@ -26,9 +26,11 @@ userRoutes.post('/searchsuggestion',userHandler.verifyToken,userHandler.searchsu
 userRoutes.post('/productList',userHandler.verifyToken,userHandler.productList)
 userRoutes.post('/brandNameList',userHandler.verifyToken,userHandler.brandNameList)
 userRoutes.post('/productDetail',userHandler.verifyToken,userHandler.productDetail)
-userRoutes.post('/styleBrandList',userHandler.verifyToken,userHandler.styleBrandList)
 userRoutes.post('/styleTipList',userHandler.verifyToken,userHandler.styleTipList)
-userRoutes.post('/favouriteBrandList',userHandler.verifyToken,userHandler.favouriteBrandList)
+
+
+// userRoutes.post('/styleBrandList',userHandler.verifyToken,userHandler.styleBrandList)
+// userRoutes.post('/favouriteBrandList',userHandler.verifyToken,userHandler.favouriteBrandList)
 
 
 // clothing App API end 

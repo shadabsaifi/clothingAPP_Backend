@@ -617,7 +617,7 @@ module.exports = {
 
 
 
-    // @@@@@@@@@@@@@@@@@@@@@@@  brandNameList Api to show the Brand Name List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+    // @@@@@@@@@@@@@@@@@@@@@@@  brandNameList Api to show the Brand Name List on Brand Management  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     brandNameList: (req, res) => {
 
@@ -815,6 +815,10 @@ module.exports = {
 
 
 
+
+
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  addNewProduct API New Version  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
     addNewProduct: (req, res) => {
         // console.log("req.body========>>>>", req.body)
         if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc ||  !req.body.productGender || !req.body.bodyType || !req.body.productImage.length || !req.body.productColor || !req.body.productSize.length || !req.body.productPrice || !req.body.productLink) {
@@ -881,31 +885,45 @@ module.exports = {
         }, (mixture, callback)=>{
 
             if(mixture){
-                let indColor = mixture.productDetail.findIndex((x)=> x.productColor === req.body.productColor)
-                let found =  { productDetail:{ $position:indColor, productPrice:req.body.productPrice, productColor:req.body.productColor, $addToSet:{ productSize:{ $each:req.body.productSize } } } }
+                let indColor = mixture.productDetail.findIndex((x)=> x.productColor === req.body.productColor)                
                     if(indColor != -1){
-                        console.log("Product Color Found")
-                        // if(req.body.productSize.length){
-                        //         found.productDetail.$addToSet.productSize.$each = req.body.productSize
-                        // }
-                        // commonFile.uploadMultipleImages(req.body.productImage, (url) => {
-                        //     if (url != undefined) {
-                        //         found.productDetail.$addToSet.productImage.$each = url
-                        //     }
-                        // })
-                        console.log("found==========>>>",found)
-                        product.findOneAndUpdate(query, found, {new:true}, (err, result)=>{
-                            if(err)
-                                callback({err:err, resCode:400, msg:"Internal Sever Error."})
-                            else
-                                callback({err:result, resCode:200, msg:"You Have Successfully Update Product."})
+                        let productId = mixture.productDetail[indColor]._id
+                        let found =  { "productDetail.$.productPrice":req.body.productPrice, "productDetail.$.productColor":req.body.productColor }
+                        if(req.body.productSize.length){
+                                found.$addToSet = { "productDetail.$.productSize":{ $each:req.body.productSize  } }
+                        }
+                        commonFile.uploadMultipleImages(req.body.productImage, (url) => {
+                            if (url != undefined) {
+                                found['$addToSet']["productDetail.$.productImage"] = { $each:url }
+                                product.findOneAndUpdate({"productDetail._id":productId}, found, {new:true}, (err, result)=>{
+                                    if(err)
+                                        callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                                    else
+                                        callback({err:result, resCode:200, msg:"You Have Successfully Update Product.", err:result})
+                                })
+                            }
                         })
 
                     }
                     else{
-                        console.log("Product Color not Found")
+                        let newObj = { 
+                            productPrice:req.body.productPrice,
+                            productColor:req.body.productColor,
+                            productSize:req.body.productSize
+                        }
+                        commonFile.uploadMultipleImages(req.body.productImage, (url) => {
+                            if (url != undefined) {
+                                newObj.productImage = url
+                                product.findOneAndUpdate(query, { $push:{ productDetail:newObj } }, {new:true}, (err, result)=>{
+                                    if(err)
+                                        callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                                    else
+                                        callback({err:result, resCode:200, msg:"You Have Successfully Update Product."})
+                                })
+                            }
+                        })
+                        
                     }
-                // callback({resCode:409, msg:"You Have Already Added Product for "+req.body.bodyType+" BodyType"})
             }
             else{
                 commonFile.uploadMultipleImages(req.body.productImage, (url) => {
@@ -932,11 +950,6 @@ module.exports = {
                 return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
         })
     },
-
-
-
-    
-
 
 
 
@@ -1037,23 +1050,40 @@ module.exports = {
 
     // @@@@@@@@@@@@@@@@@@@@@@@  productName Api to show the Product Name List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-    productNameList: (req, res) => {
+    brandNameOnAddProduct: (req, res) => {
 
+        if (!req.body.brandGender) {
+            return commonFile.responseHandler(res, 400, "Parameters missing.")
+        }
+        let query = { }
+        if(req.body.brandGender.toLowerCase() === 'male'){
+            query.brandGender ='Male'
+        }
+        if(req.body.brandGender.toLowerCase() === 'female'){
+            query.brandGender ='Female'
+        }
 
         let masterQuery = [
             {
-                $group: { _id: "$productName", productQuantity: { $sum: 1 } }
+                $match:query
+            },
+            {
+                $group: { _id: "$brandName" }
             },
             {
                 $sort: { _id: 1 }
             }
         ]
 
-        product.aggregate(masterQuery, (err, result) => {
+        brand.aggregate(masterQuery, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else
-                return commonFile.responseHandler(res, 200, "Success", result)
+            else{
+                let show = result.map((x)=> x._id)
+
+                return commonFile.responseHandler(res, 200, "Success", show)
+            }
+            
         })
 
     },
@@ -1227,7 +1257,6 @@ module.exports = {
 
 
     totalCollection: (req, res) => {
-        console.log("req.body====>>>",req.body)
         console.log("req.headers====>>>",req.headers)
 
         async.waterfall([(callback) => {
