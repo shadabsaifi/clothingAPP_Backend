@@ -37,7 +37,28 @@ let productSchema = new Schema({
 	createdAt: {
 		type: Date,
 		default: Date.now
-	}
+	},
+
+	// old Keys
+
+	productPrice: {
+        type: Number
+    },
+    productSize: {
+        type: Array,
+        default: ["S", "M", "L", "XL", "XXL", "XXXL"]
+    },
+    productColor: {
+        type: Array,
+        default: ["BLACK", "WHITE", "YELLOW", "GREEN", "GREY", "RED"]
+    },
+    productImage:{
+        type:Array
+    },
+    productType:{
+        type:String
+    }
+
 
 })
 
