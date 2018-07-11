@@ -4,6 +4,7 @@ let packages = require('../models/package.js')
 let brand = require('../models/brand.js')
 const boosts = require('../models/boost')
 const async = require('async')
+const asyncForEach = require("async-for-each");
 const multer = require('multer')
 let user = require('../models/user')
 const boostPurchases = require('../models/boost-purchases.js')
@@ -721,100 +722,98 @@ module.exports = {
 
 
 
-    
+
 
 
     // @@@@@@@@@@@@@@@@@@@@@@@  addNewProduct Api to add product by admin panel   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-    addNewProduct: (req, res) => {
-        console.log("req.body========>>>>", req.body)
-        if (!req.body.createdBy || !req.body.productName || !req.body.bodyType || !req.body.brandName ||  !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender) {
-            return commonFile.responseHandler(res, 400, "Error: Parameters missing")
-        }
+    // addNewProduct: (req, res) => {
+    //     console.log("req.body========>>>>", req.body)
+    //     if (!req.body.createdBy || !req.body.productName || !req.body.bodyType || !req.body.brandName ||  !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender) {
+    //         return commonFile.responseHandler(res, 400, "Error: Parameters missing")
+    //     }
 
 
-        if (req.body.productGender.toLowerCase() === 'male') {
-            req.body.productGender = 'Male'
-        }
-        if (req.body.productGender.toLowerCase() === 'female') {
-            req.body.productGender = 'Female'
-        }
-        if (req.body.productGender.toLowerCase() === 'both') {
-            req.body.productGender = 'Both'
-        }
+    //     if (req.body.productGender.toLowerCase() === 'male') {
+    //         req.body.productGender = 'Male'
+    //     }
+    //     if (req.body.productGender.toLowerCase() === 'female') {
+    //         req.body.productGender = 'Female'
+    //     }
+    //     if (req.body.productGender.toLowerCase() === 'both') {
+    //         req.body.productGender = 'Both'
+    //     }
 
 
-        async.waterfall([(callback) => {
+    //     async.waterfall([(callback) => {
 
-            admin.findById({ _id: req.body.createdBy }, (err, result) => {
-                if (err)
-                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
-                else if (!result)
-                    return commonFile.responseHandler(res, 409, "admin not found.")
-                else
-                    callback(null, "done")
-            })
+    //         admin.findById({ _id: req.body.createdBy }, (err, result) => {
+    //             if (err)
+    //                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
+    //             else if (!result)
+    //                 return commonFile.responseHandler(res, 409, "admin not found.")
+    //             else
+    //                 callback(null, "done")
+    //         })
 
-        }, (next, callback) => {
+    //     }, (next, callback) => {
 
-            commonFile.uploadMultipleImages(req.body.productImage, (url) => {
-                if (url != undefined) {
-                    req.body.productImage = url;
-                    callback(null, "done")
-                }
-            })
+    //         commonFile.uploadMultipleImages(req.body.productImage, (url) => {
+    //             if (url != undefined) {
+    //                 req.body.productImage = url;
+    //                 callback(null, "done")
+    //             }
+    //         })
 
-        }, (next, callback) => {
+    //     }, (next, callback) => {
 
-            var productName = (req.body.productName).toLowerCase();
-            var fullName = ""
-            let array = productName.split(" ")
+    //         var productName = (req.body.productName).toLowerCase();
+    //         var fullName = ""
+    //         let array = productName.split(" ")
 
-            var i = 0
+    //         var i = 0
 
-            do {
-                fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
-                i++;
-            } while (i < array.length)
+    //         do {
+    //             fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
+    //             i++;
+    //         } while (i < array.length)
 
-            req.body.productName = fullName.trim()
+    //         req.body.productName = fullName.trim()
 
 
-            var brandName = (req.body.brandName).toLowerCase();
-            var fullBrandName = ""
-            let brandArray = brandName.split(" ")
+    //         var brandName = (req.body.brandName).toLowerCase();
+    //         var fullBrandName = ""
+    //         let brandArray = brandName.split(" ")
 
-            var j = 0
+    //         var j = 0
 
-            do {
-                fullBrandName = fullBrandName + brandArray[j].charAt(0).toUpperCase() + brandArray[j].substr(1) + " ";
-                j++;
-            } while (j < brandArray.length)
+    //         do {
+    //             fullBrandName = fullBrandName + brandArray[j].charAt(0).toUpperCase() + brandArray[j].substr(1) + " ";
+    //             j++;
+    //         } while (j < brandArray.length)
 
-            req.body.brandName = fullBrandName.trim()
+    //         req.body.brandName = fullBrandName.trim()
 
             
 
 
-            console.log("req.body.productName",req.body.productName)
+    //         console.log("req.body.productName",req.body.productName)
 
-            new product(req.body).save((err, success) => {
-                if (err)
-                    return commonFile.responseHandler(res, 400, "Internal Server Error.", err)
-                else
-                    callback(null, success)
-            })
+    //         new product(req.body).save((err, success) => {
+    //             if (err)
+    //                 return commonFile.responseHandler(res, 400, "Internal Server Error.", err)
+    //             else
+    //                 callback(null, success)
+    //         })
 
-        }], (err, finalResult) => {
+    //     }], (err, finalResult) => {
 
-            if (err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else
-                return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
-        })
-    },
-
-
+    //         if (err)
+    //             return commonFile.responseHandler(res, 400, "Internal Server Error.")
+    //         else
+    //             return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
+    //     })
+    // },
 
 
 
@@ -825,11 +824,13 @@ module.exports = {
 
 
 
-    // //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  addNewProduct API New Version  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  addNewProduct API New Version  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     // addNewProduct: (req, res) => {
     //     // console.log("req.body========>>>>", req.body)
-    //     if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc ||  !req.body.productGender || !req.body.bodyType || !req.body.productImage.length || !req.body.productColor || !req.body.productSize.length || !req.body.productPrice || !req.body.productLink) {
+    //     if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc ||  !req.body.productGender || !req.body.bodyType || !req.body.productImage.length || !req.body.tryOnImage.length || !req.body.productColor || !req.body.productSize.length || !req.body.productPrice || !req.body.productLink) {
     //         return commonFile.responseHandler(res, 400, "Error: Parameters missing")
     //     }
 
@@ -900,14 +901,19 @@ module.exports = {
     //                     if(req.body.productSize.length){
     //                             found.$addToSet = { "productDetail.$.productSize":{ $each:req.body.productSize  } }
     //                     }
-    //                     commonFile.uploadMultipleImages(req.body.productImage, (url) => {
-    //                         if (url != undefined) {
-    //                             found['$addToSet']["productDetail.$.productImage"] = { $each:url }
-    //                             product.findOneAndUpdate({"productDetail._id":productId}, found, {new:true}, (err, result)=>{
-    //                                 if(err)
-    //                                     callback({err:err, resCode:400, msg:"Internal Sever Error."})
-    //                                 else
-    //                                     callback({err:result, resCode:200, msg:"You Have Successfully Update Product.", err:result})
+    //                     commonFile.uploadMultipleImages(req.body.productImage, (url1) => {
+    //                         if (url1 != undefined) {
+    //                             found['$addToSet']["productDetail.$.productImage"] = { $each:url1 }
+    //                             commonFile.uploadMultipleImages(req.body.tryOnImage, (url2) => {
+    //                                 if (url2 != undefined) {
+    //                                     found['$addToSet']["productDetail.$.tryOnImage"] = { $each:url2 }
+    //                                     product.findOneAndUpdate({"productDetail._id":productId}, found, {new:true}, (err, result)=>{
+    //                                         if(err)
+    //                                             callback({err:err, resCode:400, msg:"Internal Sever Error."})
+    //                                         else
+    //                                             callback({err:result, resCode:200, msg:"You Have Successfully Update Product.", err:result})
+    //                                     })
+    //                                 }
     //                             })
     //                         }
     //                     })
@@ -919,14 +925,19 @@ module.exports = {
     //                         productColor:req.body.productColor,
     //                         productSize:req.body.productSize
     //                     }
-    //                     commonFile.uploadMultipleImages(req.body.productImage, (url) => {
-    //                         if (url != undefined) {
-    //                             newObj.productImage = url
-    //                             product.findOneAndUpdate(query, { $push:{ productDetail:newObj } }, {new:true}, (err, result)=>{
-    //                                 if(err)
-    //                                     callback({err:err, resCode:400, msg:"Internal Sever Error."})
-    //                                 else
-    //                                     callback({err:result, resCode:200, msg:"You Have Successfully Update Product."})
+    //                     commonFile.uploadMultipleImages(req.body.productImage, (url1) => {
+    //                         if (url1 != undefined) {
+    //                             newObj.productImage = url1
+    //                             commonFile.uploadMultipleImages(req.body.tryOnImage, (url2) => {
+    //                                 if (url2 != undefined) {
+    //                                     newObj.tryOnImage = url2
+    //                                     product.findOneAndUpdate(query, { $push:{ productDetail:newObj } }, {new:true}, (err, result)=>{
+    //                                         if(err)
+    //                                             callback({err:err, resCode:400, msg:"Internal Sever Error."})
+    //                                         else
+    //                                             callback({err:result, resCode:200, msg:"You Have Successfully Update Product."})
+    //                                     })
+    //                                 }
     //                             })
     //                         }
     //                     })
@@ -934,10 +945,15 @@ module.exports = {
     //                 }
     //         }
     //         else{
-    //             commonFile.uploadMultipleImages(req.body.productImage, (url) => {
-    //                 if (url != undefined){
-    //                     newProduct.productDetail.productImage = url
-    //                     callback(null, "done")
+    //             commonFile.uploadMultipleImages(req.body.productImage, (url1) => {
+    //                 if (url1 != undefined){
+    //                     newProduct.productDetail.productImage = url1
+    //                     commonFile.uploadMultipleImages(req.body.tryOnImage, (url2) => {
+    //                         if (url2 != undefined){
+    //                             newProduct.productDetail.tryOnImage = url2
+    //                             callback(null, "done")
+    //                         }
+    //                     })
     //                 }
     //             })
     //         }
@@ -962,6 +978,115 @@ module.exports = {
 
 
 
+    addNewProduct: (req, res) => {
+        console.log("req.body========>>>>", req.body)
+        if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc ||  !req.body.productGender || !req.body.bodyType || !req.body.productDetail.length || !req.body.productLink) {
+            return commonFile.responseHandler(res, 400, "Error: Parameters missing")
+        }
+
+
+        let newProduct = { 
+            createdBy:req.body.createdBy,
+            brandName:req.body.brandName,
+            productDesc:req.body.productDesc,
+            bodyType:req.body.bodyType,
+            productLink:req.body.productLink,
+            productDetail:req.body.productDetail
+        }
+
+
+
+        if (req.body.productGender.toLowerCase() === 'male') {
+            newProduct.productGender = 'Male'
+        }
+        if (req.body.productGender.toLowerCase() === 'female') {
+            newProduct.productGender = 'Female'
+        }
+
+
+        var productName = (req.body.productName).toLowerCase();
+            var fullName = ""
+            let array = productName.split(" ")
+
+            var i = 0
+
+            do {
+                fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
+                i++
+            } while (i < array.length)
+
+            newProduct.productName = fullName.trim()
+
+
+            let query = { productName:newProduct.productName, brandName:req.body.brandName, bodyType:req.body.bodyType }
+
+        async.waterfall([(callback) => {
+
+            admin.findById({ _id: req.body.createdBy }, (err, result) => {
+                if (err)
+                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                else if (!result)
+                    callback({resCode:409, msg:"admin not found."})
+                else
+                    callback(null, "done")
+            })
+
+        }, (next, callback) => {
+
+            product.findOne(query, (err, mixture)=>{
+                if (err)
+                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                else
+                    callback(null, mixture)
+            })     
+
+        }, (mixture, callback)=>{
+
+            if(mixture && mixture.status == "ACTIVE"){
+                callback({resCode:409, msg:"You Have Already Added This Product."})
+            }
+            
+            else{
+
+                asyncForEach(req.body.productDetail, function(item, index, next) {
+                    console.log("index================>",index)
+                        newProduct.productDetail[index].productSize = item.productSize.sort()
+                        commonFile.uploadMultipleImages(item.productImage, (url) => {
+                        if (url != undefined){
+                            newProduct.productDetail[index].productImage = url
+                            next();
+                        }
+                    })
+                }, function(err, result) {
+                    if(err)
+                        callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                    else
+                        callback(null, result)
+                        console.log("Iteration complete!");
+                });
+
+            }
+
+        }, (next, callback) => {
+        
+            new product(newProduct).save((err, success) => {
+                if (err)
+                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                else
+                    callback(null, success)
+            })
+
+        }], (err, finalResult) => {
+            if (err)
+                return commonFile.responseHandler(res, err.resCode, err.msg, err.err)
+            else
+                return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
+        })
+    },
+
+
+
+
 
 
 
@@ -972,6 +1097,11 @@ module.exports = {
 
     deleteProduct: (req, res) => {
         console.log("req.body========>>>>", req.body)
+
+        if(!req.body.productId){
+            return commonFile.responseHandler(res, 400, "Error: Parameters missing")
+        }
+        
         product.findByIdAndUpdate({ _id: req.body.productId, status: "ACTIVE" }, { status: "DELETED" }, { new: true }, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
@@ -990,6 +1120,11 @@ module.exports = {
 
     productDetail:(req, res)=>{
         console.log("req.body========>>>>",req.body)
+        
+        if(!req.body.productId){
+            return commonFile.responseHandler(res, 400, "Error: Parameters missing")
+        }
+
         product.findById({ _id:req.body.productId, status:"ACTIVE" }, (err, result)=>{
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
@@ -1011,7 +1146,7 @@ module.exports = {
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
         re = new RegExp(pattern, 'gi');
 
-        let query = {}
+        let query = { status:"ACTIVE" }
 
         if(req.body.search){
             query.productName = re
@@ -1216,10 +1351,8 @@ module.exports = {
             console.log("result",result)
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else{
-                let show = result.map((x)=> x._id)
-                return commonFile.responseHandler(res, 200, "Success", show)
-            }
+            else
+                return commonFile.responseHandler(res, 200, "Success", result)
                 
         })
     },

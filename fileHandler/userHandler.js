@@ -898,6 +898,7 @@ module.exports = {
             limit: req.body.limit || 5
         }
 
+
         product.paginate({ productName: re }, options, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
@@ -933,7 +934,7 @@ module.exports = {
         let query = {}
 
         if (req.body.search) {
-            query.productName = re
+            query.$or = [ { productName:re },{ brandName:re } ]
         }
 
         let options = {

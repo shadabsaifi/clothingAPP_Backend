@@ -21,7 +21,7 @@ let productSchema = new Schema({
 	bodyType:{
 		type:String
 	},
-	productDetail: [{ productImage:[], productColor:{ type:String }, productSize:[], productPrice:{ type:Number } } ],
+	productDetail: [{ productImage:[], tryOnImage:[], productColor:{ type:String }, productSize:[], productPrice:{ type:Number } } ],
 	
 	productLink:{
 		type:String
@@ -37,28 +37,7 @@ let productSchema = new Schema({
 	createdAt: {
 		type: Date,
 		default: Date.now
-	},
-
-	// old Keys
-
-	productPrice: {
-        type: Number
-    },
-    productSize: {
-        type: Array,
-        default: ["S", "M", "L", "XL", "XXL", "XXXL"]
-    },
-    productColor: {
-        type: Array,
-        default: ["BLACK", "WHITE", "YELLOW", "GREEN", "GREY", "RED"]
-    },
-    productImage:{
-        type:Array
-    },
-    productType:{
-        type:String
-    }
-
+	}
 
 })
 
