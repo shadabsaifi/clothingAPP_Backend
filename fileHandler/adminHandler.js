@@ -1433,7 +1433,7 @@ module.exports = {
                     callback(null, { totalUser: user, totalBrand: brand.length })
             })
         }, (both, callback) => {
-            product.find({}, (err, product) => {
+            product.find({ status:"ACTIVE" }, (err, product) => {
                 if (err)
                     callback(err)
                 else {
