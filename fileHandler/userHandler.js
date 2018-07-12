@@ -809,7 +809,7 @@ module.exports = {
 
             })
         }, (productList, callback) => {
-            let query = { _id: { $in: productList } }
+            let query = { _id: { $in: productList }, status:"ACTIVE" }
 
             if (req.body.brandName.length) {
                 query.brandName = { $in: req.body.brandName }
@@ -931,7 +931,7 @@ module.exports = {
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
         re = new RegExp(pattern, 'gi');
 
-        let query = {}
+        let query = { status:"ACTIVE" }
 
         if (req.body.search) {
             query.$or = [ { productName:re },{ brandName:re } ]
@@ -1003,6 +1003,7 @@ module.exports = {
                     callback(err)
                 else {
                     if(result.docs.length){
+                        console.log("result.docs.length=======>>>",result.docs.length)
                         result.docs.map((x) => {
                             let index = userResult.myFavourite.findIndex((y) => y.product._id.toString() === x._id.toString())
                             if (index != -1) {
@@ -1211,14 +1212,13 @@ module.exports = {
     // @@@@@@@@@@@@@@@@@@@@@@@  StyleList Api to show the StyleList Name List  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
     styleTipList: (req, res) => {
-
         if (!req.body.userId) {
             return commonFile.responseHandler(res, 400, "Parameters missing.")
         }
 
         let n = req.body.page || 1
         let m = req.body.limit || 6
-        let masterQuery = {}
+        let masterQuery =  { status:"ACTIVE" }
 
         let options = {
             lean:true,
@@ -1358,6 +1358,63 @@ module.exports = {
         })
 
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // @@@@@@@@@@@@@@@@@@@@@@@  Example  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //

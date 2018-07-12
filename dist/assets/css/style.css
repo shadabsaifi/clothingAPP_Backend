@@ -44,7 +44,7 @@ a, input, button {
 .mb12{margin-bottom: 12px!important;} .mb13{margin-bottom: 13px!important;} .mb14{margin-bottom: 14px!important;}
 .mb15{margin-bottom: 15px!important;} .mb16{margin-bottom: 16px!important;} .mb17{margin-bottom: 17px!important;}
 .mb18{margin-bottom: 18px!important;} .mb19{margin-bottom: 19px!important;} .mb20{margin-bottom: 20px!important;}
-.mb25{margin-bottom: 25px!important;} .mb30{margin-bottom: 30px!important;} .mb35{margin-bottom: 35px!important;}
+.mb25{margin-bottom: 25px!important;} .mb30{/*margin-bottom: 30px!important;*/} .mb35{margin-bottom: 35px!important;}
 .mb40{margin-bottom: 40px!important;} .mb50{margin-bottom: 50px!important;} .mb100{margin-bottom: 100px!important;}
 
 .pt0{padding-top: 0px!important;} .pt1{padding-top: 1px!important;} .pt2{padding-top: 2px!important;}
@@ -845,3 +845,5 @@ ul.check_list{padding:0;}
 .right-section.no-scroll{
 	height:auto;
 }
+
+.no_record{display: flex; align-items: center; justify-content: center; min-height:54px; width:100%;margin-bottom: 12px;}

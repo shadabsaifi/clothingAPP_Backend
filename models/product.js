@@ -37,6 +37,14 @@ let productSchema = new Schema({
 	createdAt: {
 		type: Date,
 		default: Date.now
+	},
+
+	// old key 
+	productImage:{
+		type:Array
+	},
+	productPrice:{ 
+		type:Number 
 	}
 
 })

@@ -67,9 +67,9 @@ module.exports = {
                         }, config.jwtSecretKey)
                         delete result.password
                         result["token"] = token;
-                        return commonFile.responseHandler(res, 200, "Successful login", result)
+                        return commonFile.responseHandler(res, 200, "Successfully login", result)
                     } else {
-                        return commonFile.responseHandler(res, 400, "Invalid Password")
+                        return commonFile.responseHandler(res, 409, "Invalid password")
                     }
                 })
             } else
@@ -95,7 +95,7 @@ module.exports = {
                 return commonFile.responseHandler(res, 400, "Internal server error")
             }
             else if (!result) {
-                return commonFile.responseHandler(res, 400, "Error: No such user exists")
+                return commonFile.responseHandler(res, 409, "No such user exists.")
             }
             else {
                 return commonFile.responseHandler(res, 200, "success", result)
@@ -135,9 +135,9 @@ module.exports = {
                 if (err)
                     return commonFile.responseHandler(res, 400, "Error: findOneAndUpdate error editProfile")
                 else if (result) {
-                    return commonFile.responseHandler(res, 200, "Success: admin updated")
+                    return commonFile.responseHandler(res, 200, "Success update profile.")
                 } else
-                    return commonFile.responseHandler(res, 400, "Error: No such user exists")
+                    return commonFile.responseHandler(res, 409, "No such user exists.")
             })
     },
 
@@ -187,9 +187,9 @@ module.exports = {
                     if (err)
                         commonFile.responseHandler(res, 400, "Error: resetPassword")
                     else if (result) {
-                        commonFile.responseHandler(res, 200, "Password Successfully Reset")
+                        commonFile.responseHandler(res, 200, "Password successfully reset")
                     } else {
-                        commonFile.responseHandler(res, 400, "Error: No user found")
+                        commonFile.responseHandler(res, 409, "No such user exists.")
                     }
                 })
             }
@@ -218,7 +218,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else if (firstResult)
-                return commonFile.responseHandler(res, 409, "Email id already Registered.")
+                return commonFile.responseHandler(res, 409, "Email id already registered.")
             else {
                 var name = (req.body.name).toLowerCase();
                 var fullName = ""
@@ -237,7 +237,7 @@ module.exports = {
                     if (err)
                         return commonFile.responseHandler(res, 400, "Internal Server Error.")
                     else
-                        return commonFile.responseHandler(res, 200, "You have Successfully Add New User.")
+                        return commonFile.responseHandler(res, 200, "You have successfully add new user.")
                 })
             }
         })
@@ -286,7 +286,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Error")
             else {
-                return commonFile.responseHandler(res, 200, "Success", result)
+                return commonFile.responseHandler(res, 200, "success", result)
             }
         })
     },
@@ -364,7 +364,7 @@ module.exports = {
                         var index = -1
                         index = emailResult.findIndex((x) => x.email === req.body.email)
                         if (index != -1) {
-                            return commonFile.responseHandler(res, 200, "Email ID already exits.")
+                            return commonFile.responseHandler(res, 200, "Email id already exits.")
                         }
                         else {
                             callback(null, "done")
@@ -395,7 +395,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else
-                return commonFile.responseHandler(res, 200, "Profile Successfully Updated.")
+                return commonFile.responseHandler(res, 200, "Profile successfully updated.")
         })
 
     },
@@ -423,14 +423,14 @@ module.exports = {
                 return commonFile.responseHandler(res, 400, "Error: blockUnblock API")
             else if (result) {
                 if (req.body.requestType.toLowerCase() === 'block') {
-                    return commonFile.responseHandler(res, 200, "You have Successfully Block this User.")
+                    return commonFile.responseHandler(res, 200, "You have successfully block this User.")
                 }
                 if (req.body.requestType.toLowerCase() === 'unblock') {
-                    return commonFile.responseHandler(res, 200, "You have Successfully Unblock this User.")
+                    return commonFile.responseHandler(res, 200, "You have successfully unblock this User.")
                 }
 
             } else
-                return commonFile.responseHandler(res, 400, "Error: no user exists")
+                return commonFile.responseHandler(res, 409, "No such user exists.")
         })
     },
 
@@ -447,7 +447,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error")
             else if (result)
-                return commonFile.responseHandler(res, 200, "User Deleted Successfully.")
+                return commonFile.responseHandler(res, 200, "User deleted successfully.")
             else
                 return commonFile.responseHandler(res, 409, "user not found")
         })
@@ -553,7 +553,7 @@ module.exports = {
                         if (err)
                             return commonFile.responseHandler(res, 400, "Internal Server Error.")
                         if(finalResult)
-                            return commonFile.responseHandler(res, 200, "Brand Successfully Added for "+ req.body.brandGender +" Gender")
+                            return commonFile.responseHandler(res, 200, "Brand has been successfully added for "+req.body.brandGender.toLowerCase()+" gender")
     
                     })
                 
@@ -562,21 +562,21 @@ module.exports = {
                 
                 console.log("final length====>>",final.length)
                 if(final.length == 2){
-                    return commonFile.responseHandler(res, 409, "Brand Already Having for Both Gender")
+                    return commonFile.responseHandler(res, 409, "Brand already having for both gender")
                 }
                 else{
 
                     if (req.body.brandGender.toLowerCase() != 'both') {
                         
                         if (final[0].brandGender == query.brandGender) {
-                            return commonFile.responseHandler(res, 409, "Brand Already Having for "+ newUserObj.brandGender +" Gender")
+                            return commonFile.responseHandler(res, 409, "Brand already having for "+ newUserObj.brandGender.toLowerCase() +" gender")
                         }else{
     
                             new brand(newUserObj).save((err, result) => {
                                 if (err)
                                     return commonFile.responseHandler(res, 400, "Internal Server Error.")(err)
                                 else
-                                    return commonFile.responseHandler(res, 200, "Brand Successfully Added for "+ newUserObj.brandGender +" Gender")
+                                    return commonFile.responseHandler(res, 200, "Brand has been successfully added for "+ newUserObj.brandGender.toLowerCase() +" gender")
                             })
                         }
                     }
@@ -587,7 +587,7 @@ module.exports = {
                                 if (err)
                                     return commonFile.responseHandler(res, 400, "Internal Server Error.")(err)
                                 else
-                                    return commonFile.responseHandler(res, 200, "Brand Successfully Added for Both Gender")
+                                    return commonFile.responseHandler(res, 200, "Brand successfully added for both gender")
                             })
                         }
                         if(final[0].brandGender === 'Female'){
@@ -596,7 +596,7 @@ module.exports = {
                                 if (err)
                                     return commonFile.responseHandler(res, 400, "Internal Server Error.")(err)
                                 else
-                                    return commonFile.responseHandler(res, 200, "Brand Successfully Added for Both Gender")
+                                    return commonFile.responseHandler(res, 200, "Brand has been successfully added for both gender")
                             })
                         }
                         
@@ -713,7 +713,7 @@ module.exports = {
                     bothList
                  }
 
-                return commonFile.responseHandler(res, 200, "Success", finalResult)
+                return commonFile.responseHandler(res, 200, "success", finalResult)
             }
 
         })
@@ -1043,7 +1043,7 @@ module.exports = {
         }, (mixture, callback)=>{
 
             if(mixture && mixture.status == "ACTIVE"){
-                callback({resCode:409, msg:"You Have Already Added This Product."})
+                callback({resCode:409, msg:"You have already added this product."})
             }
             
             else{
@@ -1054,6 +1054,11 @@ module.exports = {
                         commonFile.uploadMultipleImages(item.productImage, (url) => {
                         if (url != undefined){
                             newProduct.productDetail[index].productImage = url
+                            if(index == 0){
+                                newProduct.productImage = url
+                                newProduct.productPrice = item.productPrice
+                            }
+                            
                             next();
                         }
                     })
@@ -1080,7 +1085,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, err.resCode, err.msg, err.err)
             else
-                return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
+                return commonFile.responseHandler(res, 200, "Product successfully added.")
         })
     },
 
@@ -1106,7 +1111,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else
-                return commonFile.responseHandler(res, 200, "Successfully Deleted")
+                return commonFile.responseHandler(res, 200, "Successfully deleted product.")
         })
     },
 
@@ -1129,7 +1134,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else
-                return commonFile.responseHandler(res, 200, "Success", result)
+                return commonFile.responseHandler(res, 200, "success", result)
         })
 
     },
@@ -1167,7 +1172,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else
-                return commonFile.responseHandler(res, 200, "Success.", result)
+                return commonFile.responseHandler(res, 200, "success.", result)
         })
     },
 
@@ -1186,7 +1191,7 @@ module.exports = {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else if (result)
-                return commonFile.responseHandler(res, 200, "Success.", result)
+                return commonFile.responseHandler(res, 200, "success.", result)
             else
                 return commonFile.responseHandler(res, 409, "Product not found.")
         })
@@ -1231,7 +1236,7 @@ module.exports = {
             else{
                 let show = result.map((x)=> x._id)
 
-                return commonFile.responseHandler(res, 200, "Success", show)
+                return commonFile.responseHandler(res, 200, "success", show)
             }
             
         })
@@ -1275,7 +1280,7 @@ module.exports = {
                 else{
                     let show = result.map((x)=> x._id)
 
-                    return commonFile.responseHandler(res, 200, "Success", show)
+                    return commonFile.responseHandler(res, 200, "success", show)
                 }
                     
             })
@@ -1304,13 +1309,13 @@ module.exports = {
             if(err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else if(result)
-                return commonFile.responseHandler(res, 200, "Style Tips Already Having in " + req.body.styleGender + " for this Brand")
+                return commonFile.responseHandler(res, 200, "Style tip already having in " + req.body.styleGender.toLowerCase() + " for this brand")
             else{
                 new style(newStyle).save((err, success)=>{
                     if (err)
                         return commonFile.responseHandler(res, 400, "Internal Server Error.")
                     else
-                        return commonFile.responseHandler(res, 200, "Success")
+                        return commonFile.responseHandler(res, 200, "The style tip has been successfully added.")
     
                 })
             }
