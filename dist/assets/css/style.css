@@ -843,7 +843,8 @@ ul.check_list{padding:0;}
 /*********/
 
 .right-section.no-scroll{
-	height:auto;
+	/* height:auto; */
+	height: 100%;
 }
 
 .no_record{display: flex; align-items: center; justify-content: center; min-height:54px; width:100%;margin-bottom: 12px;}
