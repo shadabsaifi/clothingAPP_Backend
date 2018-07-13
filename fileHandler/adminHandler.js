@@ -212,7 +212,7 @@ module.exports = {
             bodyType: req.body.bodyType,
             height: req.body.height,
             weight: req.body.weight,
-            gender:req.body.gender
+            gender: req.body.gender
         }
         user.findOne({ email: req.body.email }, (err, firstResult) => {
             if (err)
@@ -252,7 +252,7 @@ module.exports = {
 
     getAllUsers: (req, res) => {
 
-        console.log("getAllUsers req.body====>>>>",req.body)
+        console.log("getAllUsers req.body====>>>>", req.body)
 
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
         let re = new RegExp(pattern, 'gi');
@@ -267,7 +267,7 @@ module.exports = {
             query.bodyType = req.body.bodyType
         }
 
-        if (req.body.gender){
+        if (req.body.gender) {
             query.gender = req.body.gender
         }
 
@@ -275,11 +275,11 @@ module.exports = {
         let options = {
 
             page: req.body.page || 1,
-            limit:req.body.limit || 10,
+            limit: req.body.limit || 10,
             lean: true,
             sort: {
-                createdAt:-1
-              }
+                createdAt: -1
+            }
         }
 
         user.paginate(query, options, (err, result) => {
@@ -466,8 +466,8 @@ module.exports = {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
 
-        let newUserObj = { createdBy: req.body.createdBy, brandType:req.body.brandType }
-        let query = { }
+        let newUserObj = { createdBy: req.body.createdBy, brandType: req.body.brandType }
+        let query = {}
 
         if (req.body.brandGender.toLowerCase() === 'male') {
             newUserObj.brandGender = 'Male'
@@ -492,96 +492,96 @@ module.exports = {
         newUserObj.brandName = fullName.trim()
 
         query.brandName = newUserObj.brandName
-        
 
-        brand.find(query, (err, final)=>{
+
+        brand.find(query, (err, final) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else if (!final.length){
-                    
-                    async.waterfall([(callback)=>{
-                        if (req.body.brandGender.toLowerCase() === 'both') {
-                            console.log("both")
-                                newUserObj.brandGender = 'Male'
-                                new brand(newUserObj).save((err, Male) => {
+            else if (!final.length) {
+
+                async.waterfall([(callback) => {
+                    if (req.body.brandGender.toLowerCase() === 'both') {
+                        console.log("both")
+                        newUserObj.brandGender = 'Male'
+                        new brand(newUserObj).save((err, Male) => {
+                            if (err)
+                                callback(err)
+                            else {
+                                newUserObj.brandGender = 'Female'
+                                new brand(newUserObj).save((err, Female) => {
                                     if (err)
                                         callback(err)
-                                    else{
-                                        newUserObj.brandGender = 'Female'
-                                        new brand(newUserObj).save((err, Female) => {
-                                            if (err)
-                                                callback(err)
-                                            else{
-                                                callback(null, "done")
-                                            }
-                                                
-                                        })
+                                    else {
+                                        callback(null, "done")
                                     }
-                                        
+
                                 })
-                        }else{
-                            callback(null, "done")
-                        }
-                        
-                    }, (next, callback)=>{
-                        if (req.body.brandGender.toLowerCase() === 'male') {
-                            console.log("Male")
-                            newUserObj.brandGender = 'Male'
-                            new brand(newUserObj).save((err, Female) => {
-                                if (err)
-                                    callback(err)
-                                else
-                                    callback(null, "done")
-                            })
-                        }else{
-                            callback(null, "done")
-                        }
-                    },(next, callback)=>{
-                        if (req.body.brandGender.toLowerCase() === 'female') {
-                            console.log("Female")
-                            newUserObj.brandGender = 'Female'
-                            new brand(newUserObj).save((err, Female) => {
-                                if (err)
-                                    callback(err)
-                                else
-                                    callback(null, "done")
-                            })
-                        }else{
-                            callback(null, "done")
-                        }
-                    }],(err, finalResult)=>{
-                        if (err)
-                            return commonFile.responseHandler(res, 400, "Internal Server Error.")
-                        if(finalResult)
-                            return commonFile.responseHandler(res, 200, "Brand has been successfully added for "+req.body.brandGender.toLowerCase()+" gender")
-    
-                    })
-                
+                            }
+
+                        })
+                    } else {
+                        callback(null, "done")
+                    }
+
+                }, (next, callback) => {
+                    if (req.body.brandGender.toLowerCase() === 'male') {
+                        console.log("Male")
+                        newUserObj.brandGender = 'Male'
+                        new brand(newUserObj).save((err, Female) => {
+                            if (err)
+                                callback(err)
+                            else
+                                callback(null, "done")
+                        })
+                    } else {
+                        callback(null, "done")
+                    }
+                }, (next, callback) => {
+                    if (req.body.brandGender.toLowerCase() === 'female') {
+                        console.log("Female")
+                        newUserObj.brandGender = 'Female'
+                        new brand(newUserObj).save((err, Female) => {
+                            if (err)
+                                callback(err)
+                            else
+                                callback(null, "done")
+                        })
+                    } else {
+                        callback(null, "done")
+                    }
+                }], (err, finalResult) => {
+                    if (err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                    if (finalResult)
+                        return commonFile.responseHandler(res, 200, "Brand has been successfully added for " + req.body.brandGender.toLowerCase() + " gender")
+
+                })
+
             }
-            else{
-                
-                console.log("final length====>>",final.length)
-                if(final.length == 2){
+            else {
+
+                console.log("final length====>>", final.length)
+                if (final.length == 2) {
                     return commonFile.responseHandler(res, 409, "Brand already having for both gender")
                 }
-                else{
+                else {
 
                     if (req.body.brandGender.toLowerCase() != 'both') {
-                        
+
                         if (final[0].brandGender == query.brandGender) {
-                            return commonFile.responseHandler(res, 409, "Brand already having for "+ newUserObj.brandGender.toLowerCase() +" gender")
-                        }else{
-    
+                            return commonFile.responseHandler(res, 409, "Brand already having for " + newUserObj.brandGender.toLowerCase() + " gender")
+                        } else {
+
                             new brand(newUserObj).save((err, result) => {
                                 if (err)
                                     return commonFile.responseHandler(res, 400, "Internal Server Error.")(err)
                                 else
-                                    return commonFile.responseHandler(res, 200, "Brand has been successfully added for "+ newUserObj.brandGender.toLowerCase() +" gender")
+                                    return commonFile.responseHandler(res, 200, "Brand has been successfully added for " + newUserObj.brandGender.toLowerCase() + " gender")
                             })
                         }
                     }
-                    else{
-                        if(final[0].brandGender === 'Male'){
+                    else {
+                        if (final[0].brandGender === 'Male') {
                             newUserObj.brandGender = 'Female'
                             new brand(newUserObj).save((err, result) => {
                                 if (err)
@@ -590,7 +590,7 @@ module.exports = {
                                     return commonFile.responseHandler(res, 200, "Brand successfully added for both gender")
                             })
                         }
-                        if(final[0].brandGender === 'Female'){
+                        if (final[0].brandGender === 'Female') {
                             newUserObj.brandGender = 'Male'
                             new brand(newUserObj).save((err, result) => {
                                 if (err)
@@ -599,19 +599,19 @@ module.exports = {
                                     return commonFile.responseHandler(res, 200, "Brand has been successfully added for both gender")
                             })
                         }
-                        
+
                     }
 
-                    
-                    
-                    
+
+
+
                 }
-                
+
             }
-                
+
         })
 
-        
+
 
     },
 
@@ -638,80 +638,80 @@ module.exports = {
             query.brandName = re
         }
 
-        brand.find(query).sort({createdAt:-1}).exec((err, result) => {
+        brand.find(query).sort({ createdAt: -1 }).exec((err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else {
-                
+
                 let menArray = []
-                result.map((x)=>{
-                    if(x.brandGender === 'Male'){
+                result.map((x) => {
+                    if (x.brandGender === 'Male') {
                         menArray.push(x.brandName)
                     }
                 })
 
                 let womenArray = []
-                result.map((x)=>{
-                    if(x.brandGender ==='Female'){
+                result.map((x) => {
+                    if (x.brandGender === 'Female') {
                         womenArray.push(x.brandName)
                     }
                 })
 
                 let bothArray = []
-                
-                for(let i=0;i<menArray.length;i++){
-                    for(let j=0;j<womenArray.length;j++){
-                        if(menArray[i] == womenArray[j]){
+
+                for (let i = 0; i < menArray.length; i++) {
+                    for (let j = 0; j < womenArray.length; j++) {
+                        if (menArray[i] == womenArray[j]) {
                             bothArray.push(menArray[i])
-                        }                        
-                    }    
+                        }
+                    }
                 }
 
-                let men = menArray.slice((n1-1)*m1, n1*m1)
+                let men = menArray.slice((n1 - 1) * m1, n1 * m1)
 
                 let menList = {
 
                     men,
-                    menPage:n1,
-                    menTotal:menArray.length,
-                    menLimit:m1,
-                    menPages:Math.ceil(menArray.length/m1)
+                    menPage: n1,
+                    menTotal: menArray.length,
+                    menLimit: m1,
+                    menPages: Math.ceil(menArray.length / m1)
 
 
                 }
 
-                let women = womenArray.slice((n2-1)*m2, n2*m2)
+                let women = womenArray.slice((n2 - 1) * m2, n2 * m2)
 
                 let womenList = {
 
                     women,
-                    womenPage:n2,
-                    womenTotal:womenArray.length,
-                    womenlimit:m2,
-                    womenPages:Math.ceil(womenArray.length/m2)
+                    womenPage: n2,
+                    womenTotal: womenArray.length,
+                    womenlimit: m2,
+                    womenPages: Math.ceil(womenArray.length / m2)
 
 
                 }
 
-                let both = bothArray.slice((n3-1)*m3, n3*m3)
+                let both = bothArray.slice((n3 - 1) * m3, n3 * m3)
 
                 let bothList = {
 
                     both,
-                    bothPage:n3,
-                    bothTotal:bothArray.length,
-                    bothLimit:m3,
-                    bothPages:Math.ceil(bothArray.length/m3)
+                    bothPage: n3,
+                    bothTotal: bothArray.length,
+                    bothLimit: m3,
+                    bothPages: Math.ceil(bothArray.length / m3)
 
 
                 }
 
 
-                let finalResult = { 
+                let finalResult = {
                     menList,
                     womenList,
                     bothList
-                 }
+                }
 
                 return commonFile.responseHandler(res, 200, "success", finalResult)
             }
@@ -794,7 +794,7 @@ module.exports = {
 
     //         req.body.brandName = fullBrandName.trim()
 
-            
+
 
 
     //         console.log("req.body.productName",req.body.productName)
@@ -941,7 +941,7 @@ module.exports = {
     //                             })
     //                         }
     //                     })
-                        
+
     //                 }
     //         }
     //         else{
@@ -959,7 +959,7 @@ module.exports = {
     //         }
 
     //     }, (next, callback) => {
-        
+
     //         new product(newProduct).save((err, success) => {
     //             if (err)
     //                 callback({err:err, resCode:400, msg:"Internal Sever Error."})
@@ -980,18 +980,18 @@ module.exports = {
 
     addNewProduct: (req, res) => {
         console.log("req.body========>>>>", req.body)
-        if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc ||  !req.body.productGender || !req.body.bodyType || !req.body.productDetail.length || !req.body.productLink) {
+        if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc || !req.body.productGender || !req.body.bodyType || !req.body.productDetail.length || !req.body.productLink) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
 
 
-        let newProduct = { 
-            createdBy:req.body.createdBy,
-            brandName:req.body.brandName,
-            productDesc:req.body.productDesc,
-            bodyType:req.body.bodyType,
-            productLink:req.body.productLink,
-            productDetail:req.body.productDetail
+        let newProduct = {
+            createdBy: req.body.createdBy,
+            brandName: req.body.brandName,
+            productDesc: req.body.productDesc,
+            bodyType: req.body.bodyType,
+            productLink: req.body.productLink,
+            productDetail: req.body.productDetail
         }
 
 
@@ -1005,78 +1005,78 @@ module.exports = {
 
 
         var productName = (req.body.productName).toLowerCase();
-            var fullName = ""
-            let array = productName.split(" ")
+        var fullName = ""
+        let array = productName.split(" ")
 
-            var i = 0
+        var i = 0
 
-            do {
-                fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
-                i++
-            } while (i < array.length)
+        do {
+            fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
+            i++
+        } while (i < array.length)
 
-            newProduct.productName = fullName.trim()
+        newProduct.productName = fullName.trim()
 
 
-            let query = { productName:newProduct.productName, brandName:req.body.brandName, bodyType:req.body.bodyType }
+        let query = { productName: newProduct.productName, brandName: req.body.brandName, bodyType: req.body.bodyType }
 
         async.waterfall([(callback) => {
 
             admin.findById({ _id: req.body.createdBy }, (err, result) => {
                 if (err)
-                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                    callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
                 else if (!result)
-                    callback({resCode:409, msg:"admin not found."})
+                    callback({ resCode: 409, msg: "admin not found." })
                 else
                     callback(null, "done")
             })
 
         }, (next, callback) => {
 
-            product.findOne(query, (err, mixture)=>{
+            product.findOne(query, (err, mixture) => {
                 if (err)
-                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                    callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
                 else
                     callback(null, mixture)
-            })     
+            })
 
-        }, (mixture, callback)=>{
+        }, (mixture, callback) => {
 
-            if(mixture && mixture.status == "ACTIVE"){
-                callback({resCode:409, msg:"You have already added this product."})
+            if (mixture && mixture.status == "ACTIVE") {
+                callback({ resCode: 409, msg: "You have already added this product." })
             }
-            
-            else{
 
-                asyncForEach(req.body.productDetail, function(item, index, next) {
-                    console.log("index================>",index)
-                        newProduct.productDetail[index].productSize = item.productSize.sort()
-                        commonFile.uploadMultipleImages(item.productImage, (url) => {
-                        if (url != undefined){
+            else {
+
+                asyncForEach(req.body.productDetail, function (item, index, next) {
+                    console.log("index================>", index)
+                    newProduct.productDetail[index].productSize = item.productSize.sort()
+                    commonFile.uploadMultipleImages(item.productImage, (url) => {
+                        if (url != undefined) {
                             newProduct.productDetail[index].productImage = url
-                            if(index == 0){
+                            if (index == 0) {
                                 newProduct.productImage = url
                                 newProduct.productPrice = item.productPrice
                             }
-                            
+
                             next();
                         }
                     })
-                }, function(err, result) {
-                    if(err)
-                        callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                }, function (err, result) {
+                    if (err)
+                        callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
                     else
                         callback(null, result)
-                        console.log("Iteration complete!");
+                    console.log("Iteration complete!");
                 });
 
             }
 
         }, (next, callback) => {
-        
+
             new product(newProduct).save((err, success) => {
                 if (err)
-                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                    callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
                 else
                     callback(null, success)
             })
@@ -1103,10 +1103,10 @@ module.exports = {
     deleteProduct: (req, res) => {
         console.log("req.body========>>>>", req.body)
 
-        if(!req.body.productId){
+        if (!req.body.productId) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
-        
+
         product.findByIdAndUpdate({ _id: req.body.productId, status: "ACTIVE" }, { status: "DELETED" }, { new: true }, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
@@ -1123,14 +1123,13 @@ module.exports = {
     // @@@@@@@@@@@@@@@@@@@@@@@  productDetail Api to show the product Detail   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 
-    productDetail:(req, res)=>{
-        console.log("req.body========>>>>",req.body)
-        
-        if(!req.body.productId){
+    productDetail: (req, res) => {
+        console.log("req.body========>>>>", req.body)
+        if (!req.body.productId) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
 
-        product.findById({ _id:req.body.productId, status:"ACTIVE" }, (err, result)=>{
+        product.findById({ _id: req.body.productId, status: "ACTIVE" }, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else
@@ -1151,16 +1150,16 @@ module.exports = {
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
         re = new RegExp(pattern, 'gi');
 
-        let query = { status:"ACTIVE" }
+        let query = { status: "ACTIVE" }
 
-        if(req.body.search){
+        if (req.body.search) {
             query.productName = re
         }
 
-        if(req.body.productGender){
+        if (req.body.productGender) {
             query.productGender = req.body.productGender
         }
-        if(req.body.bodyType){
+        if (req.body.bodyType) {
             query.bodyType = req.body.bodyType
         }
 
@@ -1210,17 +1209,17 @@ module.exports = {
         if (!req.body.brandGender) {
             return commonFile.responseHandler(res, 400, "Parameters missing.")
         }
-        let query = { }
-        if(req.body.brandGender.toLowerCase() === 'male'){
-            query.brandGender ='Male'
+        let query = {}
+        if (req.body.brandGender.toLowerCase() === 'male') {
+            query.brandGender = 'Male'
         }
-        if(req.body.brandGender.toLowerCase() === 'female'){
-            query.brandGender ='Female'
+        if (req.body.brandGender.toLowerCase() === 'female') {
+            query.brandGender = 'Female'
         }
 
         let masterQuery = [
             {
-                $match:query
+                $match: query
             },
             {
                 $group: { _id: "$brandName" }
@@ -1233,12 +1232,12 @@ module.exports = {
         brand.aggregate(masterQuery, (err, result) => {
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else{
-                let show = result.map((x)=> x._id)
+            else {
+                let show = result.map((x) => x._id)
 
                 return commonFile.responseHandler(res, 200, "success", show)
             }
-            
+
         })
 
     },
@@ -1246,81 +1245,81 @@ module.exports = {
 
 
 
-      // @@@@@@@@@@@@@@@@@@@@@@@  bodyTypeList Api to show (BodyType according to gender) or (Brand List according to bodyType) on Add New Style Page @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+    // @@@@@@@@@@@@@@@@@@@@@@@  bodyTypeList Api to show (BodyType according to gender) or (Brand List according to bodyType) on Add New Style Page @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 
-        bodyTypeBrandList:(req, res)=>{
-                
-            if (!req.body.productGender) {
-                return commonFile.responseHandler(res, 400, "Parameters missing.")
+    bodyTypeBrandList: (req, res) => {
+
+        if (!req.body.productGender) {
+            return commonFile.responseHandler(res, 400, "Parameters missing.")
+        }
+        let query = {}
+        if (req.body.productGender.toLowerCase() === 'male') {
+            query.productGender = 'Male'
+        }
+        if (req.body.productGender.toLowerCase() === 'female') {
+            query.productGender = 'Female'
+        }
+        if (req.body.bodyType) {
+            query.bodyType = req.body.bodyType
+        }
+
+        let masterQuery = [
+            {
+                $match: query
+            },
+            {
+                $group: { _id: "$brandName" }
             }
-            let query = { }
-            if(req.body.productGender.toLowerCase() === 'male'){
-                query.productGender ='Male'
+        ]
+        product.aggregate(masterQuery, (err, result) => {
+            console.log("result", result)
+            if (err)
+                return commonFile.responseHandler(res, 400, "Internal Server Error.")
+            else {
+                let show = result.map((x) => x._id)
+
+                return commonFile.responseHandler(res, 200, "success", show)
             }
-            if(req.body.productGender.toLowerCase() === 'female'){
-                query.productGender ='Female'
-            }
-            if(req.body.bodyType){
-                query.bodyType = req.body.bodyType
-            }
 
-            let masterQuery = [
-                {
-                    $match:query
-                },
-                {
-                    $group: { _id: "$brandName" }
-                }
-            ]
-            product.aggregate(masterQuery,(err, result)=>{
-                console.log("result",result)
-                if (err)
-                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
-                else{
-                    let show = result.map((x)=> x._id)
-
-                    return commonFile.responseHandler(res, 200, "success", show)
-                }
-                    
-            })
-        },
+        })
+    },
 
 
 
-     // @@@@@@@@@@@@@@@@@@@@@@@  addNewStyle Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+    // @@@@@@@@@@@@@@@@@@@@@@@  addNewStyle Api  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 
-     addNewStyleTip:(req, res)=>{
-        
+    addNewStyleTip: (req, res) => {
+
         if (!req.body.createdBy || !req.body.brandName || !req.body.styleGender || !req.body.bodyType) {
             return commonFile.responseHandler(res, 400, "Error: Parameters missing")
         }
-        
+
         let newStyle = {
-            brandName:req.body.brandName,
-            styleGender:req.body.styleGender,
-            bodyType:req.body.bodyType,
-            createdBy:req.body.createdByList
+            brandName: req.body.brandName,
+            styleGender: req.body.styleGender,
+            bodyType: req.body.bodyType,
+            createdBy: req.body.createdByList
         }
 
-        let query = { $and:[{ brandName:req.body.brandName },{ bodyType:req.body.bodyType }] }
-        style.findOne(query, (err, result)=>{
-            if(err)
+        let query = { $and: [{ brandName: req.body.brandName }, { bodyType: req.body.bodyType }] }
+        style.findOne(query, (err, result) => {
+            if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else if(result)
+            else if (result)
                 return commonFile.responseHandler(res, 200, "Style tip already having in " + req.body.styleGender.toLowerCase() + " for this brand")
-            else{
-                new style(newStyle).save((err, success)=>{
+            else {
+                new style(newStyle).save((err, success) => {
                     if (err)
                         return commonFile.responseHandler(res, 400, "Internal Server Error.")
                     else
                         return commonFile.responseHandler(res, 200, "The style tip has been successfully added.")
-    
+
                 })
             }
         })
-     },
+    },
 
 
 
@@ -1328,46 +1327,46 @@ module.exports = {
     // @@@@@@@@@@@@@@@@@@@@@@@  bodyTypeList Api to show (BodyType according to gender) or (Brand List according to bodyType) on Style Management Screen  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 
-    styleBrandList:(req, res)=>{
+    styleBrandList: (req, res) => {
 
-        let query = { }
-        
-        if(req.body.styleGender == 'Male'){
-            query.styleGender ='Male'
+        let query = {}
+
+        if (req.body.styleGender == 'Male') {
+            query.styleGender = 'Male'
         }
 
-        if(req.body.styleGender == 'Female'){
-            query.styleGender ='Female'
+        if (req.body.styleGender == 'Female') {
+            query.styleGender = 'Female'
         }
 
-        if(req.body.bodyType){
+        if (req.body.bodyType) {
             query.bodyType = req.body.bodyType
         }
 
         let masterQuery = [
             {
-                $match:query
+                $match: query
             },
             {
                 $group: { _id: "$brandName" }
             }
         ]
-        style.aggregate(masterQuery,(err, result)=>{
-            console.log("result",result)
+        style.aggregate(masterQuery, (err, result) => {
+            console.log("result", result)
             if (err)
                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
             else
                 return commonFile.responseHandler(res, 200, "Success", result)
-                
+
         })
     },
 
 
 
-     // @@@@@@@@@@@@@@@@@@@@@@@  DashBoard Collections  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+    // @@@@@@@@@@@@@@@@@@@@@@@  DashBoard Collections  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
-     styleTipList:(req, res)=>{
-        
+    styleTipList: (req, res) => {
+
         let pattern = "\\b[a-z0-9']*" + req.body.search + "[a-z0-9'?]*\\b";
         re = new RegExp(pattern, 'gi');
 
@@ -1392,7 +1391,7 @@ module.exports = {
         let options = {
             page: req.body.page || 1,
             limit: req.body.limit || 10,
-            sort: { createdAt:-1 }
+            sort: { createdAt: -1 }
         }
 
         style.paginate(query, options, (err, result) => {
@@ -1401,7 +1400,7 @@ module.exports = {
             else
                 return commonFile.responseHandler(res, 200, "Success.", result)
         })
-     },
+    },
 
 
 
@@ -1410,17 +1409,17 @@ module.exports = {
 
 
     totalCollection: (req, res) => {
-        console.log("req.headers====>>>",req.headers)
+        console.log("req.headers====>>>", req.headers)
 
         async.waterfall([(callback) => {
-            user.find({ status:"ACTIVE" }, (err, user) => {
+            user.find({ status: "ACTIVE" }, (err, user) => {
                 if (err)
                     callback(err)
                 else
                     callback(null, user.length)
             })
         }, (user, callback) => {
-            
+
             let masterQuery = [
                 {
                     $group: { _id: "$brandName" }
@@ -1433,7 +1432,7 @@ module.exports = {
                     callback(null, { totalUser: user, totalBrand: brand.length })
             })
         }, (both, callback) => {
-            product.find({ status:"ACTIVE" }, (err, product) => {
+            product.find({ status: "ACTIVE" }, (err, product) => {
                 if (err)
                     callback(err)
                 else {
@@ -1453,6 +1452,25 @@ module.exports = {
 
 
 
+
+
+    //======================async-await=====================================
+    // function doubleAfter2Seconds(x) {
+    // return new Promise(resolve => {
+    // setTimeout(() => {
+    // resolve(x * 2);
+    // }, 2000);
+    // });
+    // }
+    // async function addAsync(x) {
+    // const a = await doubleAfter2Seconds(10);
+    // const b = await doubleAfter2Seconds(20);
+    // const c = await doubleAfter2Seconds(30);
+    // return x + a + b + c;
+    // }
+    // addAsync(10).then((sum) => {
+    // console.log(sum);
+    // });
 
 
 

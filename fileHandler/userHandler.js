@@ -1064,8 +1064,7 @@ module.exports = {
                     }
                 }
             })
-
-
+            
         }, (result, callback) => {
 
             favourite.find({ productId: req.body.productId }, (err, favourite) => {
@@ -3928,6 +3927,13 @@ module.exports = {
             })
 
     },
+
+
+
+
+
+
+
 
     //************************** buy package api *****************************/
     buyPackage: (req, res) => {
