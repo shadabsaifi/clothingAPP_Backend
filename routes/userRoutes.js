@@ -4,8 +4,8 @@ const userHandler = require('../fileHandler/userHandler.js')
 const commonFile = require('../fileHandler/commonFile.js')
 
 
-
-// clothing App API start 
+// clothing App API start
+// userRoutes.get('/session', userHandler.session.required())
 
 userRoutes.post('/verifyToken',userHandler.verifyToken)
 userRoutes.post('/checkSubscription',userHandler.checkSubscription)

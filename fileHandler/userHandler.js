@@ -15,11 +15,21 @@ const style = require('../models/style.js')
 var randomstring = require("randomstring")
 var forEach = require('async-foreach').forEach
 
+
+
+
 // stripr Payment Getway start
 const keyPublishable = 'pk_test_a3o6GZZXrNDlLjDnpL4dfOaf';
 const keySecret = 'sk_test_0vKQEflQAPi2Mr9JmWYUtfmx';
 const stripe = require("stripe")(keySecret);
 // stripr Payment Getway end
+
+
+const authentication = require('express-authentication')
+const auth = authentication();
+const session = auth.for('session').use(function(req, res, next) {
+    // ...
+});
 
 
 
@@ -59,6 +69,11 @@ const stripe = require("stripe")(keySecret);
 
 
 module.exports = {
+
+
+    session:(req, res)=>{
+        
+    },
 
     //  api calls internally when user hit any piiverify token 
     verifyToken: (req, res, next) => {

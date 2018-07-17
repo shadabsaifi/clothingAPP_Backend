@@ -30,7 +30,7 @@ module.exports = {
     //     number: '+18555728559'
     // },
     speakeasy:{
-      secret_key:"tapNCulture@456"
+      secret_key:"clothing@456"
     },
     nodemailer:{
         pass: "sxd328shubham",
@@ -42,7 +42,7 @@ module.exports = {
     // mongo_url:"mongodb://localhost:27017/clothing",
     // mongo_url:"mongodb://localhost:27017/clothing1",
     mongo_url:"mongodb://ec2-52-76-162-65.ap-southeast-1.compute.amazonaws.com:27017/clothing",
-    jwt1SecretKey:"anujdubeyNode",
+    jwt1SecretKey:"shadabSaifiNode",
     jwtSecretKey:"clothing",
     cloud:{
             cloud_name:"dvflctxao",

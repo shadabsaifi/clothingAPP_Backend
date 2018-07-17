@@ -1186,14 +1186,72 @@ module.exports = {
 
         let query = { _id: req.body.productId }
 
-        product.findByIdAndUpdate(query, req.body, { new: true }, (err, result) => {
+        async.waterfall([(callback)=>{
+
+            let update = { }
+            
+            if(req.body.productDesc){
+                update.productDesc = req.body.productDesc
+            }
+            if(req.body.productLink){
+                update.productLink = req.body.productLink
+            }
+            
+            product.findByIdAndUpdate(query, update, { new:true },   (err, result) => {
+                if (err)
+                    return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                else if (result)
+                    callback(null, result)
+                else
+                    callback({err:err, resCode:409, msg:"Product id not found."})
+            })
+
+        }, (product, callback)=>{
+            
+            asyncForEach(req.body.productDetail, function (item, index, next) {
+                let update =  { }
+                console.log("index================>", index, item)
+                if(item.productPrice){
+                    update["productDetail.$.productPrice"] = item.productPrice
+                }
+                if(item.productSize.length){
+                    update.$addToSet = { "productDetail.$.productSize":{ $each:item.productSize.sort() } }
+                }
+                if(item.productImage.length){
+                    
+                    commonFile.uploadMultipleImages(item.productImage, (url) => {
+                        if (url != undefined) {
+                            update['$addToSet']["productDetail.$.productImage"] = { $each:url }
+                            
+                            product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
+                                if(err)
+                                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                                else
+                                    next();
+                            })
+
+                        }
+                    })
+                }
+                else{
+                    next()
+                }
+                
+            }, function (err, result) {
+                if (err)
+                    callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                else
+                    callback(null, "done")
+                
+            })
+
+        }], (err, finalResult)=>{
             if (err)
-                return commonFile.responseHandler(res, 400, "Internal Server Error.")
-            else if (result)
-                return commonFile.responseHandler(res, 200, "success.", result)
+                return commonFile.responseHandler(res, err.resCode, err.msg, err.err)
             else
-                return commonFile.responseHandler(res, 409, "Product not found.")
+                return commonFile.responseHandler(res, 200, "Product successfully updated.")
         })
+        
     },
 
 
