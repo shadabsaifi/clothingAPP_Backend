@@ -1208,33 +1208,116 @@ module.exports = {
 
         }, (product, callback)=>{
             
+            
             asyncForEach(req.body.productDetail, function (item, index, next) {
-                let update =  { }
+                
                 console.log("index================>", index, item)
-                if(item.productPrice){
-                    update["productDetail.$.productPrice"] = item.productPrice
-                }
-                if(item.productSize.length){
-                    update.$addToSet = { "productDetail.$.productSize":{ $each:item.productSize.sort() } }
-                }
-                if(item.productImage.length){
+                if(item._id){
                     
-                    commonFile.uploadMultipleImages(item.productImage, (url) => {
-                        if (url != undefined) {
-                            update['$addToSet']["productDetail.$.productImage"] = { $each:url }
-                            
-                            product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
-                                if(err)
-                                    callback({err:err, resCode:400, msg:"Internal Sever Error."})
-                                else
-                                    next();
+                    let update =  { }
+                    
+                    if(item.productPrice){
+                        update["productDetail.$.productPrice"] = item.productPrice
+                    }
+                    
+                    if(item.productSize.length){
+                        update.$addToSet = { "productDetail.$.productSize":{ $each:item.productSize.sort() } }
+                    }
+                    
+                    if(item.productImage.length && item.tryOnImage.length){
+                        console.log("productImage.length && tryOnImage.length")
+                        commonFile.uploadMultipleImages(item.productImage, (url1) => {
+                            if (url1 != undefined) {
+                                update['$addToSet']["productDetail.$.productImage"] = { $each:url1 }
+                                
+                                commonFile.uploadMultipleImages(item.tryOnImage, (url2) => {
+                                    if (url2 != undefined) {
+                                        update['$addToSet']["productDetail.$.tryOnImage"] = { $each:url2 }
+                                        
+                                        product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
+                                            if(err)
+                                                callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                                            else
+                                                next();
+                                        })
+            
+                                    }
+                                })
+    
+                            }
+                        })
+                    }
+
+                    if(item.productImage.length && !item.tryOnImage.length){
+                        console.log("productImage.length")
+                        commonFile.uploadMultipleImages(item.productImage, (url) => {
+                            if (url != undefined) {
+                                update['$addToSet']["productDetail.$.productImage"] = { $each:url }
+                                
+                                product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
+                                    if(err)
+                                        callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                                    else
+                                        next();
+                                })
+    
+                            }
+                        })
+                    }
+                    
+                    if(!item.productImage.length && item.tryOnImage.length){
+                        console.log("tryOnImage.length")
+                        commonFile.uploadMultipleImages(item.tryOnImage, (url) => {
+                            if (url != undefined) {
+                                update['$addToSet']["productDetail.$.tryOnImage"] = { $each:url }
+                                
+                                product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
+                                    if(err)
+                                        callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                                    else
+                                        next();
+                                })
+    
+                            }
+                        })
+                    }
+                    else{
+
+                        product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
+                            if(err)
+                                callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                            else
+                                next();
+                        })
+                    }
+                }
+                else{
+
+                    let newObj = { 
+                        productColor:item.productColor,
+                        productPrice:item.productPrice,
+                        productSize:item.productSize.sort(),
+                    }
+
+                    commonFile.uploadMultipleImages(item.productImage, (url1) => {
+                        if (url1 != undefined) {
+                            newObj.productImage = { $each:url1 }
+                            commonFile.uploadMultipleImages(item.tryOnImage, (url2) => {
+                                if (url2 != undefined) {
+                                    newObj.tryOnImage = { $each:url2 }
+                                    product.findByIdAndUpdate({ _id:req.body.productId }, { $push:{ productDetail:newObj } }, {new:true}, (err, result)=>{
+                                        if(err)
+                                            callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                                        else
+                                            next();
+                                    })
+        
+                                }
                             })
 
                         }
                     })
-                }
-                else{
-                    next()
+
                 }
                 
             }, function (err, result) {
