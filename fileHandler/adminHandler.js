@@ -11,6 +11,7 @@ const boostPurchases = require('../models/boost-purchases.js')
 const staticContent = require('../models/staticContent')
 const premiumAccount = require('../models/premiumAccount')
 const cloudinary = require('cloudinary')
+var forEach = require('async-foreach').forEach;
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, './i_have_created_this_folder/')
@@ -220,6 +221,7 @@ module.exports = {
             else if (firstResult)
                 return commonFile.responseHandler(res, 409, "Email id already registered.")
             else {
+                
                 var name = (req.body.name).toLowerCase();
                 var fullName = ""
                 let array = name.split(" ")
@@ -720,262 +722,7 @@ module.exports = {
 
     },
 
-
-
-
-
-
-    // @@@@@@@@@@@@@@@@@@@@@@@  addNewProduct Api to add product by admin panel   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
-
-    // addNewProduct: (req, res) => {
-    //     console.log("req.body========>>>>", req.body)
-    //     if (!req.body.createdBy || !req.body.productName || !req.body.bodyType || !req.body.brandName ||  !req.body.productType || !req.body.productPrice || !req.body.productDesc || !req.body.productImage || !req.body.productLink || !req.body.productGender) {
-    //         return commonFile.responseHandler(res, 400, "Error: Parameters missing")
-    //     }
-
-
-    //     if (req.body.productGender.toLowerCase() === 'male') {
-    //         req.body.productGender = 'Male'
-    //     }
-    //     if (req.body.productGender.toLowerCase() === 'female') {
-    //         req.body.productGender = 'Female'
-    //     }
-    //     if (req.body.productGender.toLowerCase() === 'both') {
-    //         req.body.productGender = 'Both'
-    //     }
-
-
-    //     async.waterfall([(callback) => {
-
-    //         admin.findById({ _id: req.body.createdBy }, (err, result) => {
-    //             if (err)
-    //                 return commonFile.responseHandler(res, 400, "Internal Server Error.")
-    //             else if (!result)
-    //                 return commonFile.responseHandler(res, 409, "admin not found.")
-    //             else
-    //                 callback(null, "done")
-    //         })
-
-    //     }, (next, callback) => {
-
-    //         commonFile.uploadMultipleImages(req.body.productImage, (url) => {
-    //             if (url != undefined) {
-    //                 req.body.productImage = url;
-    //                 callback(null, "done")
-    //             }
-    //         })
-
-    //     }, (next, callback) => {
-
-    //         var productName = (req.body.productName).toLowerCase();
-    //         var fullName = ""
-    //         let array = productName.split(" ")
-
-    //         var i = 0
-
-    //         do {
-    //             fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
-    //             i++;
-    //         } while (i < array.length)
-
-    //         req.body.productName = fullName.trim()
-
-
-    //         var brandName = (req.body.brandName).toLowerCase();
-    //         var fullBrandName = ""
-    //         let brandArray = brandName.split(" ")
-
-    //         var j = 0
-
-    //         do {
-    //             fullBrandName = fullBrandName + brandArray[j].charAt(0).toUpperCase() + brandArray[j].substr(1) + " ";
-    //             j++;
-    //         } while (j < brandArray.length)
-
-    //         req.body.brandName = fullBrandName.trim()
-
-
-
-
-    //         console.log("req.body.productName",req.body.productName)
-
-    //         new product(req.body).save((err, success) => {
-    //             if (err)
-    //                 return commonFile.responseHandler(res, 400, "Internal Server Error.", err)
-    //             else
-    //                 callback(null, success)
-    //         })
-
-    //     }], (err, finalResult) => {
-
-    //         if (err)
-    //             return commonFile.responseHandler(res, 400, "Internal Server Error.")
-    //         else
-    //             return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
-    //     })
-    // },
-
-
-
-
-
-
-
-
-
-
-
-
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  addNewProduct API New Version  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-    // addNewProduct: (req, res) => {
-    //     // console.log("req.body========>>>>", req.body)
-    //     if (!req.body.createdBy || !req.body.productName || !req.body.brandName || !req.body.productDesc ||  !req.body.productGender || !req.body.bodyType || !req.body.productImage.length || !req.body.tryOnImage.length || !req.body.productColor || !req.body.productSize.length || !req.body.productPrice || !req.body.productLink) {
-    //         return commonFile.responseHandler(res, 400, "Error: Parameters missing")
-    //     }
-
-    //     let arrayOfSize = req.body.productSize.sort((a, b)=>{
-    //             return a-b
-    //     })
-
-    //     let newProduct = { 
-    //         createdBy:req.body.createdBy,
-    //         brandName:req.body.brandName,
-    //         productDesc:req.body.productDesc,
-    //         bodyType:req.body.bodyType,
-    //         productLink:req.body.productLink,
-    //         productDetail:{ productColor:req.body.productColor, productPrice:req.body.productPrice, productSize:arrayOfSize, $position:0 } 
-    //      }
-
-    //     if (req.body.productGender.toLowerCase() === 'male') {
-    //         newProduct.productGender = 'Male'
-    //     }
-    //     if (req.body.productGender.toLowerCase() === 'female') {
-    //         newProduct.productGender = 'Female'
-    //     }
-
-
-    //     var productName = (req.body.productName).toLowerCase();
-    //         var fullName = ""
-    //         let array = productName.split(" ")
-
-    //         var i = 0
-
-    //         do {
-    //             fullName = fullName + array[i].charAt(0).toUpperCase() + array[i].substr(1) + " ";
-    //             i++
-    //         } while (i < array.length)
-
-    //         newProduct.productName = fullName.trim()
-
-
-    //         let query = { productName:newProduct.productName, brandName:req.body.brandName, bodyType:req.body.bodyType }
-
-    //     async.waterfall([(callback) => {
-
-    //         admin.findById({ _id: req.body.createdBy }, (err, result) => {
-    //             if (err)
-    //                 callback({err:err, resCode:400, msg:"Internal Sever Error."})
-    //             else if (!result)
-    //                 callback({resCode:409, msg:"admin not found."})
-    //             else
-    //                 callback(null, "done")
-    //         })
-
-    //     }, (next, callback) => {
-
-    //         product.findOne(query, (err, mixture)=>{
-    //             if (err)
-    //                 callback({err:err, resCode:400, msg:"Internal Sever Error."})
-    //             else
-    //                 callback(null, mixture)
-    //         })     
-
-    //     }, (mixture, callback)=>{
-
-    //         if(mixture){
-    //             let indColor = mixture.productDetail.findIndex((x)=> x.productColor === req.body.productColor)                
-    //                 if(indColor != -1){
-    //                     let productId = mixture.productDetail[indColor]._id
-    //                     let found =  { "productDetail.$.productPrice":req.body.productPrice, "productDetail.$.productColor":req.body.productColor }
-    //                     if(req.body.productSize.length){
-    //                             found.$addToSet = { "productDetail.$.productSize":{ $each:req.body.productSize  } }
-    //                     }
-    //                     commonFile.uploadMultipleImages(req.body.productImage, (url1) => {
-    //                         if (url1 != undefined) {
-    //                             found['$addToSet']["productDetail.$.productImage"] = { $each:url1 }
-    //                             commonFile.uploadMultipleImages(req.body.tryOnImage, (url2) => {
-    //                                 if (url2 != undefined) {
-    //                                     found['$addToSet']["productDetail.$.tryOnImage"] = { $each:url2 }
-    //                                     product.findOneAndUpdate({"productDetail._id":productId}, found, {new:true}, (err, result)=>{
-    //                                         if(err)
-    //                                             callback({err:err, resCode:400, msg:"Internal Sever Error."})
-    //                                         else
-    //                                             callback({err:result, resCode:200, msg:"You Have Successfully Update Product.", err:result})
-    //                                     })
-    //                                 }
-    //                             })
-    //                         }
-    //                     })
-
-    //                 }
-    //                 else{
-    //                     let newObj = { 
-    //                         productPrice:req.body.productPrice,
-    //                         productColor:req.body.productColor,
-    //                         productSize:req.body.productSize
-    //                     }
-    //                     commonFile.uploadMultipleImages(req.body.productImage, (url1) => {
-    //                         if (url1 != undefined) {
-    //                             newObj.productImage = url1
-    //                             commonFile.uploadMultipleImages(req.body.tryOnImage, (url2) => {
-    //                                 if (url2 != undefined) {
-    //                                     newObj.tryOnImage = url2
-    //                                     product.findOneAndUpdate(query, { $push:{ productDetail:newObj } }, {new:true}, (err, result)=>{
-    //                                         if(err)
-    //                                             callback({err:err, resCode:400, msg:"Internal Sever Error."})
-    //                                         else
-    //                                             callback({err:result, resCode:200, msg:"You Have Successfully Update Product."})
-    //                                     })
-    //                                 }
-    //                             })
-    //                         }
-    //                     })
-
-    //                 }
-    //         }
-    //         else{
-    //             commonFile.uploadMultipleImages(req.body.productImage, (url1) => {
-    //                 if (url1 != undefined){
-    //                     newProduct.productDetail.productImage = url1
-    //                     commonFile.uploadMultipleImages(req.body.tryOnImage, (url2) => {
-    //                         if (url2 != undefined){
-    //                             newProduct.productDetail.tryOnImage = url2
-    //                             callback(null, "done")
-    //                         }
-    //                     })
-    //                 }
-    //             })
-    //         }
-
-    //     }, (next, callback) => {
-
-    //         new product(newProduct).save((err, success) => {
-    //             if (err)
-    //                 callback({err:err, resCode:400, msg:"Internal Sever Error."})
-    //             else
-    //                 callback(null, success)
-    //         })
-
-    //     }], (err, finalResult) => {
-    //         if (err)
-    //             return commonFile.responseHandler(res, err.resCode, err.msg, err.err)
-    //         else
-    //             return commonFile.responseHandler(res, 200, "Product Successfully Added.", finalResult)
-    //     })
-    // },
-
-
+    // @@@@@@@@@@@@@@@@@@@@@@@  addNewProduct Api to Add The Product on Product Management  @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
 
 
     addNewProduct: (req, res) => {
@@ -988,10 +735,11 @@ module.exports = {
         let newProduct = {
             createdBy: req.body.createdBy,
             brandName: req.body.brandName,
+            dressType:req.body.dressType,
             productDesc: req.body.productDesc,
             bodyType: req.body.bodyType,
             productLink: req.body.productLink,
-            productDetail: req.body.productDetail
+            productDetail:req.body.productDetail
         }
 
 
@@ -1018,7 +766,7 @@ module.exports = {
         newProduct.productName = fullName.trim()
 
 
-        let query = { productName: newProduct.productName, brandName: req.body.brandName, bodyType: req.body.bodyType }
+        let query = { productName: newProduct.productName, brandName: req.body.brandName, bodyType: req.body.bodyType, dressType:req.body.dressType }
 
         async.waterfall([(callback) => {
 
@@ -1050,24 +798,61 @@ module.exports = {
 
                 asyncForEach(req.body.productDetail, function (item, index, next) {
                     console.log("index================>", index)
-                    newProduct.productDetail[index].productSize = item.productSize.sort()
-                    commonFile.uploadMultipleImages(item.productImage, (url) => {
-                        if (url != undefined) {
-                            newProduct.productDetail[index].productImage = url
-                            if (index == 0) {
-                                newProduct.productImage = url
-                                newProduct.productPrice = item.productPrice
+                    
+                    newProduct.productDetail[index].productSize = item.productSize.sort()                    
+                    newProduct.productPrice = item.productPrice
+                    newProduct.productColor = item.productColor
+                    
+                    if(item.productImage.length && item.tryOnImage.length){
+                        
+                        commonFile.uploadMultipleImages(item.productImage, (url) => {
+                            if (url != undefined) {
+                                newProduct.productDetail[index].productImage = url
+                                commonFile.uploadMultipleImages(item.tryOnImage, (url1) => {
+                                    if (url1 != undefined) {
+                                        newProduct.productDetail[index].tryOnImage = url1
+                                        if(index == 0){
+                                            newProduct.productImage = url
+                                            newProduct.productPrice = item.productPrice
+                                        }
+                                        next();
+                                    }
+                                })
                             }
+                        })
+                    }
+                    if(item.productImage.length && !item.tryOnImage.length){
+                        
+                        commonFile.uploadMultipleImages(item.productImage, (url) => {
+                            if (url != undefined) {
+                                newProduct.productDetail[index].productImage = url
+                                if(index == 0){
+                                    newProduct.productImage = url
+                                    newProduct.productPrice = item.productPrice
+                                }
+                                next()
+                            }
+                        })
+                    }
+                    if(!item.productImage.length && item.tryOnImage.length){
+                        
+                        commonFile.uploadMultipleImages(item.tryOnImage, (url) => {
+                            if (url != undefined) {
+                                newProduct.productDetail[index].tryOnImage = url
+                                if(index == 0){
+                                    newProduct.productImage = url
+                                    newProduct.productPrice = item.productPrice
+                                }
+                                next()
+                            }
+                        })
+                    }
 
-                            next();
-                        }
-                    })
                 }, function (err, result) {
                     if (err)
                         callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
                     else
                         callback(null, result)
-                    console.log("Iteration complete!");
                 });
 
             }
@@ -1184,157 +969,223 @@ module.exports = {
 
     updateProduct: (req, res) => {
 
+        console.log("tryon image req=====>>>", req.body)
         let query = { _id: req.body.productId }
+        let updateImage = {} // for showing new Pic in product 
 
-        async.waterfall([(callback)=>{
+        let count = 1
 
-            let update = { }
-            
-            if(req.body.productDesc){
+        async.waterfall([(callback) => {
+
+            let update = {}
+
+            if (req.body.productDesc) {
                 update.productDesc = req.body.productDesc
             }
-            if(req.body.productLink){
+            if (req.body.productLink) {
                 update.productLink = req.body.productLink
             }
-            
-            product.findByIdAndUpdate(query, update, { new:true },   (err, result) => {
+
+            product.findByIdAndUpdate(query, update, { new: true }, (err, result) => {
                 if (err)
                     return commonFile.responseHandler(res, 400, "Internal Server Error.")
                 else if (result)
                     callback(null, result)
                 else
-                    callback({err:err, resCode:409, msg:"Product id not found."})
+                    callback({ err: err, resCode: 409, msg: "Product id not found." })
             })
 
-        }, (product, callback)=>{
-            
-            
-            asyncForEach(req.body.productDetail, function (item, index, next) {
-                
-                console.log("index================>", index, item)
-                if(item._id){
-                    
-                    let update =  { }
-                    
-                    if(item.productPrice){
+        }, (result, callback) => {
+
+            asyncForEach(req.body.productDetail, (item, index, next) => {
+
+                if (item._id) {
+                    console.log("item._id======>>>>",item._id)
+                    console.log("productDetail.length======>>>>",req.body.productDetail.length)
+                    let update = {}
+
+                    if (item.productPrice) {
                         update["productDetail.$.productPrice"] = item.productPrice
                     }
-                    
-                    if(item.productSize.length){
-                        update.$addToSet = { "productDetail.$.productSize":{ $each:item.productSize.sort() } }
+
+                    if (item.productSize.length) {
+                        update.$addToSet = { "productDetail.$.productSize": { $each: item.productSize.sort() } }
                     }
-                    
-                    if(item.productImage.length && item.tryOnImage.length){
+
+                    if (item.productImage.length && item.tryOnImage.length) {
                         console.log("productImage.length && tryOnImage.length")
                         commonFile.uploadMultipleImages(item.productImage, (url1) => {
                             if (url1 != undefined) {
-                                update['$addToSet']["productDetail.$.productImage"] = { $each:url1 }
-                                
+                                if(index == 0){
+                                    updateImage.productImage = url1[0]
+                                }
+                                update['$addToSet']["productDetail.$.productImage"] = { $each: url1 }
                                 commonFile.uploadMultipleImages(item.tryOnImage, (url2) => {
                                     if (url2 != undefined) {
-                                        update['$addToSet']["productDetail.$.tryOnImage"] = { $each:url2 }
-                                        
-                                        product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
-                                            if(err)
-                                                callback({err:err, resCode:400, msg:"Internal Sever Error."})
-                                            else
-                                                next();
+                                        let image = { "productDetail.$.productImage": [], "productDetail.$.tryOnImage": [] }
+                                        product.update({ "productDetail._id": item._id }, image, (err, result) => {
+                                            console.log("result=====>>>>",err, result)
+                                            if (err)
+                                                callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                                            else {
+                                                update['$addToSet']["productDetail.$.tryOnImage"] = { $each: url2 }
+
+                                                product.update({ "productDetail._id": item._id }, update, (err, result1) => {
+                                                    console.log("result1=====>>>>",err, result1)
+                                                    if (err)
+                                                        callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                                                    else
+                                                       next()
+                                                })
+                                            }
                                         })
-            
+
                                     }
                                 })
-    
+
                             }
                         })
                     }
 
-                    if(item.productImage.length && !item.tryOnImage.length){
-                        console.log("productImage.length")
+                    if (item.productImage.length && !item.tryOnImage.length) {
+
                         commonFile.uploadMultipleImages(item.productImage, (url) => {
                             if (url != undefined) {
-                                update['$addToSet']["productDetail.$.productImage"] = { $each:url }
-                                
-                                product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
-                                    if(err)
-                                        callback({err:err, resCode:400, msg:"Internal Sever Error."})
-                                    else
-                                        next();
+                                if(index == 0){
+                                    updateImage.productImage = url[0]
+                                }
+                                let image = { "productDetail.$.productImage": [] }
+                                product.update({ "productDetail._id": mongoose.Types.ObjectId(item._id) }, image, (err, result) => {
+                                    console.log("image======>>>", url, result)
+                                    if (err)
+                                        callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                                    else {
+
+                                        update['$addToSet']["productDetail.$.productImage"] = { $each: url }
+
+                                        product.update({ "productDetail._id": mongoose.Types.ObjectId(item._id) }, update, (err, result) => {
+                                            console.log("result===========>>>item", result)
+                                            if (err)
+                                                callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                                            else
+                                                next()
+                                        })
+                                    }
+
                                 })
-    
+
                             }
                         })
                     }
-                    
-                    if(!item.productImage.length && item.tryOnImage.length){
+
+                    if (!item.productImage.length && item.tryOnImage.length) {
                         console.log("tryOnImage.length")
                         commonFile.uploadMultipleImages(item.tryOnImage, (url) => {
                             if (url != undefined) {
-                                update['$addToSet']["productDetail.$.tryOnImage"] = { $each:url }
-                                
-                                product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
-                                    if(err)
-                                        callback({err:err, resCode:400, msg:"Internal Sever Error."})
-                                    else
-                                        next();
+                                if(index == 0){
+                                    updateImage.productImage = url[0]
+                                }
+                                let image = { "productDetail.$.tryOnImage": [] }
+
+                                product.findByIdAndUpdate({ "productDetail._id": item._id }, image, { new: true }, (err, result) => {
+                                    if (err)
+                                        callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                                    else {
+
+                                        update['$addToSet']["productDetail.$.tryOnImage"] = { $each: url }
+                                        product.findByIdAndUpdate({ "productDetail._id": item._id }, update, { new: true }, (err, result) => {
+                                            if (err)
+                                                callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                                            else 
+                                                next()
+                                        })
+                                    }
+
                                 })
-    
                             }
                         })
                     }
-                    else{
-
-                        product.findByIdAndUpdate({ "productDetail._id":item._id }, update, {new:true}, (err, result)=>{
-                            if(err)
-                                callback({err:err, resCode:400, msg:"Internal Sever Error."})
+                    if(!item.productImage.length && !item.tryOnImage.length){
+                        product.update({ "productDetail._id": item._id }, update, { new: true }, (err, result) => {
+                            if (err)
+                                callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
                             else
-                                next();
+                                next()
                         })
                     }
                 }
-                else{
+                else {
 
-                    let newObj = { 
-                        productColor:item.productColor,
-                        productPrice:item.productPrice,
-                        productSize:item.productSize.sort(),
+                    console.log("product id nhi hai")
+                    let newObj = {
+                        productColor: item.productColor,
+                        productPrice: item.productPrice,
+                        productSize: item.productSize.sort(),
                     }
 
                     commonFile.uploadMultipleImages(item.productImage, (url1) => {
                         if (url1 != undefined) {
-                            newObj.productImage = { $each:url1 }
-                            commonFile.uploadMultipleImages(item.tryOnImage, (url2) => {
-                                if (url2 != undefined) {
-                                    newObj.tryOnImage = { $each:url2 }
-                                    product.findByIdAndUpdate({ _id:req.body.productId }, { $push:{ productDetail:newObj } }, {new:true}, (err, result)=>{
-                                        if(err)
-                                            callback({err:err, resCode:400, msg:"Internal Sever Error."})
-                                        else
-                                            next();
-                                    })
-        
-                                }
-                            })
+                            if(index == 0){
+                                updateImage.productImage = url1[0]
+                            }
+                            newObj.productImage = url1
+                            if(!item.tryOnImage || !item.tryOnImage.length){
+                                console.log("tryOn Image nhi hai")
+                                product.update({ _id: req.body.productId }, { $push: { productDetail: newObj } }, (err, result) => {
+                                    console.log("result=======>>>>>bina id wala", result)
+                                    if (err)
+                                        callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                                    else
+                                        next()
+                                })
+                            }
+                            else{
+
+                                console.log("tryOn Image hai")
+                                commonFile.uploadMultipleImages(item.tryOnImage, (url2) => {
+                                    if (url2 != undefined) {
+                                        newObj.tryOnImage = url2
+                                        console.log("newObj==========>>>", newObj)
+                                        product.update({ _id: req.body.productId }, { $push: { productDetail: newObj } }, (err, result) => {
+                                            console.log("result=======>>>>>bina id wala", result)
+                                            if (err)
+                                                callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                                            else
+                                                next()
+                                        })
+    
+                                    }
+                                })
+                            }
 
                         }
                     })
 
                 }
-                
+
             }, function (err, result) {
-                if (err)
-                    callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
-                else
-                    callback(null, "done")
-                
+                    if (err)
+                        callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                    else{
+                        product.findByIdAndUpdate(query, updateImage, { new:true }, (err, product) => {
+                            if (err)
+                                callback({ err: err, resCode: 400, msg: "Internal Sever Error." })
+                            else
+                                callback(null, result)
+                        })
+                    }
+                        
             })
 
-        }], (err, finalResult)=>{
+        }], (err, finalResult) => {
+            console.log("success")
             if (err)
                 return commonFile.responseHandler(res, err.resCode, err.msg, err.err)
             else
+
                 return commonFile.responseHandler(res, 200, "Product successfully updated.")
         })
-        
+
     },
 
 

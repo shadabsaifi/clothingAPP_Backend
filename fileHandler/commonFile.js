@@ -88,6 +88,7 @@ module.exports = {
     imageUploadToCloudinary: (imageB64, callback) => {
         // console.log(imageB64)
         cloudinary.v2.uploader.upload(imageB64, (err, result) => {
+            console.log('result==>>>', result)
             callback(result.url);
         })
     },

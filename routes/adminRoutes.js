@@ -17,7 +17,7 @@ adminRoutes.post('/deleteProduct',adminHandler.verifyToken,adminHandler.deletePr
 adminRoutes.post('/productDetail',adminHandler.verifyToken,adminHandler.productDetail)
 adminRoutes.post('/productList',adminHandler.verifyToken,adminHandler.productList)
 adminRoutes.post('/brandNameOnAddProduct',adminHandler.verifyToken,adminHandler.brandNameOnAddProduct)
-adminRoutes.post('/updateProduct',adminHandler.verifyToken,adminHandler.updateProduct)
+adminRoutes.post('/updateProduct',adminHandler.updateProduct)
 adminRoutes.post('/userDetail',adminHandler.verifyToken,adminHandler.userDetail)
 adminRoutes.post('/deleteUser',adminHandler.verifyToken,adminHandler.deleteUser)
 adminRoutes.post('/bodyTypeBrandList',adminHandler.verifyToken,adminHandler.bodyTypeBrandList)

@@ -54,7 +54,7 @@ let StaticContent=mongoose.Schema({
 
 });
 
-let StaticContentMgmt=mongoose.model('staticContent',StaticContent,'staticContent');
+let StaticContentMgmt = mongoose.model('staticContent',StaticContent,'staticContent');
 module.exports=StaticContentMgmt;
 
 StaticContentMgmt.findOne({}, (error, success) => {

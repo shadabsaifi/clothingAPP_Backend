@@ -506,7 +506,9 @@ module.exports = {
                     callback(null, customerId, subscriptionId)
             })
         }, (customerId, subscriptionId, callback)=>{
+
             let update = { isSubscription:true, stripeId:customerId, subscriptionsId:subscriptionId }
+            
             user.findByIdAndUpdate({ _id:req.body.userId }, update, { new:true }, (err, result)=>{
                 if(err)
                     callback(err)
@@ -1018,7 +1020,7 @@ module.exports = {
                     callback(err)
                 else {
                     if(result.docs.length){
-                        console.log("result.docs.length=======>>>",result.docs.length)
+                        console.log("result.docs.length=======>>>",result.docs)
                         result.docs.map((x) => {
                             let index = userResult.myFavourite.findIndex((y) => y.product._id.toString() === x._id.toString())
                             if (index != -1) {

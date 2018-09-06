@@ -12,8 +12,6 @@ const cors = require('cors')
 var sessions = require("client-sessions");
 
 
-
-
 mongoose.connect(config.mongo_url, { useMongoClient: true })
 
 app.use(morgan('dev'))

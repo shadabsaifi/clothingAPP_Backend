@@ -11,6 +11,10 @@ let productSchema = new Schema({
 	brandName: {
 		type: String
 	},
+	dressType:{
+		type:String,
+		enum:['upper', 'bottom']
+	},
 	productDesc: {
 		type: String
 	},
