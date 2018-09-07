@@ -304,6 +304,7 @@ var AddProductComponent = /** @class */ (function () {
         }
     };
     AddProductComponent.prototype.addMore = function () {
+        this.showProductForm = true;
         if (this.productSize.length == 0) {
             this.sizeVali = "*Please select size.";
         }
@@ -335,6 +336,7 @@ var AddProductComponent = /** @class */ (function () {
             this.moreData.m = false;
             this.moreData.s = false;
             this.trialImage = [];
+            this.tryonImage = [];
             this.productSize = [];
         }
         //this.addProductDetail.push({});
