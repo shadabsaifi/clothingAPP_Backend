@@ -614,6 +614,28 @@ module.exports = {
 
     },
 
+    // @@@@@@@@@@@@@@@@@@@@@@@  maskImageUpload Api to upload mask image   @@@@@@@@@@@@@@@@@@@@@@@@@@@@ //
+
+    maskImageUpload:(req, res)=>{
+        console.log("maskImageUpload req.body========>>>>", req.body)
+        if (!req.body.userId || !req.body.maskImage) {
+            return commonFile.responseHandler(res, 400, "Parameters Missing.")
+        }
+        commonFile.imageUploadToCloudinary(req.body.maskImage, (url)=>{
+            if(url != undefined){
+                user.findByIdAndUpdate({ _id:req.body.userId }, { maskImage:url }, { new:true }, (err, result)=>{
+                    if (err)
+                        return commonFile.responseHandler(res, 400, "Internal Server Error.")
+                    else if (result)
+                        return commonFile.responseHandler(res, 200, "Image successfully uploaded.")
+                    else
+                        return commonFile.responseHandler(res, 400, "User not found.")
+
+                })
+            }
+        })
+    },
+
 
 
 

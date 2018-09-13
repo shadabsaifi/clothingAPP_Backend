@@ -31,6 +31,10 @@ let User = mongoose.Schema({
         type: String,
         default:""
     },
+    maskImage:{
+        String:"",
+        default:""
+    },
     height:{
         type:Number
     },

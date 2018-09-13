@@ -18,6 +18,7 @@ userRoutes.post('/completeProfileSetup',userHandler.verifyToken,userHandler.comp
 userRoutes.post('/activeSubsciption',userHandler.verifyToken,userHandler.activeSubsciption)
 userRoutes.post('/cancelSubsciption',userHandler.verifyToken,userHandler.cancelSubsciption)
 userRoutes.post('/userDetail',userHandler.verifyToken,userHandler.userDetail)
+userRoutes.post('/maskImageUpload',userHandler.verifyToken,userHandler.maskImageUpload)
 userRoutes.post('/updateUserDetail',userHandler.verifyToken,userHandler.updateUserDetail)
 userRoutes.post('/likeUnlikeProduct',userHandler.verifyToken,userHandler.likeUnlikeProduct)
 userRoutes.post('/myFavourite',userHandler.verifyToken,userHandler.myFavourite)
