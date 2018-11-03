@@ -1,14 +1,10 @@
 module.exports = {
     
-        twilio: {
-        sid: "AC70d02cf2c76d11ff4e6c0f3e9ecfb923",
-        auth_token: "052a59ef85f9fec4aa0f8c7dd46886bb",
-        // number: '+19513192317' // vaibhav sir
-       //  number: '+918273242159' //anuj dubey
-        number:'+918053000680' // anshu mamrtjfjt
-
+    twilio:{
+        sid: "ACf786a64203b2524f8ee2878ee632bbe7",
+        auth_token: "0f53e378507e1543cd5e2ddfcf5389a1",
+        number:"(855) 572-8559"
     },
-
     speakeasy:{
       secret_key:"clothing@456"
     },

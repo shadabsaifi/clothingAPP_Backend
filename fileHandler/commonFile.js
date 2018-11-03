@@ -13,9 +13,7 @@ cloudinary.config({
     api_key: config.cloud.api_key,
     api_secret: config.cloud.api_secret
 });
-const accountSid = 'AC70d02cf2c76d11ff4e6c0f3e9ecfb923';
-const authToken = '052a59ef85f9fec4aa0f8c7dd46886bb';
-const client = require('twilio')(accountSid, authToken);
+const client = require('twilio')(config.twilio.sid, config.twilio.auth_token);
 let secret = speakEasy.generateSecret({ length: 20 });
 
 
@@ -86,7 +84,6 @@ module.exports = {
     },
 
     imageUploadToCloudinary: (imageB64, callback) => {
-        // console.log(imageB64)
         cloudinary.v2.uploader.upload(imageB64, (err, result) => {
             console.log('result==>>>', result)
             callback(result.url);
@@ -108,23 +105,15 @@ module.exports = {
 
     generateOTP: (callback) => {
         let secret = speakEasy.generateSecret({ length: 20 });
-        console.log("secret======>>>>>>"+JSON.stringify(secret))
-        // let token = speakEasy.totp({
-        //     secret: secret.base32,
-        //     encoding: 'base32'
-        // })
         let token = 123456;
         callback(token, secret);
     },
 
-    sendText: (number, otp, callback) => {
-        console.log(number, "====>>>", typeof(number))
+    sendText: (countryCode, number, otp, callback) => {
         client.messages
             .create({
-                to:  number,
-                from: "+19513192317", // vaibhav sir
-                // from: "+19783064180", // anshu mam
-                // from: "+14132695276", // shadab
+                to:  countryCode+number,
+                from:config.twilio.number,
                 body: 'Your one-time password for Tap Culture is' + otp,
             })
             .then((message) => {
@@ -154,16 +143,13 @@ module.exports = {
             provider: 'google',
            
             apiKey: 'AIzaSyB959XY2RqlTkZNYuNRp1EU_YiA3KjS71Q' // for Mapquest, OpenCage, Google Premier
-            // formatter: null         // 'gpx', 'string', ...
         };
         var geocoder = NodeGeocoder(options);
-        // fn = () => {
-            geocoder.geocode(place, function(err, result) {
-                // console.log(err, result);
-                if (result) {
-                    callback(result[0].latitude, result[0].longitude)
-                }
-            });
+        geocoder.geocode(place, function(err, result) {
+            if (result) {
+                callback(result[0].latitude, result[0].longitude)
+            }
+        });
        
     }
 
